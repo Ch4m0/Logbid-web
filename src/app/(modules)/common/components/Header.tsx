@@ -10,6 +10,7 @@ import {
 import useAuthStore from '@/src/store/authStore'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import MenuHeader from './MenuHeader'
 
 const getInitials = (name?: string, lastName?: string) => {
   const initials =
@@ -31,7 +32,7 @@ const Header = () => {
   }
 
   return (
-    <header className="flex items-center h-16 px-4 border-b shrink-0 md:px-6 mx-auto w-full ">
+    <header className="flex items-center h-16 px-4 shrink-0 md:px-6 mx-auto w-full ">
       <Link
         href="#"
         className="flex items-center gap-2 text-lg font-semibold md:text-base"
@@ -39,6 +40,9 @@ const Header = () => {
       >
         <span className="sr-only">LOGBID</span>
       </Link>
+      <div className="flex-1 flex justify-center">
+        <MenuHeader /> {/* Coloca el componente MenuHeader en el centro */}
+      </div>
       <div className="ml-auto flex items-center gap-4">
         <span className="text-sm font-bold">
           {user?.name} {user?.last_name}

@@ -1,5 +1,4 @@
 'use client'
-
 import { useEffect, useState } from 'react'
 import {
   Tabs,
@@ -8,25 +7,37 @@ import {
   TabsTrigger,
 } from '@/src/components/ui/tabs'
 
-export default function CargoTransportTabs({ children1, children2 }: any) {
+interface CargoTransportTabsProps {
+  children1: React.ReactElement
+  children2: React.ReactElement
+  children3: React.ReactElement
+}
+
+export default function CargoTransportTabs({
+  children1,
+  children2,
+  children3,
+}: CargoTransportTabsProps) {
   const [activeTab, setActiveTab] = useState('sin-propuestas')
   const statusChildren1 = children1.props.status
   const statusChildren2 = children2.props.status
+  const statusChildren3 = children3.props.status
 
   useEffect(() => {
     try {
       const searchParams = new URLSearchParams(window.location.search)
       const statusParam = searchParams.get('status')
-
       if (statusParam === statusChildren1) {
         setActiveTab('sin-propuestas')
       } else if (statusParam === statusChildren2) {
         setActiveTab('con-propuestas')
+      } else if (statusParam === statusChildren3) {
+        setActiveTab('historico')
       }
     } catch (error) {
       console.error('Error reading URL parameters:', error)
     }
-  }, [statusChildren1, statusChildren2])
+  }, [statusChildren1, statusChildren2, statusChildren3])
 
   const changeUrl = (value: string) => {
     const url = new URL(window.location.href)
@@ -36,7 +47,7 @@ export default function CargoTransportTabs({ children1, children2 }: any) {
 
   return (
     <Tabs defaultValue={activeTab} value={activeTab} className="w-full mx-auto">
-      <TabsList className="grid w-full grid-cols-2">
+      <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger
           value="sin-propuestas"
           onClick={() => {
@@ -59,9 +70,21 @@ export default function CargoTransportTabs({ children1, children2 }: any) {
         >
           Con propuestas
         </TabsTrigger>
+        <TabsTrigger
+          value="historico"
+          onClick={() => {
+            setActiveTab('historico')
+            if (statusChildren3) {
+              changeUrl(statusChildren3)
+            }
+          }}
+        >
+          Histórico
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="sin-propuestas">{children1}</TabsContent>
       <TabsContent value="con-propuestas">{children2}</TabsContent>
+      <TabsContent value="historico">{children3}</TabsContent>
     </Tabs>
   )
 }

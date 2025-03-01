@@ -207,7 +207,7 @@ export default function CreateCargoTransport() {
     <div>
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
-          <Button onClick={() => setIsOpen(true)}>Crear viaje de carga</Button>
+          <Button onClick={() => setIsOpen(true)}>Crear</Button>
         </SheetTrigger>
 
         <SheetContent
