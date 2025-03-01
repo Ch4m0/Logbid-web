@@ -1,0 +1,13 @@
+version: '3.7'
+services:
+  nextjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000" # Mapea el puerto del contenedor al host
+    volumes:
+      - .:/app # Monta el directorio actual en el contenedor para desarrollo
+      - /app/node_modules # Evita conflictos con node_modules local
+    environment:
+      - NODE_ENV=development # Define el entorno

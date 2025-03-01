@@ -1,0 +1,71 @@
+'use client'
+import { Avatar, AvatarFallback, AvatarImage } from '@/src/components/ui/avatar'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/src/components/ui/dropdown-menu'
+import useAuthStore from '@/src/store/authStore'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+
+const getInitials = (name?: string, lastName?: string) => {
+  const initials =
+    name && lastName ? `${name.charAt(0)}${lastName.charAt(0)}` : ''
+  return initials.toUpperCase()
+}
+
+const Header = () => {
+  const router = useRouter()
+  const user = useAuthStore((state) => state.user)
+  const logout = useAuthStore((state) => state.logout)
+  const initials = getInitials(user?.name, user?.last_name)
+
+  const handleLogout = () => {
+    logout()
+    document.cookie =
+      'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;'
+    router.push('/auth')
+  }
+
+  return (
+    <header className="flex items-center h-16 px-4 border-b shrink-0 md:px-6 mx-auto w-full ">
+      <Link
+        href="#"
+        className="flex items-center gap-2 text-lg font-semibold md:text-base"
+        prefetch={false}
+      >
+        <span className="sr-only">LOGBID</span>
+      </Link>
+      <div className="ml-auto flex items-center gap-4">
+        <span className="text-sm font-bold">
+          {user?.name} {user?.last_name}
+        </span>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Avatar className="h-9 w-9">
+              <AvatarImage src="/placeholder-user.jpg" />
+              <AvatarFallback>
+                {initials ? <p>{initials}</p> : <p>No user data</p>}
+              </AvatarFallback>
+              <span className="sr-only">Toggle user menu</span>
+            </Avatar>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            {/*
+            <DropdownMenuItem>My Account</DropdownMenuItem>
+            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuSeparator /> */}
+            <DropdownMenuItem onClick={() => handleLogout()}>
+              Salir
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </header>
+  )
+}
+
+export default Header
