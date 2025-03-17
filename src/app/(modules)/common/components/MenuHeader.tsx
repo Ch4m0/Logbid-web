@@ -1,8 +1,17 @@
 import { Plane, Ship, Truck, Warehouse } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 // Definición de tipos
 type TransportType = 'air' | 'sea' | 'land' | 'warehouse' | null
+
+// Mapping for transport types to shipping_type URL parameter values
+const transportToShippingType = {
+  air: 'Aéreo',
+  sea: 'Marítimo',
+  land: 'Terrestre',
+  warehouse: 'Almacén',
+}
 
 interface ColorMap {
   air: string
@@ -12,8 +21,26 @@ interface ColorMap {
 }
 
 const MenuHeader: React.FC = () => {
-  // Estado para rastrear qué icono está seleccionado (marítimo preseleccionado)
-  const [selected, setSelected] = useState<TransportType>('sea')
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // Initialize selected state based on URL parameter
+  const initializeSelectedFromURL = (): TransportType => {
+    const shippingParam = searchParams.get('shipping_type')
+
+    if (shippingParam === 'Aéreo') return 'air'
+    if (shippingParam === 'Marítimo') return 'sea'
+    if (shippingParam === 'Terrestre') return 'land'
+    if (shippingParam === 'Almacén') return 'warehouse'
+
+    // Default to sea if not specified
+    return 'sea'
+  }
+
+  // Estado para rastrear qué icono está seleccionado
+  const [selected, setSelected] = useState<TransportType>(
+    initializeSelectedFromURL
+  )
 
   // Colores para cada tipo de transporte cuando están seleccionados
   const activeColors: ColorMap = {
@@ -31,13 +58,35 @@ const MenuHeader: React.FC = () => {
 
   // Función para manejar clics en iconos
   const handleSelect = (type: TransportType): void => {
-    // Si ya está seleccionado, deseleccionar
-    if (selected === type) {
-      setSelected(null)
-    } else {
-      setSelected(type)
-    }
+    if (type === null) return
+
+    // Always set the selected type
+    setSelected(type)
+
+    // Create new URL with updated parameters
+    const currentParams = new URLSearchParams(searchParams.toString())
+
+    // Add or update the shipping_type parameter
+    currentParams.set('shipping_type', transportToShippingType[type])
+
+    // Preserve market_id and status parameters
+    const marketId = searchParams.get('market_id') || '1'
+    const status = searchParams.get('status') || 'Active'
+
+    currentParams.set('market_id', marketId)
+    currentParams.set('status', status)
+
+    // Navigate to the updated URL
+    router.push(`/?${currentParams.toString()}`)
   }
+
+  // Update selected when URL changes
+  useEffect(() => {
+    const newSelected = initializeSelectedFromURL()
+    if (newSelected !== selected) {
+      setSelected(newSelected)
+    }
+  }, [searchParams])
 
   // Función para determinar qué clase de color aplicar
   const getColorClass = (type: TransportType): string => {

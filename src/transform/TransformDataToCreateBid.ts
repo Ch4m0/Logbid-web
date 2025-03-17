@@ -49,6 +49,7 @@ export class TransFormDataToCreateBid {
   constructor() {}
 
   transform(input: InputData): OutputData {
+    console.log(input, 'input')
     return {
       user_id: input.user_id, // Asignar un id de usuario fijo
       origin_id: input.origen, // Mantener el id de origen
@@ -67,7 +68,9 @@ export class TransFormDataToCreateBid {
       merchandise_type: input.tipoMercancia, // Tipo de mercancía
       dangerous_merch: input.cargaClasificacion === 'General' ? false : true, // Determinar si la mercancía es peligrosa
       tariff_item: input.partidaArancelaria, // Partida arancelaria
-      container_id: parseInt(input.contenedor), // Obtener el ID del contenedor
+      container_id: input.contenedor
+        ? parseInt(input.contenedor)
+        : parseInt(input.empaque), // Obtener el ID del contenedor o empaque si es null o vacío
       incoterms_id: parseInt(input.incoterm, 10), // Convertir incoterm a número
       market_id: input.market_id, // Asignar el id de mercado
     }

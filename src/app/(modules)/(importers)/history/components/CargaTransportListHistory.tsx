@@ -29,11 +29,15 @@ export function CargaTransportListHistory() {
     user?.all_markets[0]?.id?.toString() ??
     null
 
+  const shippingType = searchParams.get('shipping_type') as any
+
   const { data: bidList } = useGetBidList({
     user_id: user?.id || null,
     market_id: marketId,
     status: 'Closed',
+    shipping_type: shippingType,
   })
+
   const currentPage = Number(searchParams.get('page')) || 1
   const [itemsPerPage] = useState(10)
 

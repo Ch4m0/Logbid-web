@@ -33,6 +33,7 @@ import { useGetIncotermList } from '@/src/app/hooks/useGetIncotermList'
 import { useGetListContainer } from '@/src/app/hooks/useGetContainerList'
 import { useCreateBid } from '@/src/app/hooks/useCreateBid'
 import FilterableSelectMaritimePort from '@/src/app/(modules)/common/components/FilterableSelectMaritimePort'
+import { useQuery } from '@tanstack/react-query'
 
 // Definir el tipo para los valores del formulario
 interface FormValues {
@@ -124,8 +125,9 @@ const ErrorMessage = styled.span`
 
 export default function CreateCargoTransport() {
   const [isOpen, setIsOpen] = useState(false)
+  const [shippingType, setShippingType] = useState('Marítimo')
   const searchParams = useSearchParams()
-  const { data: containerList } = useGetListContainer()
+  const { data: containerList = [] } = useGetListContainer(shippingType)
 
   const user = useAuthStore((state) => state.user)
 
@@ -203,6 +205,8 @@ export default function CreateCargoTransport() {
     }
   }
 
+  console.log(containerList, 'containerList')
+
   return (
     <div>
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -224,9 +228,11 @@ export default function CreateCargoTransport() {
                 <Label htmlFor="tipoTransporte">Transporte</Label>
                 <Select
                   value={formik.values.tipoTransporte}
-                  onValueChange={(value) =>
-                    formik.setFieldValue('tipoTransporte', value)
-                  }
+                  onValueChange={(value) => {
+                    console.log(value, 'value')
+                    setShippingType(value)
+                    return formik.setFieldValue('tipoTransporte', value)
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar" />
@@ -274,9 +280,9 @@ export default function CreateCargoTransport() {
                     <FilterableSelectMaritimePort
                       label="Orígen"
                       value={formik.values.origen}
-                      onSelect={(option: any) =>
+                      onSelect={(option: any) => {
                         formik.setFieldValue('origen', option.id)
-                      }
+                      }}
                     />
                     <div className="text-red-500 min-h-[20px]">
                       {formik.errors.origen && formik.touched.origen && (
@@ -373,7 +379,7 @@ export default function CreateCargoTransport() {
                       <SelectValue placeholder="Seleccionar" />
                     </SelectTrigger>
                     <SelectContent>
-                      {containerList.map(
+                      {containerList?.map(
                         (item: { id: number; name: string }, index: number) => (
                           <SelectItem key={index} value={item.id.toString()}>
                             {item.name}
@@ -393,19 +399,27 @@ export default function CreateCargoTransport() {
                   <Label htmlFor="empaque">Empaque</Label>
                   <Select
                     value={formik.values.empaque}
-                    onValueChange={(value) =>
-                      formik.setFieldValue('empaque', value)
-                    }
+                    onValueChange={(value) => {
+                      console.log(value, 'value')
+                      return formik.setFieldValue('empaque', value)
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar" />
                     </SelectTrigger>
                     <SelectContent>
-                      {container_airplane.map((item, index) => (
+                      {/* containerList.map((item, index) => (
                         <SelectItem key={index} value={item}>
                           {item}
                         </SelectItem>
-                      ))}
+                      )) */}
+                      {containerList?.map(
+                        (item: { id: number; name: string }, index: number) => (
+                          <SelectItem key={index} value={item.id.toString()}>
+                            {item.name}
+                          </SelectItem>
+                        )
+                      )}
                     </SelectContent>
                   </Select>
                   <div className="text-red-500 min-h-[20px]">

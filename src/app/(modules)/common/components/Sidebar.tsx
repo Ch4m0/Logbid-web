@@ -14,7 +14,7 @@ const Sidebar = () => {
   const user = useAuthStore((state) => state.user)
 
   return (
-    <div className="w-[18rem] bg-blue-600 border-r">
+    <div className="w-[18rem] bg-primary border-r">
       <div className="flex flex-col h-screen">
         <div className="flex items-center justify-between h-16 px-4">
           <Link href="#" className="flex items-center gap-2" prefetch={false}>
@@ -109,7 +109,7 @@ const MarketItem = ({
             <Link
               key={index}
               href={`${item.url}?market_id=${market_id}`}
-              className="flex items-center gap-2 rounded-md px-3 py-2 text-md font-bold hover:bg-blue-700 hover:text-white text-white"
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-md font-bold hover:bg-purple hover:text-black text-white"
               prefetch={false}
             >
               {index === 0 ? <TripIcon /> : <HistoryIcon />}

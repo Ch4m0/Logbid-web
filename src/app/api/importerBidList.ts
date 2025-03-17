@@ -6,15 +6,17 @@ interface Args {
   market_id: string | null
   user_id: number | null
   status: 'Active' | 'Closed' | 'Offering'
+  shipping_type: 'Aéreo' | 'Marítimo'
 }
 
 export const getBidList = async ({
   market_id,
   user_id,
   status,
+  shipping_type,
 }: Args): Promise<BidListItem[]> => {
   const response = await apiClient.get(
-    `/importer/bid_list?user_id=${user_id}&market_id=${market_id}&status=${status}`
+    `/importer/bid_list?shipping_type=${shipping_type}&user_id=${user_id}&market_id=${market_id}&status=${status}`
   )
 
   // Mapea la respuesta para convertirla en una instancia de BidListItem
@@ -112,8 +114,12 @@ function organizeContainers(containers: any) {
   })
 }
 
-export const fetchListContainer = async () => {
-  const response = await apiClient.get(`/cross/get_containers`)
+export const fetchListContainer = async (shipping_type = 'Aéreo') => {
+  console.log(shipping_type, 'shipping_type')
+  const response = await apiClient.get(
+    `/cross/get_containers?shipping_type=${shipping_type}`
+  )
+  console.log(response.data)
   return organizeContainers(response.data.data)
 }
 
