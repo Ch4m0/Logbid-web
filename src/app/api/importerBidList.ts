@@ -89,7 +89,6 @@ export const fetchListIncoterm = async () => {
 }
 
 export const createBid = async (data: any) => {
-  console.log(data, 'data')
   const transformData = new TransFormDataToCreateBid()
   const dataTransformed = transformData.transform(data)
   const response = await apiClient.post(`/importer/create_bid`, {
@@ -115,11 +114,9 @@ function organizeContainers(containers: any) {
 }
 
 export const fetchListContainer = async (shipping_type = 'Aéreo') => {
-  console.log(shipping_type, 'shipping_type')
   const response = await apiClient.get(
     `/cross/get_containers?shipping_type=${shipping_type}`
   )
-  console.log(response.data)
   return organizeContainers(response.data.data)
 }
 

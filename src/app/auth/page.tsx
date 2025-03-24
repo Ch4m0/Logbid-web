@@ -26,7 +26,6 @@ export default function Auth() {
       { email, password },
       {
         onSuccess: ({ user }) => {
-          console.log(user, 'user')
           // Guardar usuario en Zustand
           document.cookie = `authToken=${user.uuid}; path=/;`
 
@@ -40,11 +39,10 @@ export default function Auth() {
 
   const handleUserRole = (roleId: number, market_id: number) => {
     if (roleId === IMPORTER) {
-      router.push(`/?market=${market_id}`)
+      router.push(`/?market=${market_id}&status=Active&shipping_type=Marítimo`)
     } else if (roleId === AGENT) {
       router.push('/bid_list')
     } else {
-      // Puedes manejar otros roles aquí si es necesario
       console.log('Unknown role')
     }
   }

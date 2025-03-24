@@ -70,7 +70,6 @@ const validationSchema = Yup.object({
       : schema.notRequired() // Para otros tipos de transporte, no se requiere
   }),
   empaque: Yup.string().when('tipoTransporte', (tipoTransporte, schema) => {
-    console.log(tipoTransporte)
     return tipoTransporte[0] === 'Marítimo'
       ? schema.notRequired() // Si es "maritimo", no se requiere
       : schema.required('El empaque es requerido') // Requiere "empaque" para otros tipos de envío
