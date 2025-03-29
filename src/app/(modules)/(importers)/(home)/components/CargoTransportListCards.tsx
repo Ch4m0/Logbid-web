@@ -9,7 +9,7 @@ import {
 import { Input } from '@/src/components/ui/input'
 import { modalService } from '@/src/service/modalService'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Suspense, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import CreateCargoTransport from './CreateCargoTransport/CreateCargoTransport'
 import { ExtendCargoTransport } from './ExtendCargoTransport'
 import { useBidStore } from '@/src/store/useBidStore'
@@ -28,6 +28,7 @@ import {
 } from 'lucide-react'
 import { Badge } from '@/src/components/ui/badge'
 import { Separator } from '@/src/components/ui/separator'
+import { ShippingType } from '@/src/models/common'
 
 interface CargoTransporListProps {
   status: 'Active' | 'Closed' | 'Offering'
@@ -45,14 +46,20 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
     user?.all_markets[0]?.id?.toString() ??
     null
 
-  const shippingType = searchParams.get('shipping_type') as any
 
-  const { data: bidList } = useGetBidList({
+  const shippingType = searchParams.get('shipping_type') || 'Marítimo'
+
+
+  const { data: bidList, refetch } = useGetBidList({
     user_id: user?.id || null,
     market_id: marketId,
     status,
-    shipping_type: shippingType,
+    shipping_type: shippingType as ShippingType,
   })
+
+   useEffect(() => {
+      refetch()
+  }, [shippingType, refetch])
 
   const currentPage = Number(searchParams.get('page')) || 1
 

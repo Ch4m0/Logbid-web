@@ -20,6 +20,7 @@ interface ColorMap {
 
 const MenuHeader: React.FC = () => {
   const router = useRouter()
+
   const searchParams = useSearchParams()
 
   const initializeSelectedFromURL = (): TransportType => {

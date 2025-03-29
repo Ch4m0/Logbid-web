@@ -26,13 +26,18 @@ export default function CargoTransportTabs({
   useEffect(() => {
     try {
       const searchParams = new URLSearchParams(window.location.search)
+
       const statusParam = searchParams.get('status')
+
       if (statusParam === statusChildren1) {
         setActiveTab('sin-propuestas')
+
       } else if (statusParam === statusChildren2) {
         setActiveTab('con-propuestas')
+
       } else if (statusParam === statusChildren3) {
         setActiveTab('historico')
+
       }
     } catch (error) {
       console.error('Error reading URL parameters:', error)
@@ -41,7 +46,9 @@ export default function CargoTransportTabs({
 
   const changeUrl = (value: string) => {
     const url = new URL(window.location.href)
+
     url.searchParams.set('status', value)
+    
     window.history.pushState({}, '', url.toString())
   }
 
