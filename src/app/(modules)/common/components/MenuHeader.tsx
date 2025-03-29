@@ -64,6 +64,8 @@ const MenuHeader: React.FC = () => {
     currentParams.set('market_id', marketId)
     currentParams.set('status', status)
 
+    currentParams.delete('page')
+
     router.push(`/?${currentParams.toString()}`)
   }
 

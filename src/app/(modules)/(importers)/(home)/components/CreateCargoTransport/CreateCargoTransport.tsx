@@ -159,7 +159,6 @@ export default function CreateCargoTransport() {
     },
     validationSchema,
     onSubmit: (values) => {
-      console.log(JSON.stringify(values))
       createBid(
         {
           ...values,
@@ -204,7 +203,6 @@ export default function CreateCargoTransport() {
     }
   }
 
-  console.log(containerList, 'containerList')
 
   return (
     <div>
