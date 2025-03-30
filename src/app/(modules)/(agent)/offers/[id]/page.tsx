@@ -63,7 +63,6 @@ const Page = () => {
       },
       {
         onSuccess: (data) => {
-          console.log(data, 'data')
           setBidDataForAgent(data)
         },
         onError: (error) => {
@@ -78,6 +77,7 @@ const Page = () => {
   }
 
   const handleCreateOffer = (value: any) => {
+    console.log(value, 'value')
     modalService.showModal({
       component: ConfirmOffer,
       props: {
@@ -87,6 +87,7 @@ const Page = () => {
       },
     })
   }
+
   const closeConfirm = () => {
     modalService.closeModal()
   }

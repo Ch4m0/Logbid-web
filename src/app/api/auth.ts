@@ -7,7 +7,6 @@ interface Credential {
 }
 
 export const loginUser = async ({ email, password }: Credential) => {
-  console.log(email, password, 'entroo')
   const response = await apiClient.post(`/auth/login`, {
     email,
     password,
@@ -15,4 +14,3 @@ export const loginUser = async ({ email, password }: Credential) => {
   return response.data
 }
 
-// Otras funciones relacionadas con la autenticación, si las tienes

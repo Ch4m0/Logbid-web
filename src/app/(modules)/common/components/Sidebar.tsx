@@ -61,10 +61,6 @@ const list: List = {
       name: 'Viajes de carga',
     },
     {
-      url: '/history',
-      name: 'Histórico',
-    },
-    {
       url: '/graphics',
       name: 'Estadísticas',
     },

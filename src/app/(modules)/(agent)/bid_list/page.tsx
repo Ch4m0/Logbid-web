@@ -9,6 +9,7 @@ const page = () => {
         <CargoTransportTabs
           children1={<CargoTransporListAvaliable status={'Active'} />}
           children2={<CargoTransporListAvaliable status={'Offered'} />}
+          children3={<CargoTransporListAvaliable status={'Closed'} />}
         ></CargoTransportTabs>
       </Suspense>
     </div>

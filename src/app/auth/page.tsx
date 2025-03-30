@@ -41,7 +41,7 @@ export default function Auth() {
     if (roleId === IMPORTER) {
       router.push(`/?market=${market_id}&status=Active&shipping_type=Marítimo`)
     } else if (roleId === AGENT) {
-      router.push('/bid_list')
+      router.push(`/bid_list?market=${market_id}&status=Active&shipping_type=Marítimo`)
     } else {
       console.log('Unknown role')
     }

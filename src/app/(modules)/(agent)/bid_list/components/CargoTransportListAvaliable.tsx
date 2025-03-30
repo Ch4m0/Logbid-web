@@ -20,8 +20,9 @@ import { useGetBidListByMarket } from '@/src/app/hooks/useGetBidListByMarket'
 import useAuthStore from '@/src/store/authStore'
 import { useBidStore } from '@/src/store/useBidStore'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Suspense, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import Pagination from '../../../common/components/pagination/Pagination'
+import { ShippingType } from '@/src/models/common'
 
 interface BidByMarket {
   hasData: any
@@ -41,18 +42,21 @@ export function CargoTransporListAvaliable({ status }: CargoTransporListProps) {
   const searchParams = useSearchParams()
   const user = useAuthStore((state) => state.user)
   const router = useRouter()
-  console.log(status, 'status')
 
   const marketId =
     searchParams.get('market_id') ??
     user?.all_markets[0]?.id?.toString() ??
     null
 
-  const { data: bidList } = useGetBidListByMarket(
+  const shippingType = searchParams.get('shipping_type') || 'Marítimo'
+
+  const { data: bidList, refetch } = useGetBidListByMarket(
     marketId,
     status,
-    user?.id || null
+    user?.id || null,
+    shippingType as ShippingType
   )
+
 
   const [filters, setFilters] = useState({
     id: '',
@@ -117,6 +121,11 @@ export function CargoTransporListAvaliable({ status }: CargoTransporListProps) {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   )
+
+
+   useEffect(() => {
+      refetch()
+  }, [shippingType, refetch])
 
   return (
     <Card className="w-full">

@@ -145,7 +145,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
   return (
     <Card className="w-full">
       <CardHeader className="flex justify-between flex-row w-full">
-        <CardTitle className="font-bold">Marítimo</CardTitle>
+        <CardTitle className="font-bold">{shippingType}</CardTitle>
         <CreateCargoTransport />
       </CardHeader>
       <CardContent>

@@ -66,7 +66,7 @@ const MenuHeader: React.FC = () => {
 
     currentParams.delete('page')
 
-    router.push(`/?${currentParams.toString()}`)
+    router.push(`?${currentParams.toString()}`)
   }
 
   useEffect(() => {

@@ -17,7 +17,7 @@ const useAuthStore = create<AuthState>()(
       logout: () => set({ user: null }),
     }),
     {
-      name: 'logbidd-storage', // nombre del ítem en el storage (debe ser único)
+      name: 'logbidd-storage', 
     }
   )
 )

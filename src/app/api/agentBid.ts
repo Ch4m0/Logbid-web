@@ -1,11 +1,13 @@
+import { ShippingType } from '@/src/models/common'
 import { apiClient } from './apiClient'
 
 export const fetchListBidByMarket = async (
   market: string | null,
   status: string,
-  user_id: number | null
+  user_id: number | null,
+  shippingType: ShippingType
 ) => {
-  let url = `/market/get_bids_by_market_id?market_id=${market}&status=${status}`
+  let url = `/market/get_bids_by_market_id?market_id=${market}&status=${status}&shipping_type=${shippingType}`
   if (status === 'Offered') {
     url = url + `&user_id=${user_id}`
   }
