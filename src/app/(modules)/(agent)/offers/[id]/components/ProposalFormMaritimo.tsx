@@ -172,9 +172,9 @@ export default function ProposalFormMaritimo({
           time: 30,
           unit: 'min',
         },
+        cancellation_fee: 100,
+        free_days: 30,
       },
-      cancellation_fee: 100,
-      free_days: 30,
       freight_fees: {
         value: 5000,
         container: '40 HC',
