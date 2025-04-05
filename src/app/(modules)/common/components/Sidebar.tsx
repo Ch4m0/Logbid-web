@@ -70,10 +70,10 @@ const list: List = {
       url: '/bid_list',
       name: 'Viajes de carga',
     },
-    {
+   /* {
       url: '/history_offers',
       name: 'Histórico Propuestas',
-    },
+    },*/
     {
       url: '/graphics',
       name: 'Estadísticas',

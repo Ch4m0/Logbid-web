@@ -17,14 +17,18 @@ export const fetchListBidByMarket = async (
     id: item.id,
     uuid: item.uuid,
     inserted_at: item.inserted_at,
+    expiration_date: item.expiration_date,
     shipping_type: item.shipping_type,
     origin: item.origin_country + ' - ' + item.origin_name,
     destination: item.destination_country + ' - ' + item.destination_name,
+    destination_name: item.destination_name,
+    origin_name: item.origin_name,
+    last_price: item.last_price,
+    agent_code: item.agent_code,
   }))
 }
 
 export const createOffer = async (info: any) => {
-  console.log(info, 'info')
   const response = await apiClient.post(`/agent/v2/create_offer`, {
     ...info,
   })

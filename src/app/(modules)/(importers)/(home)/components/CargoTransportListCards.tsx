@@ -304,7 +304,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                 <div className="md:col-span-3 p-4 bg-muted/10">
                   <div className="space-y-2">
                     <Badge variant="outline" className="w-full justify-center">
-                      ID: {bid.uuid.substring(0, 8)}...
+                      ID: {bid.uuid.substring(0, 20)}
                     </Badge>
                     {STATUS.includes(status) && (
                       <Badge
@@ -318,7 +318,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                       <div className="flex items-center justify-center space-x-2 mt-3 bg-primary/10 p-2 rounded-md">
                         <DollarSign className="h-4 w-4 text-primary" />
                         <span className="text-sm font-medium">
-                          USD ${bid.last_price}
+                          USD {bid.last_price}
                         </span>
                       </div>
                     )}
