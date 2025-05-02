@@ -1,25 +1,18 @@
 'use client'
-import { DetailProposal } from '../../(home)/components/DetailProposal'
+import { useGetBidById } from '@/src/app/hooks/useGetBidById'
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from '@/src/components/ui/card'
-import { Input } from '@/src/components/ui/input'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/src/components/ui/table'
 import { modalService } from '@/src/service/modalService'
+import { DollarSign } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import { convertToColombiaTime } from '@/src/lib/utils'
-import { useGetBidById } from '@/src/app/hooks/useGetBidById'
+import { DetailProposal } from '../../(home)/components/DetailProposal'
+import AdvancedFilters from '../../../(agent)/offers/components/AdvancedFilters'
+import OfferCard from '../../../(agent)/offers/components/OfferCard'
 import Pagination from '../../../common/components/pagination/Pagination'
 import BidInfo from './BidInfo'
 interface Offer {
@@ -57,12 +50,29 @@ export function CargaProposalsList() {
   const [itemsPerPage] = useState(20)
   const [bid, setBid] = useState<Bid | null>(null)
 
+  const [expandedOffers, setExpandedOffers] = useState<Record<string, boolean>>({})
+  const [bidDataForAgent, setBidDataForAgent] = useState<any>({})
+
   const [filters, setFilters] = useState({
     uuid: '',
     agent_id: '',
     price: '',
     inserted_at: '',
   })
+
+  const resetFilters = () => {
+    setFilters({
+      inserted_at: "",
+      agent_id: "",
+      price: "",
+      shipping_type: "",
+      "details.freight_fees.container": "",
+      "details.freight_fees.value": "",
+      "details.destination_fees.handling": "",
+      "details.freight_fees.dimensions.length": "",
+      "details.additional_fees.fuel": "",
+    });
+  }
 
   useEffect(() => {
     fetchDetailById(
@@ -84,6 +94,13 @@ export function CargaProposalsList() {
       }
     )
   }, [])
+
+  const toggleOfferDetails = (offerId: string) => {
+    setExpandedOffers((prev) => ({
+      ...prev,
+      [offerId]: !prev[offerId],
+    }))
+  }
 
   if (!params) {
     return <h1>Hubo un error cargando el Detalle de la Transacción</h1>
@@ -200,117 +217,42 @@ export function CargaProposalsList() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow className="cursor-pointer font-bold">
-                  <TableHead onClick={() => handleSort('uuid')}>
-                    <span className="font-bold">ID</span>
-                    {sort.key === 'uuid' && (
-                      <span className="ml-1">
-                        {sort.order === 'asc' ? '\u2191' : '\u2193'}
-                      </span>
-                    )}
-                  </TableHead>
-                  <TableHead onClick={() => handleSort('inserted_at')}>
-                    <span className="font-bold">Fecha Creación</span>
-                    {sort.key === 'inserted_at' && (
-                      <span className="ml-1">
-                        {sort.order === 'asc' ? '\u2191' : '\u2193'}
-                      </span>
-                    )}
-                  </TableHead>
-                  <TableHead onClick={() => handleSort('agent_id')}>
-                    <span className="font-bold">Código Agente</span>
-                    {sort.key === 'agent_id' && (
-                      <span className="ml-1">
-                        {sort.order === 'asc' ? '\u2191' : '\u2193'}
-                      </span>
-                    )}
-                  </TableHead>
+       
+          <AdvancedFilters 
+            filters={filters} 
+            handleFilterChange={handleFilterChange} 
+            handleSort={handleSort} 
+            resetFilters={resetFilters}
+            bidDataForAgent={bidDataForAgent}
+          />
 
-                  <TableHead onClick={() => handleSort('price')}>
-                    <span className="font-bold">Precio</span>
-                    {sort.key === 'price' && (
-                      <span className="ml-1">
-                        {sort.order === 'asc' ? '\u2191' : '\u2193'}
-                      </span>
-                    )}
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {/* Mostrar el resto de la lista paginada */}
-                <TableRow>
-                  <TableCell>
-                    <Input
-                      placeholder="Filtrar ID"
-                      onChange={(e) =>
-                        handleFilterChange('uuid', e.target.value)
-                      }
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      placeholder="Filtrar fecha"
-                      onChange={(e) =>
-                        handleFilterChange('inserted_at', e.target.value)
-                      }
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      placeholder="Filtrar código"
-                      onChange={(e) =>
-                        handleFilterChange('agent_id', e.target.value)
-                      }
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Input
-                      placeholder="Filtrar precio"
-                      onChange={(e) =>
-                        handleFilterChange('price', e.target.value)
-                      }
-                    />
-                  </TableCell>
-                </TableRow>
-                {paginatedList && paginatedList.length > 0 ? (
-                  paginatedList.map((offer: any) => (
-                    <TableRow
-                      key={offer.uuid}
-                      onClick={() =>
-                        openModal(
-                          offer.id,
-                          offer.agent_id,
-                          offer.uuid,
-                          `$${offer.price}`,
-                          convertToColombiaTime(offer.inserted_at)
-                        )
-                      }
-                      // Aplicar fondo amarillo si el precio es el menor
-                      className={
-                        offer.price === bid.lowestPrice
-                          ? 'bg-yellow-500 bg-opacity-20 cursor-pointer text-xs'
-                          : 'cursor-pointer text-xs'
-                      }
-                    >
-                      <TableCell>{offer.uuid}</TableCell>
-                      <TableCell>
-                        {convertToColombiaTime(offer.inserted_at)}
-                      </TableCell>
-                      <TableCell>{offer.agent_id}</TableCell>
-                      <TableCell>{`${offer.price}`}</TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={4} className="text-center">
-                      No hay resultados que coincidan con los filtros.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
+          {/* Estado de carga */}
+          {loading && (
+            <div className="text-center py-8">
+              <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
+              <p className="mt-2 text-sm text-muted-foreground">Cargando ofertas...</p>
+            </div>
+          )}
+
+
+
+          {paginatedList?.map((offer: any, idx: number) => (
+              <OfferCard 
+                key={idx} 
+                offer={offer} 
+                toggleOfferDetails={toggleOfferDetails} 
+                expandedOffers={expandedOffers} 
+              />
+          ))}
+
+
+          {(!paginatedList || paginatedList.length === 0) && (
+              <div className="text-center py-8">
+                <DollarSign className="h-12 w-12 mx-auto text-muted-foreground" />
+                <h3 className="mt-2 text-lg font-medium">No hay propuestas</h3>
+                <p className="text-sm text-muted-foreground">No se encontraron propuestas con los filtros actuales.</p>
+              </div>
+            )}
             <div className="w-full flex justify-end mt-8">
               <Suspense fallback={<div>Loading...</div>}>
                 <Pagination
