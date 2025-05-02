@@ -21,6 +21,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { convertToColombiaTime } from '@/src/lib/utils'
 import { useGetBidById } from '@/src/app/hooks/useGetBidById'
 import Pagination from '../../../common/components/pagination/Pagination'
+import BidInfo from './BidInfo'
 interface Offer {
   id: number
   uuid: string
@@ -191,36 +192,7 @@ export function CargaProposalsList() {
               Detalle viaje
             </h2>
             <div className="grid gap-2 pb-6">
-              <div className="flex items-center gap-2">
-                <span className="font-bold">Origen:</span>
-                <span>{bid.origin_country + ' - ' + bid.origin_name}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold">Destino:</span>
-                <span>
-                  {bid.destination_country + ' - ' + bid.destination_name}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold">Codigo:</span>
-                <span>{bid.uuid}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold">Menor Precio de la Lista:</span>
-                <span className="text-xl font-bold text-green-500">
-                  {bid.offers.length > 0
-                    ? `USD $${bid.lowestPrice}`
-                    : 'No hay ofertas'}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold">Fecha inicio:</span>
-                <span>{bid.inserted_at}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold">Fecha Fin:</span>
-                <span>{bid.expiration_date}</span>
-              </div>
+              {bid &&  BidInfo({ bidDataForAgent: bid })}
             </div>
 
             <CardTitle className="text-blue-500 font-bold text-xl">

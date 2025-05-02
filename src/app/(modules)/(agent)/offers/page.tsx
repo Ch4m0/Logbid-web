@@ -15,6 +15,7 @@ import ProposalFormMaritimo from "./components/ProposalFormMaritimo"
 import { ArrowLeft, DollarSign } from "lucide-react"
 import AdvancedFilters from "./components/AdvancedFilters"
 import OfferCard from "./components/OfferCard"
+import BidInfo from "./components/BidInfo"
 
 const Page = () => {
   const searchParams = useSearchParams()
@@ -257,46 +258,29 @@ const Page = () => {
         <CardHeader>
           <h2 className="text-xl font-bold mt-4">INFO SUBASTA: {bidDataForAgent.uuid}</h2>
           <div className="grid gap-2 pb-6">
-            <div className="flex items-center gap-2">
-              <span className="font-bold">Orígen:</span>
-              <span>{bidDataForAgent.origin_country + " - " + bidDataForAgent.origin_name}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold">Destíno:</span>
-              <span>{bidDataForAgent.destination_country + " - " + bidDataForAgent.destination_name}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold">Fecha inicio:</span>
-              <span>{bidDataForAgent.inserted_at}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold">Fecha Fin:</span>
-              <span>{bidDataForAgent.expiration_date}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold"> Precio más bajo :</span>
-              <span>
-                {bidDataForAgent.currency} {bidDataForAgent.lowestPrice}
-              </span>
-            </div>
+          {bidDataForAgent && (BidInfo({ bidDataForAgent }))}
             <div className="flex items-center gap-2">
               {bidDataForAgent.shipping_type === shippingType ? (
                 <Accordion type="single" collapsible className="w-full">
-                  <AccordionItem value="item-1">
-                    <AccordionTrigger>Proponer un nuevo precio</AccordionTrigger>
-                    <AccordionContent>
-                      <ProposalFormMaritimo onSubmit={handleCreateOffer} />
-                    </AccordionContent>
-                  </AccordionItem>
+                  <AccordionItem value="item-1" className="border-none">
+                    <AccordionTrigger className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded flex justify-center items-center transition-colors">
+                      <span className="flex-1 text-center">Proponer un nuevo precio</span>
+                    </AccordionTrigger>
+                  <AccordionContent className="pt-4">
+                    <ProposalFormMaritimo onSubmit={handleCreateOffer} />
+                  </AccordionContent>
+                 </AccordionItem>
                 </Accordion>
               ) : (
                 <Accordion type="single" collapsible className="w-full">
-                  <AccordionItem value="item-1">
-                    <AccordionTrigger>Proponer un nuevo precio</AccordionTrigger>
-                    <AccordionContent>
-                      <ProposalForm onSubmit={handleCreateOffer} />
-                    </AccordionContent>
-                  </AccordionItem>
+                  <AccordionItem value="item-1" className="border-none">
+                    <AccordionTrigger className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded flex justify-center items-center transition-colors">
+                      <span className="flex-1 text-center">Proponer un nuevo precio</span>
+                    </AccordionTrigger>
+                  <AccordionContent className="pt-4">
+                    <ProposalForm onSubmit={handleCreateOffer} />
+                  </AccordionContent>
+                 </AccordionItem>
                 </Accordion>
               )}
             </div>
