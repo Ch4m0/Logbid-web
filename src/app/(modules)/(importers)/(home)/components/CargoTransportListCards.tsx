@@ -93,6 +93,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
         origin: origin,
         destination: destination,
         id,
+        shippingType
       },
     })
   }

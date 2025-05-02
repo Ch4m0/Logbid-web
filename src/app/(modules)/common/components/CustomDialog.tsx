@@ -31,7 +31,7 @@ const Modal = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center w-full bg-gray-500  bg-opacity-40">
-      <div className="relative  w-full max-w-2xl mx-4  rounded-lg shadow-lg h-[calc(100vh-2rem)] bg-white">
+      <div className="relative  w-full max-w-2xl mx-4  rounded-lg shadow-lg bg-white">
         <CloseIcon
           className="absolute top-3 right-3 cursor-pointer"
           onClick={closeModal}
