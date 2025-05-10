@@ -207,6 +207,7 @@ export default function ProposalFormMaritimo({
         if (onSubmit) {
           onSubmit({
             ...values,
+            price: subtotals.total
           })
         }
       } catch (error) {

@@ -111,6 +111,7 @@ const Page = () => {
   // Enviar una nueva oferta
   const sendOffer = (info: any) => {
     console.log(JSON.stringify(info), "info")
+    
     createOffer(
       { ...info, ...{ bid_id: bidDataForAgent.id, agent_id: user?.id } },
       {
@@ -120,7 +121,8 @@ const Page = () => {
           toast({
             title: "Oferta enviada!",
           })
-          window.location.href = `/offers/${bidDataForAgent.id}?page=1`
+
+          window.location.reload()
         },
         onError: (error) => {
           console.log("Error al crear la oferta:", error)
