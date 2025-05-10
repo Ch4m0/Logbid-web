@@ -78,12 +78,12 @@ const BidInfo = ({ bidDataForAgent }: any) => {
         <div className="bg-gray-50 p-4 rounded-md">
           <h3 className="font-bold text-lg mb-3 text-blue-700">Información de Precio</h3>
           <div className="space-y-2">
-            <div className="flex items-center gap-2">
+            {/*<div className="flex items-center gap-2">
               <span className="font-bold">Precio más bajo:</span>
               <span className="font-semibold text-green-600">
                 {bidDataForAgent.currency} {bidDataForAgent.lowestPrice}
               </span>
-            </div>
+            </div> */}
             <div className="flex items-center gap-2">
               <span className="font-bold">Último precio:</span>
               <span>{bidDataForAgent.currency} {bidDataForAgent.last_price}</span>
