@@ -10,11 +10,11 @@ import { modalService } from '@/src/service/modalService'
 import { DollarSign } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
-import { DetailProposal } from '../../(home)/components/DetailProposal'
 import AdvancedFilters from '../../../(agent)/offers/components/AdvancedFilters'
 import OfferCard from '../../../(agent)/offers/components/OfferCard'
 import Pagination from '../../../common/components/pagination/Pagination'
 import BidInfo from './BidInfo'
+import { OfferConfirmationDialog } from '../../(home)/components/OfferConfirmacionDialog'
 interface Offer {
   id: number
   uuid: string
@@ -118,26 +118,16 @@ export function CargaProposalsList() {
   }
 
   const openModal = (
-    offerId: number,
-    agent_id: number,
-    agentCode: string,
-    _proposalPrice: string,
-    _proposalCreatedDate: string
+    offer: any
   ) => {
     modalService.showModal({
-      component: DetailProposal,
+      component: OfferConfirmationDialog,
       props: {
         originBid: bid?.origin_country + ' - ' + bid?.origin_name,
         finishBid: bid?.destination_country + ' - ' + bid?.destination_name,
         codeBid: bid?.uuid,
         bidId: bid?.id,
-        offerId: offerId,
-        startDate: bid?.inserted_at,
-        finishDate: bid?.expiration_date,
-        proposalCreatedDate: _proposalCreatedDate,
-        agentId: agent_id,
-        agentCode: agentCode,
-        proposalPrice: _proposalPrice,
+        ...offer,
       },
     })
   }
@@ -242,6 +232,7 @@ export function CargaProposalsList() {
                 offer={offer} 
                 toggleOfferDetails={toggleOfferDetails} 
                 expandedOffers={expandedOffers} 
+                acceptOffer={openModal}
               />
           ))}
 

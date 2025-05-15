@@ -4,19 +4,44 @@ import { Card } from "@/src/components/ui/card";
 import { Badge } from "@/src/components/ui/badge";
 import { Button } from "@/src/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
-import { User, Tag, Calendar, Ship, DollarSign, Package, Ruler, ChevronDown } from "lucide-react";
+import { User, Tag, Calendar, Ship, DollarSign, Package, Ruler, ChevronDown, CheckCircle } from "lucide-react";
 import { convertToColombiaTime } from "@/src/lib/utils";
 import { Offer } from "@/src/models/Offer";
 
 interface OfferCardProps {
     offer: Offer;
     toggleOfferDetails: (id: string) => void;
-    expandedOffers: Record<string, boolean>;
+    expandedOffers: Record<string,  boolean>;
+    acceptOffer?: (offer: any) => void;
 }
 
-const OfferCard = ({ offer, toggleOfferDetails, expandedOffers }: OfferCardProps) => {
+const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: OfferCardProps) => {
+  const [isAccepting, setIsAccepting] = useState(false)
+
+  const handleAcceptOffer = () => {
+    setIsAccepting(true)
+    acceptOffer(offer)
+    // Note: You might want to reset isAccepting based on a success callback
+    // This example assumes acceptOffer is asynchronous and will be handled elsewhere
+  }
+
+  
+
   return (
-    <Card className="w-full border-l-4 border-l-primary overflow-hidden">
+      <Card className="w-full border-l-4 border-l-primary overflow-hidden relative">
+        <div className="absolute top-2 right-2 z-10">
+        <Button
+          variant="default"
+          size="sm"
+          className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-1"
+          onClick={handleAcceptOffer}
+          disabled={isAccepting || offer.status !== "Active"}
+        >
+          <CheckCircle className="h-4 w-4" />
+          {isAccepting ? "Aceptando..." : "Aceptar Oferta"}
+        </Button>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
         <div className="md:col-span-3 p-4 bg-muted/10">
           <div className="space-y-4">
