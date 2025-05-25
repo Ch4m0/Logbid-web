@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/src/components/ui/card"
 import { Separator } from "@/src/components/ui/separator"
@@ -14,58 +14,70 @@ import { useBidStore } from "@/src/store/useBidStore"
 const ConfirmationPage = () => {
   const [isCopied, setIsCopied] = useState(false)
   const router = useRouter()
-  const offerDat1 = useBidStore()
-  console.log(offerDat1, 'OfferDat1')
+  const bidStoreData = useBidStore()
+  console.log(bidStoreData, 'BidStoreData')
 
-  // Static offer data
+  // Get the actual offer data from the store instead of hardcoded data
   const offerData = {
-    originBid: " United Kingdom -  Aberdour",
-    finishBid: " Indonesia -  Adang Bay",
-    codeBid: "BID-W6X7C8V",
-    bidId: 5,
-    id: 71,
-    agent_id: 2,
-    price: "USD 0",
-    uuid: "OFF-TD0TF6W",
-    status: "Active",
-    bid_id: 5,
-    shipping_type: "Marítimo",
-    details: {
+    originBid: bidStoreData.originBid || "No especificado",
+    finishBid: bidStoreData.finishBid || "No especificado", 
+    codeBid: bidStoreData.codeBid || "No especificado",
+    bidId: bidStoreData.bidId || null,
+    id: bidStoreData.id || null,
+    agent_id: bidStoreData.agent_id || null,
+    price: bidStoreData.price || "USD 0",
+    uuid: bidStoreData.uuid || "No especificado",
+    status: bidStoreData.status || "Active",
+    bid_id: bidStoreData.bid_id || null,
+    shipping_type: bidStoreData.shipping_type || "Marítimo",
+    details: bidStoreData.details || {
       basic_service: {
-        cancellation_fee: 100,
-        free_days: 30,
+        cancellation_fee: 0,
+        free_days: 0,
         validity: {
-          time: 30,
+          time: 0,
           unit: "min",
         },
       },
       destination_fees: {
-        agency: 50,
+        agency: 0,
         bl_emission: 0,
-        collect_fee: "2%",
-        handling: 65,
+        collect_fee: "0%",
+        handling: 0,
       },
       freight_fees: {
-        container: "40 HC",
-        value: 9995,
+        container: "No especificado",
+        value: 0,
       },
       origin_fees: {
-        handling: 50,
-        security_manifest: 100,
+        handling: 0,
+        security_manifest: 0,
       },
       other_fees: {
-        cancellation: 100,
-        carbon: 35,
-        low_sulfur: 68,
-        other: 100,
-        pre_shipment_inspection: 125,
-        security_facility: 45,
-        security_manifest: 45,
+        cancellation: 0,
+        carbon: 0,
+        low_sulfur: 0,
+        other: 0,
+        pre_shipment_inspection: 0,
+        security_facility: 0,
+        security_manifest: 0,
       },
     },
-    inserted_at: "2025-05-10T18:25:44",
-    updated_at: "2025-05-10T18:25:44",
+    inserted_at: bidStoreData.inserted_at || new Date().toISOString(),
+    updated_at: bidStoreData.updated_at || new Date().toISOString(),
   }
+
+  // Redirect to home if no data is available
+  useEffect(() => {
+    if (!bidStoreData.uuid && !bidStoreData.codeBid) {
+      toast({
+        title: "Sin datos de propuesta",
+        description: "No se encontraron datos de la propuesta aceptada",
+        variant: "destructive",
+      })
+      router.push("/")
+    }
+  }, [bidStoreData, router])
 
   const copyToClipboard = () => {
     const textToCopy = `
@@ -181,7 +193,7 @@ Fecha: ${formatDate(offerData.inserted_at)}
                 <DollarSign className="h-5 w-5 text-primary" />
                 <div>
                   <p className="text-sm text-muted-foreground">Precio Total</p>
-                  <p className="font-medium text-lg">USD {offerData.details.freight_fees.value}</p>
+                  <p className="font-medium text-lg">USD {offerData.details?.freight_fees?.value || 0}</p>
                 </div>
               </div>
             </div>
@@ -191,7 +203,7 @@ Fecha: ${formatDate(offerData.inserted_at)}
                 <Package className="h-5 w-5 text-primary" />
                 <div>
                   <p className="text-sm text-muted-foreground">Contenedor</p>
-                  <p className="font-medium">{offerData.details.freight_fees.container}</p>
+                  <p className="font-medium">{offerData.details?.freight_fees?.container || "No especificado"}</p>
                 </div>
               </div>
             </div>
@@ -207,17 +219,17 @@ Fecha: ${formatDate(offerData.inserted_at)}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Días Libres:</span>
-                  <span className="font-medium">{offerData.details.basic_service.free_days} días</span>
+                  <span className="font-medium">{offerData.details?.basic_service?.free_days || 0} días</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Validez:</span>
                   <span className="font-medium">
-                    {offerData.details.basic_service.validity.time} {offerData.details.basic_service.validity.unit}
+                    {offerData.details?.basic_service?.validity?.time || 0} {offerData.details?.basic_service?.validity?.unit || "min"}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Tarifa de Cancelación:</span>
-                  <span className="font-medium">USD {offerData.details.basic_service.cancellation_fee}</span>
+                  <span className="font-medium">USD {offerData.details?.basic_service?.cancellation_fee || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Fecha de Creación:</span>
@@ -235,19 +247,19 @@ Fecha: ${formatDate(offerData.inserted_at)}
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="flex justify-between p-2 bg-muted/20 rounded">
                   <span>Flete:</span>
-                  <span className="font-medium">USD {offerData.details.freight_fees.value}</span>
+                  <span className="font-medium">USD {offerData.details?.freight_fees?.value || 0}</span>
                 </div>
                 <div className="flex justify-between p-2 bg-muted/20 rounded">
                   <span>Manejo en Origen:</span>
-                  <span className="font-medium">USD {offerData.details.origin_fees.handling}</span>
+                  <span className="font-medium">USD {offerData.details?.origin_fees?.handling || 0}</span>
                 </div>
                 <div className="flex justify-between p-2 bg-muted/20 rounded">
                   <span>Manejo en Destino:</span>
-                  <span className="font-medium">USD {offerData.details.destination_fees.handling}</span>
+                  <span className="font-medium">USD {offerData.details?.destination_fees?.handling || 0}</span>
                 </div>
                 <div className="flex justify-between p-2 bg-muted/20 rounded">
                   <span>Agencia:</span>
-                  <span className="font-medium">USD {offerData.details.destination_fees.agency}</span>
+                  <span className="font-medium">USD {offerData.details?.destination_fees?.agency || 0}</span>
                 </div>
               </div>
             </div>
@@ -261,19 +273,19 @@ Fecha: ${formatDate(offerData.inserted_at)}
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="flex justify-between p-2 bg-muted/20 rounded">
                   <span>Carbono:</span>
-                  <span className="font-medium">USD {offerData.details.other_fees.carbon}</span>
+                  <span className="font-medium">USD {offerData.details?.other_fees?.carbon || 0}</span>
                 </div>
                 <div className="flex justify-between p-2 bg-muted/20 rounded">
                   <span>Bajo Azufre:</span>
-                  <span className="font-medium">USD {offerData.details.other_fees.low_sulfur}</span>
+                  <span className="font-medium">USD {offerData.details?.other_fees?.low_sulfur || 0}</span>
                 </div>
                 <div className="flex justify-between p-2 bg-muted/20 rounded">
                   <span>Inspección:</span>
-                  <span className="font-medium">USD {offerData.details.other_fees.pre_shipment_inspection}</span>
+                  <span className="font-medium">USD {offerData.details?.other_fees?.pre_shipment_inspection || 0}</span>
                 </div>
                 <div className="flex justify-between p-2 bg-muted/20 rounded">
                   <span>Seguridad:</span>
-                  <span className="font-medium">USD {offerData.details.other_fees.security_facility}</span>
+                  <span className="font-medium">USD {offerData.details?.other_fees?.security_facility || 0}</span>
                 </div>
               </div>
             </div>
@@ -287,7 +299,7 @@ Fecha: ${formatDate(offerData.inserted_at)}
                 <div>
                   <p className="text-sm text-muted-foreground">Información del Agente</p>
                   <p className="font-medium">Agente</p>
-                  <p className="text-sm">Código: {offerData.agent_id}</p>
+                  <p className="text-sm">Código: {offerData.agent_id || "No especificado"}</p>
                 </div>
               </div>
             </div>

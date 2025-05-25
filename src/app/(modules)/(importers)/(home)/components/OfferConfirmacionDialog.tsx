@@ -36,7 +36,7 @@ export function OfferConfirmationDialog(offerData) {
     closeBid(
       { bid_id: offerData.bidId, offer_id: offerData.id },
       {
-        onSuccess: () => {
+        onSuccess: (res) => {
           console.log('Subasta cerrada correctamente')
 
           setBidData({
@@ -110,7 +110,7 @@ export function OfferConfirmationDialog(offerData) {
             <div>
               <p className="text-sm text-muted-foreground">Precio Total</p>
               <p className="font-medium text-lg">
-                {offerData.price || `USD ${offerData.details.freight_fees.value}`}
+                {offerData.price || `USD ${offerData.details.freight_fees?.value}`}
               </p>
             </div>
           </div>
@@ -120,7 +120,7 @@ export function OfferConfirmationDialog(offerData) {
             <Package className="h-5 w-5 text-primary" />
             <div>
               <p className="text-sm text-muted-foreground">Contenedor</p>
-              <p className="font-medium">{offerData.details.freight_fees.container}</p>
+              <p className="font-medium">{offerData.details.freight_fees?.container}</p>
             </div>
           </div>
         </div>
@@ -135,17 +135,17 @@ export function OfferConfirmationDialog(offerData) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Días Libres:</span>
-            <span className="font-medium">{offerData.details.basic_service.free_days} días</span>
+            <span className="font-medium">{offerData.details.basic_service?.free_days} días</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Validez:</span>
             <span className="font-medium">
-              {offerData.details.basic_service.validity.time} {offerData.details.basic_service.validity.unit}
+              {offerData.details.basic_service?.validity?.time} {offerData.details.basic_service?.validity?.unit}
             </span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Tarifa de Cancelación:</span>
-            <span className="font-medium">USD {offerData.details.basic_service.cancellation_fee}</span>
+            <span className="font-medium">USD {offerData.details?.basic_service?.cancellation_fee}</span>
           </div>
         </div>
       </div>
@@ -156,19 +156,19 @@ export function OfferConfirmationDialog(offerData) {
         <div className="grid grid-cols-2 gap-2 text-sm">
           <div className="flex justify-between p-2 bg-muted/20 rounded">
             <span>Flete:</span>
-            <span className="font-medium">USD {offerData.details.freight_fees.value}</span>
+            <span className="font-medium">USD {offerData.details?.freight_fees?.value}</span>
           </div>
           <div className="flex justify-between p-2 bg-muted/20 rounded">
             <span>Manejo en Origen:</span>
-            <span className="font-medium">USD {offerData.details.origin_fees.handling}</span>
+            <span className="font-medium">USD {offerData.details?.origin_fees?.handling}</span>
           </div>
           <div className="flex justify-between p-2 bg-muted/20 rounded">
             <span>Manejo en Destino:</span>
-            <span className="font-medium">USD {offerData.details.destination_fees.handling}</span>
+            <span className="font-medium">USD {offerData.details.destination_fees?.handling}</span>
           </div>
           <div className="flex justify-between p-2 bg-muted/20 rounded">
             <span>Agencia:</span>
-            <span className="font-medium">USD {offerData.details.destination_fees.agency}</span>
+            <span className="font-medium">USD {offerData.details.destination_fees?.agency}</span>
           </div>
         </div>
       </div>

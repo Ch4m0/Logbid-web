@@ -25,6 +25,7 @@ import {
   DollarSign,
   ArrowUpDown,
   ArrowRight,
+  Users,
 } from 'lucide-react'
 import { Badge } from '@/src/components/ui/badge'
 import { Separator } from '@/src/components/ui/separator'
@@ -72,6 +73,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
     inserted_at: '',
     expiration_date: '',
     value: '',
+    offers_count: '',
   })
 
   const STATUS = ['Offering', 'Closed']
@@ -292,6 +294,25 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
               </div>
             </div>
           )}
+          <div>
+            <label className="text-sm font-medium mb-1 block">
+              Cantidad de Ofertas
+            </label>
+            <div className="flex items-center">
+              <Input
+                placeholder="Filtrar ofertas"
+                onChange={(e) => handleFilterChange('offers_count', e.target.value)}
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleSort('offers_count')}
+                className="ml-1"
+              >
+                <ArrowUpDown className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </div>
 
         <div className="space-y-4">
@@ -323,6 +344,12 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                         </span>
                       </div>
                     )}
+                    <div className="flex items-center justify-center space-x-2 mt-2 bg-blue-50 p-2 rounded-md">
+                      <Users className="h-4 w-4 text-blue-600" />
+                      <span className="text-sm font-medium text-blue-600">
+                        {bid.offers_count} {bid.offers_count === 1 ? 'Oferta' : 'Ofertas'}
+                      </span>
+                    </div>
                   </div>
                 </div>
 

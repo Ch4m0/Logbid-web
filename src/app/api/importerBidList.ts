@@ -45,7 +45,8 @@ export const getBidList = async ({
         item.market_id,
         item.bid_details_id,
         item.inserted_at,
-        item.last_price
+        item.last_price,
+        item.offers ? item.offers.length : 0 // Contamos las ofertas reales del array, o 0 si es null
       )
   )
 }

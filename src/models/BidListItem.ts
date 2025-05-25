@@ -23,6 +23,7 @@ export class BidListItem {
     public market_id: number,
     public bid_details_id: number,
     public inserted_at: string,
-    public last_price: number
+    public last_price: number,
+    public offers_count: number = 0
   ) {}
 }

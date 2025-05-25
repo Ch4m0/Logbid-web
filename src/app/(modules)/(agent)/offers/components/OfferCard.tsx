@@ -49,7 +49,7 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
               <User className="h-5 w-5 text-primary" />
               <div className="flex flex-col">
                 <span className="text-sm text-muted-foreground">Código Agente</span>
-                <span className="font-medium">{offer.agent_code || offer.agent_id}</span>
+                <span className="font-medium">{offer.agent_code}</span>
               </div>
             </div>
 

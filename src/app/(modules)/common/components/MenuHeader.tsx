@@ -1,6 +1,7 @@
 import { Plane, Ship, Truck, Warehouse } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import useAuthStore from '@/src/store/authStore'
 
 type TransportType = 'air' | 'sea' | 'land' | 'warehouse' | null
 
@@ -20,8 +21,8 @@ interface ColorMap {
 
 const MenuHeader: React.FC = () => {
   const router = useRouter()
-
   const searchParams = useSearchParams()
+  const user = useAuthStore((state) => state.user)
 
   const initializeSelectedFromURL = (): TransportType => {
     const shippingParam = searchParams.get('shipping_type')
@@ -46,8 +47,19 @@ const MenuHeader: React.FC = () => {
   }
 
   const inactiveColor: string = 'text-gray-500'
-
   const defaultColor: string = 'text-black'
+
+  // Get the correct base route based on user role
+  const getBaseRoute = (): string => {
+    if (!user) return '/'
+    
+    // Role 2 = Importer, Role 3 = Agent
+    if (user.role_id === 3) {
+      return '/bid_list'
+    } else {
+      return '/'
+    }
+  }
 
   const handleSelect = (type: TransportType): void => {
     if (type === null) return
@@ -58,15 +70,23 @@ const MenuHeader: React.FC = () => {
 
     currentParams.set('shipping_type', transportToShippingType[type])
 
-    const marketId = searchParams.get('market_id') || '1'
+    // Get the market_id from current params or user's first market
+    const marketId = searchParams.get('market_id') || 
+                     searchParams.get('market') || 
+                     (user?.all_markets?.[0]?.id?.toString()) || 
+                     '1'
+    
     const status = searchParams.get('status') || 'Active'
 
     currentParams.set('market_id', marketId)
     currentParams.set('status', status)
 
+    // Clean up any page parameter to start fresh
     currentParams.delete('page')
 
-    router.push(`?${currentParams.toString()}`)
+    // Navigate to the correct route based on user role
+    const baseRoute = getBaseRoute()
+    router.push(`${baseRoute}?${currentParams.toString()}`)
   }
 
   useEffect(() => {
