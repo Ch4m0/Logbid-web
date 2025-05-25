@@ -26,6 +26,7 @@ import {
   ArrowUpDown,
   ArrowRight,
   Users,
+  Filter,
 } from 'lucide-react'
 import { Badge } from '@/src/components/ui/badge'
 import { Separator } from '@/src/components/ui/separator'
@@ -66,6 +67,8 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
   const currentPage = Number(searchParams.get('page')) || 1
 
   const [sort, setSort] = useState({ key: 'id', order: 'desc' })
+
+  const [showFilters, setShowFilters] = useState(false)
 
   const [filters, setFilters] = useState({
     uuid: '',
@@ -150,60 +153,92 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
     <Card className="w-full">
       <CardHeader className="flex justify-between flex-row w-full">
         <CardTitle className="font-bold">{shippingType}</CardTitle>
-        <CreateCargoTransport />
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center space-x-2"
+          >
+            <Filter className="h-4 w-4" />
+            <span>{showFilters ? 'Ocultar Filtros' : 'Mostrar Filtros'}</span>
+          </Button>
+          <CreateCargoTransport />
+        </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-          <div>
-            <label className="text-sm font-medium mb-1 block">
-              Fecha de creación
-            </label>
-            <div className="flex items-center">
-              <Input
-                placeholder="Filtrar fecha creación"
-                onChange={(e) =>
-                  handleFilterChange('inserted_at', e.target.value)
-                }
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleSort('inserted_at')}
-                className="ml-1"
-              >
-                <ArrowUpDown className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          <div>
-            <label className="text-sm font-medium mb-1 block">
-              Fecha de Finalización
-            </label>
-            <div className="flex items-center">
-              <Input
-                placeholder="Filtrar fecha finalización"
-                onChange={(e) =>
-                  handleFilterChange('expiration_date', e.target.value)
-                }
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleSort('expiration_date')}
-                className="ml-1"
-              >
-                <ArrowUpDown className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          {STATUS.includes(status) && (
+        {showFilters && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             <div>
               <label className="text-sm font-medium mb-1 block">
-                Código agente
+                Fecha de creación
               </label>
               <div className="flex items-center">
                 <Input
-                  placeholder="Filtrar código"
+                  placeholder="Filtrar fecha creación"
+                  onChange={(e) =>
+                    handleFilterChange('inserted_at', e.target.value)
+                  }
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleSort('inserted_at')}
+                  className="ml-1"
+                >
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">
+                Fecha de Finalización
+              </label>
+              <div className="flex items-center">
+                <Input
+                  placeholder="Filtrar fecha finalización"
+                  onChange={(e) =>
+                    handleFilterChange('expiration_date', e.target.value)
+                  }
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleSort('expiration_date')}
+                  className="ml-1"
+                >
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            {STATUS.includes(status) && (
+              <div>
+                <label className="text-sm font-medium mb-1 block">
+                  Código agente
+                </label>
+                <div className="flex items-center">
+                  <Input
+                    placeholder="Filtrar código"
+                    onChange={(e) => handleFilterChange('uuid', e.target.value)}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleSort('uuid')}
+                    className="ml-1"
+                  >
+                    <ArrowUpDown className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+            <div>
+              <label className="text-sm font-medium mb-1 block">
+                ID transacción
+              </label>
+              <div className="flex items-center">
+                <Input
+                  placeholder="Filtrar ID"
                   onChange={(e) => handleFilterChange('uuid', e.target.value)}
                 />
                 <Button
@@ -216,105 +251,86 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                 </Button>
               </div>
             </div>
-          )}
-          <div>
-            <label className="text-sm font-medium mb-1 block">
-              ID transacción
-            </label>
-            <div className="flex items-center">
-              <Input
-                placeholder="Filtrar ID"
-                onChange={(e) => handleFilterChange('uuid', e.target.value)}
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleSort('uuid')}
-                className="ml-1"
-              >
-                <ArrowUpDown className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          <div>
-            <label className="text-sm font-medium mb-1 block">Origen</label>
-            <div className="flex items-center">
-              <Input
-                placeholder="Filtrar origen"
-                onChange={(e) =>
-                  handleFilterChange('origin_name', e.target.value)
-                }
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleSort('origin_name')}
-                className="ml-1"
-              >
-                <ArrowUpDown className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          <div>
-            <label className="text-sm font-medium mb-1 block">Destino</label>
-            <div className="flex items-center">
-              <Input
-                placeholder="Filtrar destino"
-                onChange={(e) =>
-                  handleFilterChange('destination_name', e.target.value)
-                }
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleSort('destination_name')}
-                className="ml-1"
-              >
-                <ArrowUpDown className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          {STATUS.includes(status) && (
             <div>
-              <label className="text-sm font-medium mb-1 block">
-                Último Precio
-              </label>
+              <label className="text-sm font-medium mb-1 block">Origen</label>
               <div className="flex items-center">
                 <Input
-                  placeholder="Filtrar precio"
-                  onChange={(e) => handleFilterChange('value', e.target.value)}
+                  placeholder="Filtrar origen"
+                  onChange={(e) =>
+                    handleFilterChange('origin_name', e.target.value)
+                  }
                 />
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => handleSort('value')}
+                  onClick={() => handleSort('origin_name')}
                   className="ml-1"
                 >
                   <ArrowUpDown className="h-4 w-4" />
                 </Button>
               </div>
             </div>
-          )}
-          <div>
-            <label className="text-sm font-medium mb-1 block">
-              Cantidad de Ofertas
-            </label>
-            <div className="flex items-center">
-              <Input
-                placeholder="Filtrar ofertas"
-                onChange={(e) => handleFilterChange('offers_count', e.target.value)}
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => handleSort('offers_count')}
-                className="ml-1"
-              >
-                <ArrowUpDown className="h-4 w-4" />
-              </Button>
+            <div>
+              <label className="text-sm font-medium mb-1 block">Destino</label>
+              <div className="flex items-center">
+                <Input
+                  placeholder="Filtrar destino"
+                  onChange={(e) =>
+                    handleFilterChange('destination_name', e.target.value)
+                  }
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleSort('destination_name')}
+                  className="ml-1"
+                >
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            {STATUS.includes(status) && (
+              <div>
+                <label className="text-sm font-medium mb-1 block">
+                  Último Precio
+                </label>
+                <div className="flex items-center">
+                  <Input
+                    placeholder="Filtrar precio"
+                    onChange={(e) => handleFilterChange('value', e.target.value)}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleSort('value')}
+                    className="ml-1"
+                  >
+                    <ArrowUpDown className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+            <div>
+              <label className="text-sm font-medium mb-1 block">
+                Cantidad de Ofertas
+              </label>
+              <div className="flex items-center">
+                <Input
+                  placeholder="Filtrar ofertas"
+                  onChange={(e) => handleFilterChange('offers_count', e.target.value)}
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleSort('offers_count')}
+                  className="ml-1"
+                >
+                  <ArrowUpDown className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div className="space-y-4">
           {paginatedList?.map((bid) => (
