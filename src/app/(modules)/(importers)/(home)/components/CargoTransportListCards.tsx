@@ -334,7 +334,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                         className="w-full justify-center"
                         variant="secondary"
                       >
-                        Código: {bid.agent_code}
+                        Código agente: {bid.agent_code}
                       </Badge>
                     )}
                     {STATUS.includes(status) && (
@@ -354,7 +354,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                   </div>
                 </div>
 
-                <div className="md:col-span-6 p-4">
+                <div className={`p-4 ${status === 'Closed' ? 'md:col-span-9' : 'md:col-span-6'}`}>
                   <div className="space-y-4">
                     <div className="flex items-center space-x-4">
                       <div className="flex items-center space-x-2 flex-1">
@@ -405,24 +405,26 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                   </div>
                 </div>
 
-                <div className="md:col-span-3 p-4 flex items-center justify-center border-t md:border-t-0 md:border-l">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      showExtendFinalDate(
-                        bid.expiration_date,
-                        bid.origin_name,
-                        bid.destination_name,
-                        bid.id.toString()
-                      )
-                    }}
-                  >
-                    Extender
-                  </Button>
-                </div>
+                {status !== 'Closed' && (
+                  <div className="md:col-span-3 p-4 flex items-center justify-center border-t md:border-t-0 md:border-l">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        showExtendFinalDate(
+                          bid.expiration_date,
+                          bid.origin_name,
+                          bid.destination_name,
+                          bid.id.toString()
+                        )
+                      }}
+                    >
+                      Extender
+                    </Button>
+                  </div>
+                )}
               </div>
             </Card>
           ))}
