@@ -30,6 +30,7 @@ import {
 import { Badge } from '@/src/components/ui/badge'
 import { Separator } from '@/src/components/ui/separator'
 import { ShippingType } from '@/src/models/common'
+import { convertToColombiaTime } from '@/src/lib/utils'
 
 interface CargoTransporListProps {
   status: 'Active' | 'Closed' | 'Offering'
@@ -388,7 +389,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                           <span className="text-xs text-muted-foreground">
                             Creación
                           </span>
-                          <span className="text-sm">{bid.inserted_at}</span>
+                          <span className="text-sm">{convertToColombiaTime(bid.inserted_at)}</span>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -397,7 +398,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                           <span className="text-xs text-muted-foreground">
                             Finalización
                           </span>
-                          <span className="text-sm">{bid.expiration_date}</span>
+                          <span className="text-sm">{convertToColombiaTime(bid.expiration_date)}</span>
                         </div>
                       </div>
                     </div>

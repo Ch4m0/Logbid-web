@@ -1,7 +1,23 @@
-
 import React from 'react';
+import { convertToColombiaTime } from '@/src/lib/utils';
 
 const BidInfo = ({ bidDataForAgent }: any) => {
+  // Función para obtener valor de mercancía de forma segura
+  const getMerchandiseValue = (key: string) => {
+    // Buscar en bid_details primero (donde vienen los datos según la API)
+    if (bidDataForAgent.bid_details && bidDataForAgent.bid_details[key] !== undefined && bidDataForAgent.bid_details[key] !== null && bidDataForAgent.bid_details[key] !== '') {
+      return bidDataForAgent.bid_details[key];
+    }
+    
+    // Buscar en el nivel principal como fallback
+    if (bidDataForAgent[key] !== undefined && bidDataForAgent[key] !== null && bidDataForAgent[key] !== '') {
+      return bidDataForAgent[key];
+    }
+    
+    // Valor por defecto
+    return "No especificado";
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md w-full mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -32,11 +48,11 @@ const BidInfo = ({ bidDataForAgent }: any) => {
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="font-bold">Fecha inicio:</span>
-              <span>{bidDataForAgent.inserted_at}</span>
+              <span>{convertToColombiaTime(bidDataForAgent.inserted_at)}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="font-bold">Fecha Fin:</span>
-              <span>{bidDataForAgent.expiration_date}</span>
+              <span>{convertToColombiaTime(bidDataForAgent.expiration_date)}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="font-bold">Estado:</span>
@@ -54,23 +70,23 @@ const BidInfo = ({ bidDataForAgent }: any) => {
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="font-bold">Tipo de Mercancía:</span>
-              <span>{bidDataForAgent.merchandise_type}</span>
+              <span>{getMerchandiseValue('merchandise_type')}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="font-bold">Tipo de Medida:</span>
-              <span>{bidDataForAgent.measure_type}</span>
+              <span>{getMerchandiseValue('measure_type')}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="font-bold">Unidades:</span>
-              <span>{bidDataForAgent.units}</span>
+              <span>{getMerchandiseValue('units')}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="font-bold">Peso Total:</span>
-              <span>{bidDataForAgent.total_weight}</span>
+              <span>{getMerchandiseValue('total_weight')}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="font-bold">Volumen:</span>
-              <span>{bidDataForAgent.volume}</span>
+              <span>{getMerchandiseValue('volume')}</span>
             </div>
           </div>
         </div>

@@ -144,6 +144,7 @@ export const fetchDetailById = async ({ bid_id }: { bid_id: string }) => {
       price: 'USD ' + offer.price,
     })),
   }
+  
   return _data
 }
 

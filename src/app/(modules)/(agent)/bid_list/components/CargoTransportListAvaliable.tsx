@@ -353,7 +353,7 @@ export function CargoTransporListAvaliable({ status }: CargoTransporListProps) {
                           <span className="text-xs text-muted-foreground">
                             Creación
                           </span>
-                          <span className="text-sm">{bid.inserted_at}</span>
+                          <span className="text-sm">{convertToColombiaTime(bid.inserted_at)}</span>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -362,7 +362,7 @@ export function CargoTransporListAvaliable({ status }: CargoTransporListProps) {
                           <span className="text-xs text-muted-foreground">
                             Finalización
                           </span>
-                          <span className="text-sm">{bid.expiration_date}</span>
+                          <span className="text-sm">{convertToColombiaTime(bid.expiration_date)}</span>
                         </div>
                       </div>
                     </div>

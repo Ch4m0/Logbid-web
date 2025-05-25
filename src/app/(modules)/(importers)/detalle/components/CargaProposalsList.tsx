@@ -87,6 +87,7 @@ export function CargaProposalsList() {
       {
         onSuccess: (bid) => {
           console.log(bid, 'success')
+          
           if (bid.status === 'Closed') {
             window.location.href = '/?market=' + marketId
           }
