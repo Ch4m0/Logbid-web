@@ -22,15 +22,15 @@ const ConfirmationPage = () => {
     originBid: bidStoreData.originBid || "No especificado",
     finishBid: bidStoreData.finishBid || "No especificado", 
     codeBid: bidStoreData.codeBid || "No especificado",
-    bidId: bidStoreData.bidId || null,
-    id: bidStoreData.id || null,
-    agent_id: bidStoreData.agent_id || null,
-    price: bidStoreData.price || "USD 0",
-    uuid: bidStoreData.uuid || "No especificado",
-    status: bidStoreData.status || "Active",
-    bid_id: bidStoreData.bid_id || null,
-    shipping_type: bidStoreData.shipping_type || "Marítimo",
-    details: bidStoreData.details || {
+    bidId: (bidStoreData as any).bidId || null,
+    id: (bidStoreData as any).id || null,
+    agent_id: (bidStoreData as any).agent_id || null,
+    price: (bidStoreData as any).price || "USD 0",
+    uuid: (bidStoreData as any).uuid || "No especificado",
+    status: (bidStoreData as any).status || "Active",
+    bid_id: (bidStoreData as any).bid_id || null,
+    shipping_type: (bidStoreData as any).shipping_type || "Marítimo",
+    details: (bidStoreData as any).details || {
       basic_service: {
         cancellation_fee: 0,
         free_days: 0,
@@ -63,13 +63,13 @@ const ConfirmationPage = () => {
         security_manifest: 0,
       },
     },
-    inserted_at: bidStoreData.inserted_at || new Date().toISOString(),
-    updated_at: bidStoreData.updated_at || new Date().toISOString(),
+    inserted_at: (bidStoreData as any).inserted_at || new Date().toISOString(),
+    updated_at: (bidStoreData as any).updated_at || new Date().toISOString(),
   }
 
   // Redirect to home if no data is available
   useEffect(() => {
-    if (!bidStoreData.uuid && !bidStoreData.codeBid) {
+    if (!(bidStoreData as any).uuid && !bidStoreData.codeBid) {
       toast({
         title: "Sin datos de propuesta",
         description: "No se encontraron datos de la propuesta aceptada",
@@ -119,7 +119,7 @@ Fecha: ${formatDate(offerData.inserted_at)}
   }
 
   // Format date
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString("es-ES", {
       year: "numeric",
@@ -166,7 +166,9 @@ Fecha: ${formatDate(offerData.inserted_at)}
           <div className="bg-muted/30 rounded-lg p-4 mb-6">
             <div className="flex items-center gap-2 mb-3">
               <Ship className="h-5 w-5 text-primary" />
-              <span className="font-medium">Ruta {offerData.shipping_type}</span>
+              <span className="font-medium">
+                Ruta {offerData.shipping_type === "Aéreo" ? "Aérea" : "Marítima"}
+              </span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-start gap-3">
@@ -187,108 +189,225 @@ Fecha: ${formatDate(offerData.inserted_at)}
             </div>
           </div>
 
+          {/* Price and container/dimensions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div className="bg-primary/5 rounded-lg p-4">
               <div className="flex items-center gap-2">
                 <DollarSign className="h-5 w-5 text-primary" />
                 <div>
                   <p className="text-sm text-muted-foreground">Precio Total</p>
-                  <p className="font-medium text-lg">USD {offerData.details?.freight_fees?.value || 0}</p>
+                  <p className="font-medium text-lg">
+                    {offerData.price || `USD ${offerData.details?.freight_fees?.value || 0}`}
+                  </p>
                 </div>
               </div>
             </div>
-
             <div className="bg-primary/5 rounded-lg p-4">
               <div className="flex items-center gap-2">
                 <Package className="h-5 w-5 text-primary" />
                 <div>
-                  <p className="text-sm text-muted-foreground">Contenedor</p>
-                  <p className="font-medium">{offerData.details?.freight_fees?.container || "No especificado"}</p>
+                  {offerData.shipping_type === "Marítimo" ? (
+                    <>
+                      <p className="text-sm text-muted-foreground">Contenedor</p>
+                      <p className="font-medium">{offerData.details?.freight_fees?.container || "No especificado"}</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-sm text-muted-foreground">Dimensiones</p>
+                      <p className="font-medium">
+                        {offerData.details?.freight_fees?.dimensions ? (
+                          `${offerData.details.freight_fees.dimensions.length}x${offerData.details.freight_fees.dimensions.width}x${offerData.details.freight_fees.dimensions.height} ${offerData.details.freight_fees.dimensions.units || "cm"}`
+                        ) : (
+                          "No especificado"
+                        )}
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="space-y-6">
-            {/* Service details */}
-            <div className="bg-muted/30 rounded-lg p-4">
+          {/* Service details */}
+          {offerData.details?.basic_service && (
+            offerData.details.basic_service.free_days || 
+            offerData.details.basic_service.validity || 
+            offerData.details.basic_service.cancellation_fee
+          ) && (
+            <div className="bg-muted/30 rounded-lg p-4 mb-6">
               <div className="flex items-center gap-2 mb-3">
                 <Calendar className="h-5 w-5 text-primary" />
                 <span className="font-medium">Detalles del Servicio</span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Días Libres:</span>
-                  <span className="font-medium">{offerData.details?.basic_service?.free_days || 0} días</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Validez:</span>
-                  <span className="font-medium">
-                    {offerData.details?.basic_service?.validity?.time || 0} {offerData.details?.basic_service?.validity?.unit || "min"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Tarifa de Cancelación:</span>
-                  <span className="font-medium">USD {offerData.details?.basic_service?.cancellation_fee || 0}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Fecha de Creación:</span>
-                  <span className="font-medium">{formatDate(offerData.inserted_at)}</span>
-                </div>
+                {offerData.details.basic_service.free_days && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Días Libres:</span>
+                    <span className="font-medium">{offerData.details.basic_service.free_days} días</span>
+                  </div>
+                )}
+                {offerData.details.basic_service.validity && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Validez:</span>
+                    <span className="font-medium">
+                      {offerData.details.basic_service.validity.time} {offerData.details.basic_service.validity.unit}
+                    </span>
+                  </div>
+                )}
+                {offerData.details.basic_service.cancellation_fee && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Tarifa de Cancelación:</span>
+                    <span className="font-medium">USD {offerData.details.basic_service.cancellation_fee}</span>
+                  </div>
+                )}
               </div>
             </div>
+          )}
 
-            {/* Fee summary */}
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium flex items-center gap-2">
-                <Tag className="h-4 w-4 text-primary" />
-                Resumen de Tarifas
+          {/* Detalles completos de la propuesta */}
+          <div className="space-y-4">
+            {/* Tarifas de Flete */}
+            <div className="bg-muted/30 rounded-lg p-4">
+              <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+                <Ship className="h-4 w-4 text-primary" />
+                Tarifas de Flete
               </h4>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="flex justify-between p-2 bg-muted/20 rounded">
-                  <span>Flete:</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                {/* Para envíos marítimos */}
+                {offerData.shipping_type === "Marítimo" && (
+                  <div className="flex justify-between p-2 bg-white/50 rounded">
+                    <span>Contenedor:</span>
+                    <span className="font-medium">{offerData.details?.freight_fees?.container || "No especificado"}</span>
+                  </div>
+                )}
+                
+                {/* Para envíos aéreos */}
+                {offerData.shipping_type === "Aéreo" && offerData.details?.freight_fees?.dimensions && (
+                  <>
+                    <div className="flex justify-between p-2 bg-white/50 rounded">
+                      <span>Longitud:</span>
+                      <span className="font-medium">{offerData.details.freight_fees.dimensions.length} {offerData.details.freight_fees.dimensions.units || "cm"}</span>
+                    </div>
+                    <div className="flex justify-between p-2 bg-white/50 rounded">
+                      <span>Ancho:</span>
+                      <span className="font-medium">{offerData.details.freight_fees.dimensions.width} {offerData.details.freight_fees.dimensions.units || "cm"}</span>
+                    </div>
+                    <div className="flex justify-between p-2 bg-white/50 rounded">
+                      <span>Altura:</span>
+                      <span className="font-medium">{offerData.details.freight_fees.dimensions.height} {offerData.details.freight_fees.dimensions.units || "cm"}</span>
+                    </div>
+                  </>
+                )}
+                
+                <div className="flex justify-between p-2 bg-white/50 rounded">
+                  <span>Valor del Flete:</span>
                   <span className="font-medium">USD {offerData.details?.freight_fees?.value || 0}</span>
                 </div>
-                <div className="flex justify-between p-2 bg-muted/20 rounded">
-                  <span>Manejo en Origen:</span>
-                  <span className="font-medium">USD {offerData.details?.origin_fees?.handling || 0}</span>
-                </div>
-                <div className="flex justify-between p-2 bg-muted/20 rounded">
-                  <span>Manejo en Destino:</span>
-                  <span className="font-medium">USD {offerData.details?.destination_fees?.handling || 0}</span>
-                </div>
-                <div className="flex justify-between p-2 bg-muted/20 rounded">
-                  <span>Agencia:</span>
-                  <span className="font-medium">USD {offerData.details?.destination_fees?.agency || 0}</span>
-                </div>
               </div>
             </div>
 
-            {/* Additional fees */}
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium flex items-center gap-2">
-                <Tag className="h-4 w-4 text-primary" />
-                Cargos Adicionales
-              </h4>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div className="flex justify-between p-2 bg-muted/20 rounded">
-                  <span>Carbono:</span>
-                  <span className="font-medium">USD {offerData.details?.other_fees?.carbon || 0}</span>
-                </div>
-                <div className="flex justify-between p-2 bg-muted/20 rounded">
-                  <span>Bajo Azufre:</span>
-                  <span className="font-medium">USD {offerData.details?.other_fees?.low_sulfur || 0}</span>
-                </div>
-                <div className="flex justify-between p-2 bg-muted/20 rounded">
-                  <span>Inspección:</span>
-                  <span className="font-medium">USD {offerData.details?.other_fees?.pre_shipment_inspection || 0}</span>
-                </div>
-                <div className="flex justify-between p-2 bg-muted/20 rounded">
-                  <span>Seguridad:</span>
-                  <span className="font-medium">USD {offerData.details?.other_fees?.security_facility || 0}</span>
+            {/* Cargos Adicionales (solo para aéreo) */}
+            {offerData.shipping_type === "Aéreo" && offerData.details?.additional_fees && (
+              <div className="bg-muted/30 rounded-lg p-4">
+                <h4 className="text-sm font-medium mb-3">Cargos Adicionales</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                  {Object.entries(offerData.details.additional_fees).map(([key, value]) => (
+                    <div key={key} className="flex justify-between p-2 bg-white/50 rounded">
+                      <span className="capitalize">{key.replace(/_/g, ' ')}:</span>
+                      <span className="font-medium">USD {String(value)}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
+            )}
+
+            {/* Tarifas de Origen */}
+            {offerData.details?.origin_fees && (
+              <div className="bg-muted/30 rounded-lg p-4">
+                <h4 className="text-sm font-medium mb-3">Tarifas de Origen</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                  {Object.entries(offerData.details.origin_fees).map(([key, value]) => (
+                    <div key={key} className="flex justify-between p-2 bg-white/50 rounded">
+                      <span className="capitalize">{key.replace(/_/g, ' ')}:</span>
+                      <span className="font-medium">USD {String(value)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Tarifas de Destino */}
+            {offerData.details?.destination_fees && (
+              <div className="bg-muted/30 rounded-lg p-4">
+                <h4 className="text-sm font-medium mb-3">Tarifas de Destino</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                  {Object.entries(offerData.details.destination_fees).map(([key, value]) => (
+                    <div key={key} className="flex justify-between p-2 bg-white/50 rounded">
+                      <span className="capitalize">{key.replace(/_/g, ' ')}:</span>
+                      <span className="font-medium">
+                        {typeof value === 'string' && String(value).includes('%') ? String(value) : `USD ${String(value)}`}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Servicio Básico */}
+            {offerData.details?.basic_service && (
+              <div className="bg-muted/30 rounded-lg p-4">
+                <h4 className="text-sm font-medium mb-3">Servicio Básico</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                  {offerData.details.basic_service?.cancellation_fee && (
+                    <div className="flex justify-between p-2 bg-white/50 rounded">
+                      <span>Tarifa de Cancelación:</span>
+                      <span className="font-medium">USD {offerData.details.basic_service.cancellation_fee}</span>
+                    </div>
+                  )}
+                  {offerData.details.basic_service?.free_days && (
+                    <div className="flex justify-between p-2 bg-white/50 rounded">
+                      <span>Días Libres:</span>
+                      <span className="font-medium">{offerData.details.basic_service.free_days} días</span>
+                    </div>
+                  )}
+                  {offerData.details.basic_service?.validity && (
+                    <div className="flex justify-between p-2 bg-white/50 rounded">
+                      <span>Validez:</span>
+                      <span className="font-medium">
+                        {offerData.details.basic_service.validity.time} {offerData.details.basic_service.validity.unit}
+                      </span>
+                    </div>
+                  )}
+                  {/* Mostrar cualquier otro campo en basic_service */}
+                  {Object.entries(offerData.details.basic_service).map(([key, value]) => {
+                    if (!['cancellation_fee', 'free_days', 'validity'].includes(key) && value) {
+                      return (
+                        <div key={key} className="flex justify-between p-2 bg-white/50 rounded">
+                          <span className="capitalize">{key.replace(/_/g, ' ')}:</span>
+                          <span className="font-medium">{String(value)}</span>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Otros Cargos */}
+            {offerData.details?.other_fees && Object.keys(offerData.details.other_fees).length > 0 && (
+              <div className="bg-muted/30 rounded-lg p-4">
+                <h4 className="text-sm font-medium mb-3">Otros Cargos</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                  {Object.entries(offerData.details.other_fees).map(([key, value]) => (
+                    <div key={key} className="flex justify-between p-2 bg-white/50 rounded">
+                      <span className="capitalize">{key.replace(/_/g, ' ')}:</span>
+                      <span className="font-medium">USD {String(value)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Agent information */}
             <div className="p-4 bg-muted/30 rounded-lg">
@@ -300,6 +419,7 @@ Fecha: ${formatDate(offerData.inserted_at)}
                   <p className="text-sm text-muted-foreground">Información del Agente</p>
                   <p className="font-medium">Agente</p>
                   <p className="text-sm">Código: {offerData.agent_id || "No especificado"}</p>
+                  <p className="text-sm">Fecha de Creación: {formatDate(offerData.inserted_at)}</p>
                 </div>
               </div>
             </div>

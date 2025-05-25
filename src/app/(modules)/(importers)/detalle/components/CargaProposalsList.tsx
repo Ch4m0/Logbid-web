@@ -15,6 +15,8 @@ import OfferCard from '../../../(agent)/offers/components/OfferCard'
 import Pagination from '../../../common/components/pagination/Pagination'
 import BidInfo from './BidInfo'
 import { OfferConfirmationDialog } from '../../(home)/components/OfferConfirmacionDialog'
+import { FiltersOffer } from '@/src/models/FiltersOffer'
+
 interface Offer {
   id: number
   uuid: string
@@ -53,11 +55,15 @@ export function CargaProposalsList() {
   const [expandedOffers, setExpandedOffers] = useState<Record<string, boolean>>({})
   const [bidDataForAgent, setBidDataForAgent] = useState<any>({})
 
-  const [filters, setFilters] = useState({
-    uuid: '',
+  const [filters, setFilters] = useState<FiltersOffer>({
+    inserted_at: '',
     agent_id: '',
     price: '',
-    inserted_at: '',
+    "details.freight_fees.container": '',
+    "details.freight_fees.value": '',
+    "details.destination_fees.handling": '',
+    "details.freight_fees.dimensions.length": '',
+    "details.additional_fees.fuel": '',
   })
 
   const resetFilters = () => {
@@ -65,7 +71,6 @@ export function CargaProposalsList() {
       inserted_at: "",
       agent_id: "",
       price: "",
-      shipping_type: "",
       "details.freight_fees.container": "",
       "details.freight_fees.value": "",
       "details.destination_fees.handling": "",
@@ -136,19 +141,56 @@ export function CargaProposalsList() {
     setFilters((prev) => ({ ...prev, [key]: value }))
   }
 
+  // Función auxiliar para obtener valor de propiedades anidadas
+  const getNestedProperty = (obj: any, path: string): any => {
+    return path.split('.').reduce((current, key) => {
+      return current && current[key] !== undefined ? current[key] : null;
+    }, obj);
+  }
+
   // Filtrado y ordenamiento aplicado a la lista de ofertas
   const filteredOffers = bid?.offers
-    ?.filter((offer: any) =>
-      Object.keys(filters).every((key) =>
-        offer[key as keyof typeof filters]
-          ?.toString()
+    ?.filter((offer: any) => {
+      // Si no hay filtros aplicados, mostrar todas las ofertas
+      const hasActiveFilters = Object.values(filters).some(value => value && value.trim() !== '');
+      if (!hasActiveFilters) return true;
+      
+      // Solo aplicar filtros si hay valores de filtro activos
+      return Object.keys(filters).every((key) => {
+        const filterValue = filters[key as keyof typeof filters];
+        if (!filterValue || filterValue.trim() === '') return true; // Si este filtro específico está vacío, no filtrar por él
+        
+        let offerValue: any;
+        
+        // Manejar propiedades anidadas
+        if (key.includes('.')) {
+          offerValue = getNestedProperty(offer, key);
+        } else {
+          offerValue = offer[key];
+        }
+        
+        // Si el valor no existe para este filtro específico, no mostrar esta oferta
+        if (offerValue === null || offerValue === undefined) {
+          return false;
+        }
+        
+        return offerValue
+          .toString()
           .toLowerCase()
-          .includes(filters[key as keyof typeof filters].toLowerCase())
-      )
-    )
+          .includes(filterValue.toLowerCase());
+      });
+    })
     .sort((a: any, b: any) => {
-      const aValue = a[sort.key as keyof typeof a]
-      const bValue = b[sort.key as keyof typeof b]
+      let aValue, bValue;
+      
+      // Manejar propiedades anidadas para el sorting también
+      if (sort.key.includes('.')) {
+        aValue = getNestedProperty(a, sort.key);
+        bValue = getNestedProperty(b, sort.key);
+      } else {
+        aValue = a[sort.key as keyof typeof a];
+        bValue = b[sort.key as keyof typeof b];
+      }
 
       if (typeof aValue === 'string' && typeof bValue === 'string') {
         return sort.order === 'asc'
@@ -160,6 +202,8 @@ export function CargaProposalsList() {
         ? Number(aValue) - Number(bValue)
         : Number(bValue) - Number(aValue)
     })
+
+  console.log(bid, 'bid')
 
   const paginatedList = filteredOffers?.slice(
     (currentPage - 1) * itemsPerPage,
