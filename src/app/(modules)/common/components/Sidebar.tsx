@@ -5,8 +5,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/src/components/ui/accordion'
-import HistoryIcon from '@/src/icons/HistoryIcon'
-import TripIcon from '@/src/icons/TripIcon'
+import { Ship, BarChart3 } from 'lucide-react'
 import useAuthStore from '@/src/store/authStore'
 import Link from 'next/link'
 
@@ -94,6 +93,17 @@ const MarketItem = ({
   if (!(role in list)) {
     return <div>Invalid role</div>
   }
+
+  const getIcon = (itemName: string) => {
+    if (itemName === 'Viajes de carga') {
+      return <Ship className="h-5 w-5" />
+    }
+    if (itemName === 'Estadísticas') {
+      return <BarChart3 className="h-5 w-5" />
+    }
+    return null
+  }
+
   return (
     <Accordion type="single" collapsible key={market}>
       <AccordionItem value="item-1">
@@ -108,7 +118,7 @@ const MarketItem = ({
               className="flex items-center gap-2 rounded-md px-3 py-2 text-md font-bold hover:bg-purple hover:text-black text-white"
               prefetch={false}
             >
-              {index === 0 ? <TripIcon /> : <HistoryIcon />}
+              {getIcon(item.name)}
               {item.name}
             </Link>
           ))}
