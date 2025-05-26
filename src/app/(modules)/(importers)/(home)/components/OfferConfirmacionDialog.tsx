@@ -17,6 +17,7 @@ import { useCloseBid } from "@/src/app/hooks/useCloseBid"
 import { modalService } from "@/src/service/modalService"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card"
+import { useTranslation } from "@/src/hooks/useTranslation"
 
 interface OfferConfirmationProps {
   offerData: any
@@ -24,6 +25,7 @@ interface OfferConfirmationProps {
 
 export function OfferConfirmationDialog(offerData: any) {
   console.log(JSON.stringify(offerData), 'OfferData')
+  const { t } = useTranslation()
   const router = useRouter()
   const [isConfirming, setIsConfirming] = useState(false)
   const { setBidData } = useBidStore()
@@ -61,9 +63,9 @@ export function OfferConfirmationDialog(offerData: any) {
     <CardHeader className="flex-shrink-0">
       <CardTitle className="flex items-center gap-2 text-xl">
         <CheckCircle className="h-5 w-5 text-green-500" />
-        Confirmar Aceptación de Oferta
+        {t('offerConfirmation.title')}
       </CardTitle>
-      <CardDescription>Por favor revise los detalles de la oferta antes de aceptar</CardDescription>
+      <CardDescription>{t('offerConfirmation.description')}</CardDescription>
     </CardHeader>
 
     <CardContent className="space-y-4 overflow-y-auto flex-1 pr-2">
@@ -83,21 +85,21 @@ export function OfferConfirmationDialog(offerData: any) {
         <div className="flex items-center gap-2 mb-2">
           <Ship className="h-5 w-5 text-primary" />
           <span className="font-medium">
-            Ruta {offerData.shipping_type === "Aéreo" ? "Aérea" : "Marítima"}
+            {t('offerConfirmation.route')} {offerData.shipping_type === "Aéreo" ? t('offerConfirmation.air') : t('offerConfirmation.maritime')}
           </span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex items-start gap-2">
             <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
             <div>
-              <p className="text-sm text-muted-foreground">Origen</p>
+              <p className="text-sm text-muted-foreground">{t('offerConfirmation.origin')}</p>
               <p className="font-medium">{offerData.originBid}</p>
             </div>
           </div>
           <div className="flex items-start gap-2">
             <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
             <div>
-              <p className="text-sm text-muted-foreground">Destino</p>
+              <p className="text-sm text-muted-foreground">{t('offerConfirmation.destination')}</p>
               <p className="font-medium">{offerData.finishBid}</p>
             </div>
           </div>
@@ -110,7 +112,7 @@ export function OfferConfirmationDialog(offerData: any) {
           <div className="flex items-center gap-2">
             <DollarSign className="h-5 w-5 text-primary" />
             <div>
-              <p className="text-sm text-muted-foreground">Precio Total</p>
+              <p className="text-sm text-muted-foreground">{t('common.totalPrice')}</p>
               <p className="font-medium text-lg">
                 {offerData.price || `USD ${offerData.details.freight_fees?.value}`}
               </p>
@@ -123,17 +125,17 @@ export function OfferConfirmationDialog(offerData: any) {
             <div>
               {offerData.shipping_type === "Marítimo" ? (
                 <>
-                  <p className="text-sm text-muted-foreground">Contenedor</p>
+                  <p className="text-sm text-muted-foreground">{t('common.container')}</p>
                   <p className="font-medium">{offerData.details.freight_fees?.container}</p>
                 </>
               ) : (
                 <>
-                  <p className="text-sm text-muted-foreground">Dimensiones</p>
+                  <p className="text-sm text-muted-foreground">{t('common.dimensions')}</p>
                   <p className="font-medium">
                     {offerData.details.freight_fees?.dimensions ? (
                       `${offerData.details.freight_fees.dimensions.length}x${offerData.details.freight_fees.dimensions.width}x${offerData.details.freight_fees.dimensions.height} ${offerData.details.freight_fees.dimensions.units || "cm"}`
                     ) : (
-                      "No especificado"
+                      t('common.notSpecified')
                     )}
                   </p>
                 </>
@@ -152,18 +154,18 @@ export function OfferConfirmationDialog(offerData: any) {
         <div className="bg-muted/30 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-3">
             <Calendar className="h-5 w-5 text-primary" />
-            <span className="font-medium">Detalles del Servicio</span>
+            <span className="font-medium">{t('common.serviceDetails')}</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
             {offerData.details.basic_service.free_days && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Días Libres:</span>
-                <span className="font-medium">{offerData.details.basic_service.free_days} días</span>
+                <span className="text-muted-foreground">{t('common.freeDays')}:</span>
+                <span className="font-medium">{offerData.details.basic_service.free_days} {t('common.days')}</span>
               </div>
             )}
             {offerData.details.basic_service.validity && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Validez:</span>
+                <span className="text-muted-foreground">{t('common.validity')}:</span>
                 <span className="font-medium">
                   {offerData.details.basic_service.validity.time} {offerData.details.basic_service.validity.unit}
                 </span>
@@ -171,7 +173,7 @@ export function OfferConfirmationDialog(offerData: any) {
             )}
             {offerData.details.basic_service.cancellation_fee && (
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Tarifa de Cancelación:</span>
+                <span className="text-muted-foreground">{t('common.cancellationFee')}:</span>
                 <span className="font-medium">USD {offerData.details.basic_service.cancellation_fee}</span>
               </div>
             )}
@@ -185,13 +187,13 @@ export function OfferConfirmationDialog(offerData: any) {
         <div className="bg-muted/30 rounded-lg p-4">
           <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
             <Ship className="h-4 w-4 text-primary" />
-            Tarifas de Flete
+            {t('offerCard.freightRates')}
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
             {/* Para envíos marítimos */}
             {offerData.shipping_type === "Marítimo" && (
               <div className="flex justify-between p-2 bg-white/50 rounded">
-                <span>Contenedor:</span>
+                <span>{t('common.container')}:</span>
                 <span className="font-medium">{offerData.details.freight_fees?.container}</span>
               </div>
             )}
@@ -200,22 +202,22 @@ export function OfferConfirmationDialog(offerData: any) {
             {offerData.shipping_type === "Aéreo" && offerData.details.freight_fees?.dimensions && (
               <>
                 <div className="flex justify-between p-2 bg-white/50 rounded">
-                  <span>Longitud:</span>
+                  <span>{t('offerCard.length')}:</span>
                   <span className="font-medium">{offerData.details.freight_fees.dimensions.length} {offerData.details.freight_fees.dimensions.units || "cm"}</span>
                 </div>
                 <div className="flex justify-between p-2 bg-white/50 rounded">
-                  <span>Ancho:</span>
+                  <span>{t('offerCard.width')}:</span>
                   <span className="font-medium">{offerData.details.freight_fees.dimensions.width} {offerData.details.freight_fees.dimensions.units || "cm"}</span>
                 </div>
                 <div className="flex justify-between p-2 bg-white/50 rounded">
-                  <span>Altura:</span>
+                  <span>{t('offerCard.height')}:</span>
                   <span className="font-medium">{offerData.details.freight_fees.dimensions.height} {offerData.details.freight_fees.dimensions.units || "cm"}</span>
                 </div>
               </>
             )}
             
             <div className="flex justify-between p-2 bg-white/50 rounded">
-              <span>Valor del Flete:</span>
+              <span>{t('offerConfirmation.freightValue')}:</span>
               <span className="font-medium">USD {offerData.details?.freight_fees?.value}</span>
             </div>
           </div>
@@ -224,7 +226,7 @@ export function OfferConfirmationDialog(offerData: any) {
         {/* Cargos Adicionales (solo para aéreo) */}
         {offerData.shipping_type === "Aéreo" && offerData.details?.additional_fees && (
           <div className="bg-muted/30 rounded-lg p-4">
-            <h4 className="text-sm font-medium mb-3">Cargos Adicionales</h4>
+            <h4 className="text-sm font-medium mb-3">{t('offerCard.additionalCharges')}</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
               {Object.entries(offerData.details.additional_fees).map(([key, value]) => (
                 <div key={key} className="flex justify-between p-2 bg-white/50 rounded">
@@ -239,7 +241,7 @@ export function OfferConfirmationDialog(offerData: any) {
         {/* Tarifas de Origen */}
         {offerData.details?.origin_fees && (
           <div className="bg-muted/30 rounded-lg p-4">
-            <h4 className="text-sm font-medium mb-3">Tarifas de Origen</h4>
+            <h4 className="text-sm font-medium mb-3">{t('offerCard.originRates')}</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
               {Object.entries(offerData.details.origin_fees).map(([key, value]) => (
                 <div key={key} className="flex justify-between p-2 bg-white/50 rounded">
@@ -254,7 +256,7 @@ export function OfferConfirmationDialog(offerData: any) {
         {/* Tarifas de Destino */}
         {offerData.details?.destination_fees && (
           <div className="bg-muted/30 rounded-lg p-4">
-            <h4 className="text-sm font-medium mb-3">Tarifas de Destino</h4>
+            <h4 className="text-sm font-medium mb-3">{t('offerCard.destinationRates')}</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
               {Object.entries(offerData.details.destination_fees).map(([key, value]) => (
                 <div key={key} className="flex justify-between p-2 bg-white/50 rounded">
@@ -271,23 +273,23 @@ export function OfferConfirmationDialog(offerData: any) {
         {/* Servicio Básico */}
         {offerData.details?.basic_service && (
           <div className="bg-muted/30 rounded-lg p-4">
-            <h4 className="text-sm font-medium mb-3">Servicio Básico</h4>
+            <h4 className="text-sm font-medium mb-3">{t('offerCard.basicService')}</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
               {offerData.details.basic_service?.cancellation_fee && (
                 <div className="flex justify-between p-2 bg-white/50 rounded">
-                  <span>Tarifa de Cancelación:</span>
+                  <span>{t('common.cancellationFee')}:</span>
                   <span className="font-medium">USD {offerData.details.basic_service.cancellation_fee}</span>
                 </div>
               )}
               {offerData.details.basic_service?.free_days && (
                 <div className="flex justify-between p-2 bg-white/50 rounded">
-                  <span>Días Libres:</span>
-                  <span className="font-medium">{offerData.details.basic_service.free_days} días</span>
+                  <span>{t('common.freeDays')}:</span>
+                  <span className="font-medium">{offerData.details.basic_service.free_days} {t('common.days')}</span>
                 </div>
               )}
               {offerData.details.basic_service?.validity && (
                 <div className="flex justify-between p-2 bg-white/50 rounded">
-                  <span>Validez:</span>
+                  <span>{t('common.validity')}:</span>
                   <span className="font-medium">
                     {offerData.details.basic_service.validity.time} {offerData.details.basic_service.validity.unit}
                   </span>
@@ -312,7 +314,7 @@ export function OfferConfirmationDialog(offerData: any) {
         {/* Otros Cargos */}
         {offerData.details?.other_fees && Object.keys(offerData.details.other_fees).length > 0 && (
           <div className="bg-muted/30 rounded-lg p-4">
-            <h4 className="text-sm font-medium mb-3">Otros Cargos</h4>
+            <h4 className="text-sm font-medium mb-3">{t('offerCard.otherCharges')}</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
               {Object.entries(offerData.details.other_fees).map(([key, value]) => (
                 <div key={key} className="flex justify-between p-2 bg-white/50 rounded">
@@ -329,7 +331,7 @@ export function OfferConfirmationDialog(offerData: any) {
       <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-800">
         <AlertCircle className="h-5 w-5 flex-shrink-0" />
         <p className="text-sm">
-          Al aceptar esta oferta, usted está de acuerdo con los términos y condiciones establecidos.
+          {t('offerConfirmation.warning')}
         </p>
       </div>
     </CardContent>
@@ -337,7 +339,7 @@ export function OfferConfirmationDialog(offerData: any) {
     <CardFooter className="flex flex-col sm:flex-row sm:justify-between gap-3 pt-4 flex-shrink-0">
       <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
         <X className="mr-2 h-4 w-4" />
-        Cancelar
+        {t('common.cancel')}
       </Button>
       <Button
         onClick={handleConfirm}
@@ -345,11 +347,11 @@ export function OfferConfirmationDialog(offerData: any) {
         className="w-full sm:w-auto bg-green-600 hover:bg-green-700"
       >
         {isConfirming ? (
-          <>Procesando...</>
+          <>{t('offerConfirmation.processing')}</>
         ) : (
           <>
             <CheckCircle className="mr-2 h-4 w-4" />
-            Confirmar y Aceptar
+            {t('offerConfirmation.confirmAndAccept')}
           </>
         )}
       </Button>

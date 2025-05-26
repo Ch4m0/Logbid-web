@@ -23,6 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/ca
 import { modalService } from "@/src/service/modalService"
 import { useExtendExpirationDate } from "@/src/app/hooks/useExtendExpirationDate"
 import { Badge } from "@/src/components/ui/badge"
+import { useTranslation } from "@/src/hooks/useTranslation"
 
 const FormSchema = z.object({
   dob: z.date({
@@ -43,6 +44,7 @@ export function ExtendCargoTransport({
   id: string
   shippingType: string
 }) {
+  const { t } = useTranslation()
   const { mutate: extendExpirationDate, isPending } = useExtendExpirationDate()
 
   const expirationDatePlusOne = new Date(expiration_date)
@@ -81,13 +83,13 @@ export function ExtendCargoTransport({
       {
         onSuccess: () => {
           toast({
-            title: "Fecha actualizada!",
+            title: t('extendCargo.dateUpdated'),
           })
           modalService.closeModal()
         },
         onError: (error) => {
           toast({
-            title: "Error al actualizar la fecha",
+            title: t('extendCargo.errorUpdating'),
             description: error.message,
             variant: "destructive",
           })
@@ -99,7 +101,7 @@ export function ExtendCargoTransport({
   return (
     <Card className="w-full">
       <CardHeader className="pb-0">
-        <CardTitle className="text-xl font-semibold">Extender Viaje de Carga</CardTitle>
+        <CardTitle className="text-xl font-semibold">{t('extendCargo.title')}</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -120,11 +122,11 @@ export function ExtendCargoTransport({
             <div className="bg-muted/50 p-3 rounded-lg mb-4">
               <div className="flex justify-between items-center">
                 <div>
-                  <div className="text-sm text-muted-foreground mb-1">Fecha de expiración actual:</div>
+                  <div className="text-sm text-muted-foreground mb-1">{t('extendCargo.currentExpiration')}:</div>
                   <div className="font-medium">{format(new Date(expiration_date), "PPP")}</div>
                 </div>
                 <Badge variant="secondary">
-                  {shippingType }
+                  {shippingType}
                 </Badge>
               </div>
             </div>
@@ -134,7 +136,7 @@ export function ExtendCargoTransport({
               name="dob"
               render={({ field }) => (
                 <FormItem className="space-y-2">
-                  <FormLabel>Nueva fecha de expiración</FormLabel>
+                  <FormLabel>{t('extendCargo.newDate')}</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -142,7 +144,7 @@ export function ExtendCargoTransport({
                           variant="outline"
                           className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
                         >
-                          {field.value ? format(field.value, "PPP") : <span>Selecciona una fecha</span>}
+                          {field.value ? format(field.value, "PPP") : <span>{t('extendCargo.selectDate')}</span>}
                           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
                       </FormControl>
@@ -158,7 +160,7 @@ export function ExtendCargoTransport({
                     </PopoverContent>
                   </Popover>
                   <FormDescription>
-                    Selecciona una fecha posterior a {format(new Date(expirationDatePlusOne), "PPP")}
+                    {t('extendCargo.selectDateAfter')} {format(new Date(expirationDatePlusOne), "PPP")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -169,10 +171,10 @@ export function ExtendCargoTransport({
               {isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Actualizando...
+                  {t('common.loading')}
                 </>
               ) : (
-                "Guardar cambios"
+                t('common.save')
               )}
             </Button>
           </form>

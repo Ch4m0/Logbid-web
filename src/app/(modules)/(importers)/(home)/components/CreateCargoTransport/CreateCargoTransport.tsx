@@ -34,6 +34,7 @@ import { useGetListContainer } from '@/src/app/hooks/useGetContainerList'
 import { useCreateBid } from '@/src/app/hooks/useCreateBid'
 import FilterableSelectMaritimePort from '@/src/app/(modules)/common/components/FilterableSelectMaritimePort'
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from '@/src/hooks/useTranslation'
 
 // Definir el tipo para los valores del formulario
 interface FormValues {
@@ -58,71 +59,13 @@ interface FormValues {
   informacionAdicional?: string
 }
 
-const validationSchema = Yup.object({
-  tipoTransporte: Yup.string().required('El tipo de transporte es requerido'),
-  origen: Yup.string().required('El origen es requerido'),
-  destino: Yup.string().required('El destino es requerido'),
-  tipoComex: Yup.string().required('El tipo de comex es requerido'),
-  tipoEnvio: Yup.string().required('El tipo de envío es requerido'),
-  contenedor: Yup.string().when('tipoTransporte', (tipoTransporte, schema) => {
-    return typeof tipoTransporte === 'string' && tipoTransporte === 'Marítimo'
-      ? schema.required('El contenedor es requerido') // Si es "Marítimo", se requiere
-      : schema.notRequired() // Para otros tipos de transporte, no se requiere
-  }),
-  empaque: Yup.string().when('tipoTransporte', (tipoTransporte, schema) => {
-    return tipoTransporte[0] === 'Marítimo'
-      ? schema.notRequired() // Si es "maritimo", no se requiere
-      : schema.required('El empaque es requerido') // Requiere "empaque" para otros tipos de envío
-  }),
-
-  pesoTotal: Yup.string()
-    .required('El peso total es requerido')
-    .test(
-      'is-numeric',
-      'Solo se permiten números en Peso Total',
-      (value) => /^[0-9]+$/.test(value) // Verifica que el valor solo contenga dígitos
-    ),
-
-  tipoMedida: Yup.string().required('El tipo de medida es requerido'),
-  cbm: Yup.string()
-    .required('El m3 (CBM) es requerido')
-    .test(
-      'is-numeric',
-      'Solo se permiten números en CBM',
-      (value) => /^[0-9]+$/.test(value) // Verifica que el valor solo contenga dígitos
-    ),
-  unidades: Yup.string()
-    .required('Las unidades son requeridas')
-    .test(
-      'is-numeric',
-      'Solo se permiten números en el campo unidades',
-      (value) => /^[0-9]+$/.test(value) // Verifica que el valor solo contenga dígitos
-    ),
-  incoterm: Yup.string().required('El incoterm es requerido'),
-  tipoMercancia: Yup.string().required('El tipo de mercancía es requerido'),
-  cargaClasificacion: Yup.string().required(
-    'La clasificación de la carga es requerida'
-  ),
-  partidaArancelaria: Yup.string().required(
-    'La partida arancelaria es requerida'
-  ),
-  valor: Yup.string()
-    .required('El valor es requerido')
-    .test(
-      'is-numeric',
-      'Solo se permiten números en el campo valor',
-      (value) => /^[0-9]+$/.test(value) // Verifica que el valor solo contenga dígitos
-    ),
-  moneda: Yup.string().required('La moneda es requerida'),
-  fechaExpiracion: Yup.string().required('La fecha de despacho es requerida'),
-})
-
 const ErrorMessage = styled.span`
   font-size: 0.875rem;
   color: red;
 `
 
 export default function CreateCargoTransport() {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [shippingType, setShippingType] = useState('Marítimo')
   const searchParams = useSearchParams()
@@ -134,6 +77,59 @@ export default function CreateCargoTransport() {
     searchParams.get('market_id') ??
     user?.all_markets[0]?.id?.toString() ??
     null
+
+  const validationSchema = Yup.object({
+    tipoTransporte: Yup.string().required(t('createCargo.validation.transportTypeRequired')),
+    origen: Yup.string().required(t('createCargo.validation.originRequired')),
+    destino: Yup.string().required(t('createCargo.validation.destinationRequired')),
+    tipoComex: Yup.string().required(t('createCargo.validation.comexTypeRequired')),
+    tipoEnvio: Yup.string().required(t('createCargo.validation.shipmentTypeRequired')),
+    contenedor: Yup.string().when('tipoTransporte', (tipoTransporte, schema) => {
+      return typeof tipoTransporte === 'string' && tipoTransporte === 'Marítimo'
+        ? schema.required(t('createCargo.validation.containerRequired'))
+        : schema.notRequired()
+    }),
+    empaque: Yup.string().when('tipoTransporte', (tipoTransporte, schema) => {
+      return tipoTransporte[0] === 'Marítimo'
+        ? schema.notRequired()
+        : schema.required(t('createCargo.validation.packagingRequired'))
+    }),
+    pesoTotal: Yup.string()
+      .required(t('createCargo.validation.totalWeightRequired'))
+      .test(
+        'is-numeric',
+        t('createCargo.validation.onlyNumbers'),
+        (value) => /^[0-9]+$/.test(value)
+      ),
+    tipoMedida: Yup.string().required(t('createCargo.validation.measureTypeRequired')),
+    cbm: Yup.string()
+      .required(t('createCargo.validation.cbmRequired'))
+      .test(
+        'is-numeric',
+        t('createCargo.validation.onlyNumbers'),
+        (value) => /^[0-9]+$/.test(value)
+      ),
+    unidades: Yup.string()
+      .required(t('createCargo.validation.unitsRequired'))
+      .test(
+        'is-numeric',
+        t('createCargo.validation.onlyNumbers'),
+        (value) => /^[0-9]+$/.test(value)
+      ),
+    incoterm: Yup.string().required(t('createCargo.validation.incotermsRequired')),
+    tipoMercancia: Yup.string().required(t('createCargo.validation.merchandiseTypeRequired')),
+    cargaClasificacion: Yup.string().required(t('createCargo.validation.cargoClassificationRequired')),
+    partidaArancelaria: Yup.string().required(t('createCargo.validation.tariffItemRequired')),
+    valor: Yup.string()
+      .required(t('createCargo.validation.valueRequired'))
+      .test(
+        'is-numeric',
+        t('createCargo.validation.onlyNumbers'),
+        (value) => /^[0-9]+$/.test(value)
+      ),
+    moneda: Yup.string().required(t('createCargo.validation.currencyRequired')),
+    fechaExpiracion: Yup.string().required(t('createCargo.validation.shipmentDateRequired')),
+  })
 
   const formik = useFormik<FormValues>({
     initialValues: {
@@ -193,9 +189,8 @@ export default function CreateCargoTransport() {
   const { mutate: createBid, isPending } = useCreateBid()
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault()
-    formik.handleSubmit() // Ejecuta la validación
+    formik.handleSubmit()
 
-    // Verifica si hay errores de validación y los imprime
     if (Object.keys(formik.errors).length > 0) {
       console.log('Errores de validación:', formik.errors)
     } else {
@@ -203,12 +198,11 @@ export default function CreateCargoTransport() {
     }
   }
 
-
   return (
     <div>
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
-          <Button onClick={() => setIsOpen(true)}>Crear</Button>
+          <Button onClick={() => setIsOpen(true)}>{t('common.save')}</Button>
         </SheetTrigger>
 
         <SheetContent
@@ -216,13 +210,13 @@ export default function CreateCargoTransport() {
           className="w-full md:max-w-3xl overflow-y-scroll"
         >
           <SheetHeader>
-            <SheetTitle>Creación de transporte de carga</SheetTitle>
+            <SheetTitle>{t('createCargo.title')}</SheetTitle>
           </SheetHeader>
 
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-4 py-4">
               <div className="grid gap-1">
-                <Label htmlFor="tipoTransporte">Transporte</Label>
+                <Label htmlFor="tipoTransporte">{t('createCargo.transportType')}</Label>
                 <Select
                   value={formik.values.tipoTransporte}
                   onValueChange={(value) => {
@@ -232,11 +226,11 @@ export default function CreateCargoTransport() {
                   }}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar" />
+                    <SelectValue placeholder={t('createCargo.select')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Marítimo">Marítimo</SelectItem>
-                    <SelectItem value="Aéreo">Aéreo</SelectItem>
+                    <SelectItem value="Marítimo">{t('transport.maritime')}</SelectItem>
+                    <SelectItem value="Aéreo">{t('transport.air')}</SelectItem>
                   </SelectContent>
                 </Select>
                 <div className="text-red-500 min-h-[20px]">
@@ -249,7 +243,7 @@ export default function CreateCargoTransport() {
                 </div>
               </div>
               <div className="grid gap-1">
-                <Label htmlFor="tipoComex">Tipo Comex</Label>
+                <Label htmlFor="tipoComex">{t('createCargo.comexType')}</Label>
                 <Select
                   value={formik.values.tipoComex}
                   onValueChange={(value) => {
@@ -257,11 +251,11 @@ export default function CreateCargoTransport() {
                   }}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar" />
+                    <SelectValue placeholder={t('createCargo.select')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Importación">Importación</SelectItem>
-                    <SelectItem value="Exportación">Exportación</SelectItem>
+                    <SelectItem value="Importación">{t('createCargo.comexTypes.importation')}</SelectItem>
+                    <SelectItem value="Exportación">{t('createCargo.comexTypes.exportation')}</SelectItem>
                   </SelectContent>
                 </Select>
                 <div className="text-red-500 min-h-[20px]">
@@ -275,7 +269,7 @@ export default function CreateCargoTransport() {
                 {formik.values.tipoTransporte === 'Marítimo' ? (
                   <>
                     <FilterableSelectMaritimePort
-                      label="Orígen"
+                      label={t('createCargo.origin')}
                       value={formik.values.origen}
                       onSelect={(option: any) => {
                         formik.setFieldValue('origen', option.id)
@@ -290,7 +284,7 @@ export default function CreateCargoTransport() {
                 ) : (
                   <>
                     <FilterableSelectAirport
-                      label="Orígen"
+                      label={t('createCargo.origin')}
                       value={formik.values.origen}
                       onSelect={(option: any) =>
                         formik.setFieldValue('origen', option.id)
@@ -309,7 +303,7 @@ export default function CreateCargoTransport() {
                 {formik.values.tipoTransporte === 'Marítimo' ? (
                   <>
                     <FilterableSelectMaritimePort
-                      label="Destino"
+                      label={t('createCargo.destination')}
                       value={formik.values.destino}
                       onSelect={(option: any) =>
                         formik.setFieldValue('destino', option.id)
@@ -324,7 +318,7 @@ export default function CreateCargoTransport() {
                 ) : (
                   <>
                     <FilterableSelectAirport
-                      label="Destino"
+                      label={t('createCargo.destination')}
                       value={formik.values.destino}
                       onSelect={(option: any) =>
                         formik.setFieldValue('destino', option.id)
@@ -340,7 +334,7 @@ export default function CreateCargoTransport() {
               </div>
 
               <div className="grid gap-1">
-                <Label htmlFor="tipoEnvio">Tipo envío</Label>
+                <Label htmlFor="tipoEnvio">{t('createCargo.shipmentType')}</Label>
                 <Select
                   value={formik.values.tipoEnvio}
                   onValueChange={(value) =>
@@ -348,12 +342,12 @@ export default function CreateCargoTransport() {
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar" />
+                    <SelectValue placeholder={t('createCargo.select')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Carga suelta">Carga suelta</SelectItem>
-                    <SelectItem value="FCL">FCL</SelectItem>
-                    <SelectItem value="LCL">LCL</SelectItem>
+                    <SelectItem value="Carga suelta">{t('createCargo.shipmentTypes.looseCargo')}</SelectItem>
+                    <SelectItem value="FCL">{t('createCargo.shipmentTypes.fcl')}</SelectItem>
+                    <SelectItem value="LCL">{t('createCargo.shipmentTypes.lcl')}</SelectItem>
                   </SelectContent>
                 </Select>
                 <div className="text-red-500 min-h-[20px]">
@@ -365,7 +359,7 @@ export default function CreateCargoTransport() {
 
               {formik.values.tipoTransporte === 'Marítimo' ? (
                 <div className="grid gap-1">
-                  <Label htmlFor="contenedor">Contenedor</Label>
+                  <Label htmlFor="contenedor">{t('createCargo.containerType')}</Label>
                   <Select
                     value={formik.values.contenedor}
                     onValueChange={(value) =>
@@ -373,7 +367,7 @@ export default function CreateCargoTransport() {
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar" />
+                      <SelectValue placeholder={t('createCargo.select')} />
                     </SelectTrigger>
                     <SelectContent>
                       {containerList?.map(
@@ -393,7 +387,7 @@ export default function CreateCargoTransport() {
                 </div>
               ) : (
                 <div className="grid gap-1">
-                  <Label htmlFor="empaque">Empaque</Label>
+                  <Label htmlFor="empaque">{t('createCargo.packaging')}</Label>
                   <Select
                     value={formik.values.empaque}
                     onValueChange={(value) => {
@@ -402,14 +396,9 @@ export default function CreateCargoTransport() {
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar" />
+                      <SelectValue placeholder={t('createCargo.select')} />
                     </SelectTrigger>
                     <SelectContent>
-                      {/* containerList.map((item, index) => (
-                        <SelectItem key={index} value={item}>
-                          {item}
-                        </SelectItem>
-                      )) */}
                       {containerList?.map(
                         (item: { id: number; name: string }, index: number) => (
                           <SelectItem key={index} value={item.id.toString()}>
@@ -428,11 +417,11 @@ export default function CreateCargoTransport() {
               )}
 
               <div className="grid gap-1">
-                <Label htmlFor="pesoTotal">Peso Bruto Total</Label>
+                <Label htmlFor="pesoTotal">{t('createCargo.totalWeight')}</Label>
                 <Input
                   id="pesoTotal"
                   name="pesoTotal"
-                  placeholder="Ingrese el peso total"
+                  placeholder={t('createCargo.enterWeight')}
                   value={formik.values.pesoTotal}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -445,7 +434,7 @@ export default function CreateCargoTransport() {
               </div>
 
               <div className="grid gap-1">
-                <Label htmlFor="tipoMedida">Tipo Medida</Label>
+                <Label htmlFor="tipoMedida">{t('createCargo.measureType')}</Label>
                 <Select
                   value={formik.values.tipoMedida}
                   onValueChange={(value) =>
@@ -453,10 +442,10 @@ export default function CreateCargoTransport() {
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar" />
+                    <SelectValue placeholder={t('createCargo.select')} />
                   </SelectTrigger>
                   <SelectContent>
-                    {['Kg', 'Lbs', 'Tons'].map((item, index) => (
+                    {['Kg', 'Lbs', 'Tons'].map((item: string, index: number) => (
                       <SelectItem key={index} value={item}>
                         {item}
                       </SelectItem>
@@ -471,11 +460,11 @@ export default function CreateCargoTransport() {
               </div>
 
               <div className="grid gap-1">
-                <Label htmlFor="cbm">m3 (CBM)</Label>
+                <Label htmlFor="cbm">{t('createCargo.cbm')}</Label>
                 <Input
                   id="cbm"
                   name="cbm"
-                  placeholder="Ingrese el m3 (CBM)"
+                  placeholder={t('createCargo.enterCbm')}
                   value={formik.values.cbm}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -488,11 +477,11 @@ export default function CreateCargoTransport() {
               </div>
 
               <div className="grid gap-1">
-                <Label htmlFor="unidades">Unidades</Label>
+                <Label htmlFor="unidades">{t('createCargo.units')}</Label>
                 <Input
                   id="unidades"
                   name="unidades"
-                  placeholder="Ingrese las unidades"
+                  placeholder={t('createCargo.enterUnits')}
                   value={formik.values.unidades}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -505,7 +494,7 @@ export default function CreateCargoTransport() {
               </div>
 
               <div className="grid gap-1">
-                <Label htmlFor="incoterm">Incoterms</Label>
+                <Label htmlFor="incoterm">{t('createCargo.incoterms')}</Label>
                 <Select
                   value={formik.values.incoterm}
                   onValueChange={(value) =>
@@ -513,7 +502,7 @@ export default function CreateCargoTransport() {
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar" />
+                    <SelectValue placeholder={t('createCargo.select')} />
                   </SelectTrigger>
                   <SelectContent>
                     {listIncoterm?.map((item: Incoterm, index: number) => (
@@ -531,11 +520,11 @@ export default function CreateCargoTransport() {
               </div>
 
               <div className="grid gap-1">
-                <Label htmlFor="tipoMercancia">Tipo Mercancia</Label>
+                <Label htmlFor="tipoMercancia">{t('createCargo.merchandiseType')}</Label>
                 <Input
                   id="tipoMercancia"
                   name="tipoMercancia"
-                  placeholder="Ingrese el tipo de mercancía"
+                  placeholder={t('createCargo.enterMerchandiseType')}
                   value={formik.values.tipoMercancia}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -549,7 +538,7 @@ export default function CreateCargoTransport() {
               </div>
 
               <div className="grid gap-1">
-                <Label htmlFor="cargaClasificacion">Carga Clasificación</Label>
+                <Label htmlFor="cargaClasificacion">{t('createCargo.cargoClassification')}</Label>
                 <Select
                   value={formik.values.cargaClasificacion}
                   onValueChange={(value) =>
@@ -557,16 +546,13 @@ export default function CreateCargoTransport() {
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar" />
+                    <SelectValue placeholder={t('createCargo.select')} />
                   </SelectTrigger>
                   <SelectContent>
-                    {['Bulk', 'General', 'Peligrosa', 'Refrigerada'].map(
-                      (item, index) => (
-                        <SelectItem key={index} value={item}>
-                          {item}
-                        </SelectItem>
-                      )
-                    )}
+                    <SelectItem value="Bulk">{t('createCargo.cargoClassifications.bulk')}</SelectItem>
+                    <SelectItem value="General">{t('createCargo.cargoClassifications.general')}</SelectItem>
+                    <SelectItem value="Peligrosa">{t('createCargo.cargoClassifications.dangerous')}</SelectItem>
+                    <SelectItem value="Refrigerada">{t('createCargo.cargoClassifications.refrigerated')}</SelectItem>
                   </SelectContent>
                 </Select>
                 <div className="text-red-500 min-h-[20px]">
@@ -580,11 +566,11 @@ export default function CreateCargoTransport() {
               </div>
 
               <div className="grid gap-1">
-                <Label htmlFor="partidaArancelaria">Partida Arancelaria</Label>
+                <Label htmlFor="partidaArancelaria">{t('createCargo.tariffItem')}</Label>
                 <Input
                   id="partidaArancelaria"
                   name="partidaArancelaria"
-                  placeholder="Ingrese la partida arancelaria"
+                  placeholder={t('createCargo.enterTariffItem')}
                   value={formik.values.partidaArancelaria}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -600,11 +586,11 @@ export default function CreateCargoTransport() {
               </div>
 
               <div className="grid gap-1">
-                <Label htmlFor="valor">Valor</Label>
+                <Label htmlFor="valor">{t('createCargo.value')}</Label>
                 <Input
                   id="valor"
                   name="valor"
-                  placeholder="Ingrese el valor"
+                  placeholder={t('createCargo.enterValue')}
                   value={formik.values.valor}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -617,7 +603,7 @@ export default function CreateCargoTransport() {
               </div>
 
               <div className="grid gap-1">
-                <Label htmlFor="moneda">Moneda</Label>
+                <Label htmlFor="moneda">{t('createCargo.currency')}</Label>
                 <Select
                   value={formik.values.moneda}
                   onValueChange={(value) =>
@@ -625,10 +611,10 @@ export default function CreateCargoTransport() {
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar" />
+                    <SelectValue placeholder={t('createCargo.select')} />
                   </SelectTrigger>
                   <SelectContent>
-                    {['EUR', 'USD'].map((item, index) => (
+                    {['EUR', 'USD'].map((item: string, index: number) => (
                       <SelectItem key={index} value={item}>
                         {item}
                       </SelectItem>
@@ -643,7 +629,7 @@ export default function CreateCargoTransport() {
               </div>
 
               <div className="grid gap-1">
-                <Label htmlFor="fechaExpiracion">Fecha despacho</Label>
+                <Label htmlFor="fechaExpiracion">{t('createCargo.shipmentDate')}</Label>
                 <Input
                   id="fechaExpiracion"
                   type="date"
@@ -662,9 +648,9 @@ export default function CreateCargoTransport() {
                 </div>
               </div>
 
-              <div className="w-full col-ErrorMessage-2 mt-3 mb-4">
+              <div className="w-full col-span-2 mt-3 mb-4">
                 <Textarea
-                  placeholder="Información adicional"
+                  placeholder={t('createCargo.enterAdditionalInfo')}
                   name="informacionAdicional"
                   value={formik.values.informacionAdicional}
                   onChange={formik.handleChange}
@@ -675,7 +661,7 @@ export default function CreateCargoTransport() {
 
             <SheetFooter>
               <Button type="submit" className="ml-auto">
-                Guardar
+                {t('common.save')}
               </Button>
             </SheetFooter>
           </form>

@@ -8,6 +8,8 @@ import {
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu'
 import { Badge } from '@/src/components/ui/badge'
+import { LanguageSelector } from '@/src/components/LanguageSelector'
+import { useTranslation } from '@/src/hooks/useTranslation'
 import useAuthStore from '@/src/store/authStore'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -19,14 +21,14 @@ const getInitials = (name?: string, lastName?: string) => {
   return initials.toUpperCase()
 }
 
-const getUserRoleLabel = (roleId?: number) => {
+const getUserRoleLabel = (roleId?: number, t?: (key: string) => string) => {
   switch (roleId) {
     case 2:
-      return 'Importador/Exportador'
+      return t?.('header.userRole.importer') || 'Importer/Exporter'
     case 3:
-      return 'Agente'
+      return t?.('header.userRole.agent') || 'Agent'
     default:
-      return 'Usuario'
+      return t?.('header.userRole.user') || 'User'
   }
 }
 
@@ -46,6 +48,7 @@ const Header = () => {
   const user = useAuthStore((state) => state.user)
   const logout = useAuthStore((state) => state.logout)
   const initials = getInitials(user?.name, user?.last_name)
+  const { t } = useTranslation()
 
   const handleLogout = () => {
     logout()
@@ -64,15 +67,16 @@ const Header = () => {
         <span className="sr-only">LOGBID</span>
       </Link>
       <div className="flex-1 flex justify-center">
-        <MenuHeader /> {/* Coloca el componente MenuHeader en el centro */}
+        <MenuHeader />
       </div>
       <div className="ml-auto flex items-center gap-4">
+        <LanguageSelector />
         <div className="flex flex-col items-end gap-1">
           <span className="text-sm font-bold">
             {user?.name} {user?.last_name}
           </span>
           <Badge variant={getUserRoleVariant(user?.role_id)} className="text-xs">
-            {getUserRoleLabel(user?.role_id)}
+            {getUserRoleLabel(user?.role_id, t)}
           </Badge>
         </div>
         <DropdownMenu>
@@ -86,12 +90,8 @@ const Header = () => {
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            {/*
-            <DropdownMenuItem>My Account</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuSeparator /> */}
             <DropdownMenuItem onClick={() => handleLogout()}>
-              Salir
+              {t('common.logout')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

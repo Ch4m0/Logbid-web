@@ -32,6 +32,7 @@ import { Badge } from '@/src/components/ui/badge'
 import { Separator } from '@/src/components/ui/separator'
 import { ShippingType } from '@/src/models/common'
 import { convertToColombiaTime } from '@/src/lib/utils'
+import { useTranslation } from '@/src/hooks/useTranslation'
 
 interface CargoTransporListProps {
   status: 'Active' | 'Closed' | 'Offering'
@@ -43,15 +44,14 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
   const { setMarketData } = useBidStore()
   const [itemsPerPage] = useState(8)
   const searchParams = useSearchParams()
+  const { t } = useTranslation()
 
   const marketId =
     searchParams.get('market_id') ??
     user?.all_markets[0]?.id?.toString() ??
     null
 
-
   const shippingType = searchParams.get('shipping_type') || 'Marítimo'
-
 
   const { data: bidList, refetch } = useGetBidList({
     user_id: user?.id || null,
@@ -60,8 +60,8 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
     shipping_type: shippingType as ShippingType,
   })
 
-   useEffect(() => {
-      refetch()
+  useEffect(() => {
+    refetch()
   }, [shippingType, refetch])
 
   const currentPage = Number(searchParams.get('page')) || 1
@@ -164,7 +164,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
   return (
     <Card className="w-full">
       <CardHeader className="flex justify-between flex-row w-full">
-        <CardTitle className="font-bold">{shippingType}</CardTitle>
+        <CardTitle className="font-bold">{t(`transport.${shippingType.toLowerCase()}`)}</CardTitle>
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
@@ -173,7 +173,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
             className="flex items-center space-x-2"
           >
             <Filter className="h-4 w-4" />
-            <span>{showFilters ? 'Ocultar Filtros' : 'Mostrar Filtros'}</span>
+            <span>{showFilters ? t('common.hideFilters') : t('common.showFilters')}</span>
           </Button>
           <CreateCargoTransport />
         </div>
@@ -183,11 +183,11 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             <div>
               <label className="text-sm font-medium mb-1 block">
-                Fecha de creación
+                {t('cargoList.creationDate')}
               </label>
               <div className="flex items-center">
                 <Input
-                  placeholder="Filtrar fecha creación"
+                  placeholder={t('filters.filterCreationDate')}
                   onChange={(e) =>
                     handleFilterChange('inserted_at', e.target.value)
                   }
@@ -204,11 +204,11 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
             </div>
             <div>
               <label className="text-sm font-medium mb-1 block">
-                Fecha de Finalización
+                {t('cargoList.finalizationDate')}
               </label>
               <div className="flex items-center">
                 <Input
-                  placeholder="Filtrar fecha finalización"
+                  placeholder={t('filters.filterFinalizationDate')}
                   onChange={(e) =>
                     handleFilterChange('expiration_date', e.target.value)
                   }
@@ -226,11 +226,11 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
             {STATUS.includes(status) && (
               <div>
                 <label className="text-sm font-medium mb-1 block">
-                  Código agente
+                  {t('cargoList.agentCode')}
                 </label>
                 <div className="flex items-center">
                   <Input
-                    placeholder="Filtrar código"
+                    placeholder={t('filters.filterCode')}
                     onChange={(e) => handleFilterChange('uuid', e.target.value)}
                   />
                   <Button
@@ -246,11 +246,11 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
             )}
             <div>
               <label className="text-sm font-medium mb-1 block">
-                ID transacción
+                {t('cargoList.transactionId')}
               </label>
               <div className="flex items-center">
                 <Input
-                  placeholder="Filtrar ID"
+                  placeholder={t('filters.filterId')}
                   onChange={(e) => handleFilterChange('uuid', e.target.value)}
                 />
                 <Button
@@ -264,10 +264,10 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
               </div>
             </div>
             <div>
-              <label className="text-sm font-medium mb-1 block">Origen</label>
+              <label className="text-sm font-medium mb-1 block">{t('cargoList.origin')}</label>
               <div className="flex items-center">
                 <Input
-                  placeholder="Filtrar origen"
+                  placeholder={t('filters.filterOrigin')}
                   onChange={(e) =>
                     handleFilterChange('origin_name', e.target.value)
                   }
@@ -283,10 +283,10 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
               </div>
             </div>
             <div>
-              <label className="text-sm font-medium mb-1 block">Destino</label>
+              <label className="text-sm font-medium mb-1 block">{t('cargoList.destination')}</label>
               <div className="flex items-center">
                 <Input
-                  placeholder="Filtrar destino"
+                  placeholder={t('filters.filterDestination')}
                   onChange={(e) =>
                     handleFilterChange('destination_name', e.target.value)
                   }
@@ -304,11 +304,11 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
             {STATUS.includes(status) && (
               <div>
                 <label className="text-sm font-medium mb-1 block">
-                  Último Precio
+                  {t('cargoList.lastPrice')}
                 </label>
                 <div className="flex items-center">
                   <Input
-                    placeholder="Filtrar precio"
+                    placeholder={t('filters.filterPrice')}
                     onChange={(e) => handleFilterChange('value', e.target.value)}
                   />
                   <Button
@@ -324,11 +324,11 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
             )}
             <div>
               <label className="text-sm font-medium mb-1 block">
-                Cantidad de Ofertas
+                {t('cargoList.offersCount')}
               </label>
               <div className="flex items-center">
                 <Input
-                  placeholder="Filtrar ofertas"
+                  placeholder={t('filters.filterOffers')}
                   onChange={(e) => handleFilterChange('offers_count', e.target.value)}
                 />
                 <Button
@@ -362,7 +362,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                         className="w-full justify-center"
                         variant="secondary"
                       >
-                        Código agente: {bid.agent_code}
+                        {t('cargoList.agentCode')}: {bid.agent_code}
                       </Badge>
                     )}
                     {STATUS.includes(status) && (
@@ -376,7 +376,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                     <div className="flex items-center justify-center space-x-2 mt-2 bg-blue-50 p-2 rounded-md">
                       <Users className="h-4 w-4 text-blue-600" />
                       <span className="text-sm font-medium text-blue-600">
-                        {bid.offers_count} {bid.offers_count === 1 ? 'Oferta' : 'Ofertas'}
+                        {bid.offers_count} {bid.offers_count === 1 ? t('cargoList.offer') : t('cargoList.offers')}
                       </span>
                     </div>
                   </div>
@@ -389,7 +389,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                         <MapPin className="h-5 w-5 text-primary" />
                         <div className="flex flex-col">
                           <span className="text-sm text-muted-foreground">
-                            Origen
+                            {t('cargoList.origin')}
                           </span>
                           <span className="font-medium">{bid.origin_name}</span>
                         </div>
@@ -399,7 +399,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                         <MapPin className="h-5 w-5 text-destructive" />
                         <div className="flex flex-col">
                           <span className="text-sm text-muted-foreground">
-                            Destino
+                            {t('cargoList.destination')}
                           </span>
                           <span className="font-medium">
                             {bid.destination_name}
@@ -415,7 +415,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                         <Calendar className="h-4 w-4 text-muted-foreground" />
                         <div className="flex flex-col">
                           <span className="text-xs text-muted-foreground">
-                            Creación
+                            {t('cargoList.creation')}
                           </span>
                           <span className="text-sm">{convertToColombiaTime(bid.inserted_at)}</span>
                         </div>
@@ -424,7 +424,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                         <Clock className="h-4 w-4 text-muted-foreground" />
                         <div className="flex flex-col">
                           <span className="text-xs text-muted-foreground">
-                            Finalización
+                            {t('cargoList.finalization')}
                           </span>
                           <span className="text-sm">{convertToColombiaTime(bid.expiration_date)}</span>
                         </div>
@@ -449,7 +449,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                         )
                       }}
                     >
-                      Extender
+                      {t('common.extend')}
                     </Button>
                   </div>
                 )}
@@ -461,10 +461,10 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
             <div className="text-center py-8">
               <Package className="h-12 w-12 mx-auto text-muted-foreground" />
               <h3 className="mt-2 text-lg font-medium">
-                No hay viajes de carga
+                {t('cargoList.noCargoTrips')}
               </h3>
               <p className="text-sm text-muted-foreground">
-                No se encontraron viajes de carga con los filtros actuales.
+                {t('cargoList.noCargoTripsMessage')}
               </p>
             </div>
           )}

@@ -8,6 +8,7 @@ import { User, Tag, Calendar, Ship, DollarSign, Package, Ruler, ChevronDown, Che
 import { convertToColombiaTime } from "@/src/lib/utils";
 import { Offer } from "@/src/models/Offer";
 import { modalService } from "@/src/service/modalService";
+import { useTranslation } from "@/src/hooks/useTranslation";
 
 interface OfferCardProps {
     offer: Offer;
@@ -17,6 +18,7 @@ interface OfferCardProps {
 }
 
 const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: OfferCardProps) => {
+  const { t } = useTranslation()
   const [isAccepting, setIsAccepting] = useState(false)
 
   // Escuchar cuando el modal se cierre para resetear el estado
@@ -54,7 +56,7 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
               disabled={isAccepting || offer.status !== "Active"}
             >
               <CheckCircle className="h-4 w-4" />
-              {isAccepting ? "Aceptando..." : "Aceptar Oferta"}
+              {isAccepting ? t('offerCard.accepting') : t('offerCard.acceptOffer')}
             </Button>
           </div>
         )}
@@ -65,7 +67,7 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
               <div className="flex items-center space-x-2">
                 <User className="h-5 w-5 text-primary" />
                 <div className="flex flex-col">
-                  <span className="text-sm text-muted-foreground">Código Agente</span>
+                  <span className="text-sm text-muted-foreground">{t('offerCard.agentCode')}</span>
                   <span className="font-medium">{offer.agent_code}</span>
                 </div>
               </div>
@@ -73,7 +75,7 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
               <div className="flex items-center space-x-2">
                 <Tag className="h-5 w-5 text-primary" />
                 <div className="flex flex-col">
-                  <span className="text-sm text-muted-foreground">ID Oferta</span>
+                  <span className="text-sm text-muted-foreground">{t('offerCard.offerId')}</span>
                   <span className="font-medium">{offer.uuid}</span>
                 </div>
               </div>
@@ -93,7 +95,7 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
               <div className="flex items-center space-x-2">
                 <Calendar className="h-5 w-5 text-muted-foreground" />
                 <div className="flex flex-col">
-                  <span className="text-sm text-muted-foreground">Fecha de Creación</span>
+                  <span className="text-sm text-muted-foreground">{t('offerCard.creationDate')}</span>
                   <span className="font-medium">{convertToColombiaTime(offer.inserted_at)}</span>
                 </div>
               </div>
@@ -101,7 +103,7 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
               <div className="flex items-center space-x-2">
                 <Ship className="h-5 w-5 text-muted-foreground" />
                 <div className="flex flex-col">
-                  <span className="text-sm text-muted-foreground">Tipo de Envío</span>
+                  <span className="text-sm text-muted-foreground">{t('offerCard.shippingType')}</span>
                   <span className="font-medium">{offer.shipping_type}</span>
                 </div>
               </div>
@@ -112,7 +114,7 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
             <div className="flex items-center space-x-2 w-full">
               <DollarSign className="h-5 w-5 text-primary" />
               <div className="flex flex-col">
-                <span className="text-sm text-muted-foreground">Oferta</span>
+                <span className="text-sm text-muted-foreground">{t('offerCard.offer')}</span>
                 <span className="font-medium text-lg">{offer.price}</span>
               </div>
             </div>
@@ -122,7 +124,7 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
               <div className="mt-3 flex items-center space-x-2">
                 <Package className="h-5 w-5 text-muted-foreground" />
                 <div className="flex flex-col">
-                  <span className="text-sm text-muted-foreground">Contenedor</span>
+                  <span className="text-sm text-muted-foreground">{t('common.container')}</span>
                   <span className="font-medium">{offer.details.freight_fees.container}</span>
                 </div>
               </div>
@@ -132,7 +134,7 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
               <div className="mt-3 flex items-center space-x-2">
                 <Ruler className="h-5 w-5 text-muted-foreground" />
                 <div className="flex flex-col">
-                  <span className="text-sm text-muted-foreground">Dimensiones</span>
+                  <span className="text-sm text-muted-foreground">{t('common.dimensions')}</span>
                   <span className="font-medium">
                     {offer.details.freight_fees.dimensions.length}x
                     {offer.details.freight_fees.dimensions.width}x
@@ -148,11 +150,11 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
             <Button variant="outline" size="sm" className="w-full" onClick={() => toggleOfferDetails(offer.id)}>
               {expandedOffers[offer.id] ? (
                 <>
-                  Ocultar Detalles <ChevronDown className="ml-2 h-4 w-4" />
+                  {t('offerCard.hideDetails')} <ChevronDown className="ml-2 h-4 w-4" />
                 </>
               ) : (
                 <>
-                  Ver Detalles <ChevronDown className="ml-2 h-4 w-4" />
+                  {t('offerCard.showDetails')} <ChevronDown className="ml-2 h-4 w-4" />
                 </>
               )}
             </Button>
@@ -163,24 +165,24 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
           <div className="border-t border-border p-4">
             <Tabs defaultValue="freight">
               <TabsList className="grid grid-cols-5 mb-4">
-                <TabsTrigger value="freight">Flete</TabsTrigger>
+                <TabsTrigger value="freight">{t('offerCard.freight')}</TabsTrigger>
                 {offer.shipping_type === "Aéreo" && offer.details.additional_fees && (
-                  <TabsTrigger value="additional">Cargos Adicionales</TabsTrigger>
+                  <TabsTrigger value="additional">{t('offerCard.additionalCharges')}</TabsTrigger>
                 )}
-                {offer.details.origin_fees && <TabsTrigger value="origin">Origen</TabsTrigger>}
-                {offer.details.destination_fees && <TabsTrigger value="destination">Destino</TabsTrigger>}
-                {offer.details.basic_service && <TabsTrigger value="basic">Servicio Básico</TabsTrigger>}
-                <TabsTrigger value="other">Otros Cargos</TabsTrigger>
+                {offer.details.origin_fees && <TabsTrigger value="origin">{t('offerCard.origin')}</TabsTrigger>}
+                {offer.details.destination_fees && <TabsTrigger value="destination">{t('offerCard.destination')}</TabsTrigger>}
+                {offer.details.basic_service && <TabsTrigger value="basic">{t('offerCard.basicService')}</TabsTrigger>}
+                <TabsTrigger value="other">{t('offerCard.otherCharges')}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="freight" className="space-y-2">
-                <h3 className="font-medium text-sm">Tarifas de Flete</h3>
+                <h3 className="font-medium text-sm">{t('offerCard.freightRates')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Para envíos marítimos */}
                   {offer.shipping_type === "Marítimo" && (
                     <>
                       <div className="flex justify-between p-2 bg-muted/20 rounded">
-                        <span className="text-sm">Contenedor</span>
+                        <span className="text-sm">{t('common.container')}</span>
                         <span className="font-medium">{offer.details.freight_fees?.container}</span>
                       </div>
                     </>
@@ -190,15 +192,15 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
                   {offer.shipping_type === "Aéreo" && offer.details.freight_fees?.dimensions && (
                     <>
                       <div className="flex justify-between p-2 bg-muted/20 rounded">
-                        <span className="text-sm">Longitud</span>
+                        <span className="text-sm">{t('offerCard.length')}</span>
                         <span className="font-medium">{offer.details.freight_fees.dimensions.length} {offer.details.freight_fees.dimensions.units || "cm"}</span>
                       </div>
                       <div className="flex justify-between p-2 bg-muted/20 rounded">
-                        <span className="text-sm">Ancho</span>
+                        <span className="text-sm">{t('offerCard.width')}</span>
                         <span className="font-medium">{offer.details.freight_fees.dimensions.width} {offer.details.freight_fees.dimensions.units || "cm"}</span>
                       </div>
                       <div className="flex justify-between p-2 bg-muted/20 rounded">
-                        <span className="text-sm">Altura</span>
+                        <span className="text-sm">{t('offerCard.height')}</span>
                         <span className="font-medium">{offer.details.freight_fees.dimensions.height} {offer.details.freight_fees.dimensions.units || "cm"}</span>
                       </div>
                     </>
@@ -206,7 +208,7 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
                   
                   {/* Común para ambos tipos */}
                   <div className="flex justify-between p-2 bg-muted/20 rounded">
-                    <span className="text-sm">Valor</span>
+                    <span className="text-sm">{t('offerCard.value')}</span>
                     <span className="font-medium">${offer.details.freight_fees?.value}</span>
                   </div>
                 </div>
@@ -215,7 +217,7 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
               {/* Tab para cargos adicionales (solo aéreo) */}
               {offer.shipping_type === "Aéreo" && (
                 <TabsContent value="additional" className="space-y-2">
-                  <h3 className="font-medium text-sm">Cargos Adicionales</h3>
+                  <h3 className="font-medium text-sm">{t('offerCard.additionalCharges')}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {offer.details.additional_fees && Object.entries(offer.details.additional_fees).map(([key, value]) => (
                       <div key={key} className="flex justify-between p-2 bg-muted/20 rounded">
@@ -228,7 +230,7 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
               )}
 
               <TabsContent value="origin" className="space-y-2">
-                <h3 className="font-medium text-sm">Tarifas de Origen</h3>
+                <h3 className="font-medium text-sm">{t('offerCard.originRates')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {offer.details.origin_fees && Object.entries(offer.details.origin_fees).map(([key, value]) => (
                     <div key={key} className="flex justify-between p-2 bg-muted/20 rounded">
@@ -240,13 +242,13 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
               </TabsContent>
 
               <TabsContent value="destination" className="space-y-2">
-                <h3 className="font-medium text-sm">Tarifas de Destino</h3>
+                <h3 className="font-medium text-sm">{t('offerCard.destinationRates')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {offer.details.destination_fees && Object.entries(offer.details.destination_fees).map(([key, value]) => (
                     <div key={key} className="flex justify-between p-2 bg-muted/20 rounded">
                       <span className="text-sm capitalize">{key.replace(/_/g, ' ')}</span>
                       <span className="font-medium">
-                        {typeof value === 'string' && value.includes('%') ? value : `$${value}`}
+                        {typeof value === 'string' && String(value).includes('%') ? String(value) : `$${String(value)}`}
                       </span>
                     </div>
                   ))}
@@ -254,21 +256,21 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
               </TabsContent>
 
               <TabsContent value="basic" className="space-y-2">
-                <h3 className="font-medium text-sm">Servicio Básico</h3>
+                <h3 className="font-medium text-sm">{t('offerCard.basicService')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {offer.details.basic_service && (
                     <>
                       <div className="flex justify-between p-2 bg-muted/20 rounded">
-                        <span className="text-sm">Tarifa de Cancelación</span>
+                        <span className="text-sm">{t('common.cancellationFee')}</span>
                         <span className="font-medium">${offer.details.basic_service?.cancellation_fee}</span>
                       </div>
                       <div className="flex justify-between p-2 bg-muted/20 rounded">
-                        <span className="text-sm">Días Libres</span>
-                        <span className="font-medium">{offer.details.basic_service?.free_days} días</span>
+                        <span className="text-sm">{t('common.freeDays')}</span>
+                        <span className="font-medium">{offer.details.basic_service?.free_days} {t('common.days')}</span>
                       </div>
                       {offer.details.basic_service?.validity && (
                         <div className="flex justify-between p-2 bg-muted/20 rounded">
-                          <span className="text-sm">Validez</span>
+                          <span className="text-sm">{t('common.validity')}</span>
                           <span className="font-medium">
                             {offer.details.basic_service?.validity?.time}{" "}
                             {offer.details.basic_service?.validity?.unit}
@@ -281,7 +283,7 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
               </TabsContent>
 
               <TabsContent value="other" className="space-y-2">
-                <h3 className="font-medium text-sm">Otros Cargos</h3>
+                <h3 className="font-medium text-sm">{t('offerCard.otherCharges')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {offer.details.other_fees && Object.entries(offer.details.other_fees).map(([key, value]) => (
                     <div key={key} className="flex justify-between p-2 bg-muted/20 rounded">

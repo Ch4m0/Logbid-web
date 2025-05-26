@@ -4,6 +4,7 @@ import { Input } from "@/src/components/ui/input";
 import { Button } from "@/src/components/ui/button";
 import { ArrowUpDown, Filter } from "lucide-react";
 import { FiltersOffer } from "@/src/models/FiltersOffer";
+import { useTranslation } from "@/src/hooks/useTranslation";
 
 interface AdvancedFiltersProps { 
     filters: FiltersOffer;
@@ -20,6 +21,7 @@ const AdvancedFilters = ({
   resetFilters, 
   bidDataForAgent 
 }: AdvancedFiltersProps) => {
+  const { t } = useTranslation();
   const [showFilters, setShowFilters] = useState(false);
 
   // Determinar qué tipos de envío hay en las ofertas
@@ -42,12 +44,12 @@ const AdvancedFilters = ({
           className="flex items-center gap-2"
         >
           <Filter className="h-4 w-4" />
-          {showFilters ? 'Ocultar Filtros' : 'Mostrar Filtros'}
+          {showFilters ? t('common.hideFilters') : t('common.showFilters')}
         </Button>
         
         {showFilters && (
           <Button variant="outline" onClick={resetFilters}>
-            Limpiar filtros
+            {t('agentFilters.clearFilters')}
           </Button>
         )}
       </div>
@@ -58,10 +60,10 @@ const AdvancedFilters = ({
           {/* Filtros básicos */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div>
-              <label className="text-sm font-medium mb-1 block">Fecha de creación</label>
+              <label className="text-sm font-medium mb-1 block">{t('agentFilters.creationDate')}</label>
               <div className="flex items-center">
                 <Input
-                  placeholder="Filtrar fecha"
+                  placeholder={t('agentFilters.filterDate')}
                   value={filters.inserted_at}
                   onChange={(e) => handleFilterChange("inserted_at", e.target.value)}
                 />
@@ -71,10 +73,10 @@ const AdvancedFilters = ({
               </div>
             </div>
             <div>
-              <label className="text-sm font-medium mb-1 block">Código agente</label>
+              <label className="text-sm font-medium mb-1 block">{t('agentFilters.agentCode')}</label>
               <div className="flex items-center">
                 <Input 
-                  placeholder="Filtrar agente" 
+                  placeholder={t('agentFilters.filterAgent')} 
                   value={filters.agent_id}
                   onChange={(e) => handleFilterChange("agent_id", e.target.value)} 
                 />
@@ -84,10 +86,10 @@ const AdvancedFilters = ({
               </div>
             </div>
             <div>
-              <label className="text-sm font-medium mb-1 block">Oferta</label>
+              <label className="text-sm font-medium mb-1 block">{t('agentFilters.offer')}</label>
               <div className="flex items-center">
                 <Input 
-                  placeholder="Filtrar oferta" 
+                  placeholder={t('agentFilters.filterOffer')} 
                   value={filters.price}
                   onChange={(e) => handleFilterChange("price", e.target.value)} 
                 />
@@ -104,13 +106,13 @@ const AdvancedFilters = ({
             {hasMaritimoOffers && (
               <>
                 <div className="md:col-span-3">
-                  <h3 className="font-medium text-sm mb-2">Filtros para envíos Marítimos</h3>
+                  <h3 className="font-medium text-sm mb-2">{t('agentFilters.maritimeFilters')}</h3>
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-1 block">Tipo de Contenedor</label>
+                  <label className="text-sm font-medium mb-1 block">{t('agentFilters.containerType')}</label>
                   <div className="flex items-center">
                     <Input 
-                      placeholder="Filtrar contenedor" 
+                      placeholder={t('agentFilters.filterContainer')} 
                       value={filters["details.freight_fees.container"]}
                       onChange={(e) => handleFilterChange("details.freight_fees.container", e.target.value)} 
                     />
@@ -121,10 +123,10 @@ const AdvancedFilters = ({
                 </div>
                 
                 <div>
-                  <label className="text-sm font-medium mb-1 block">Valor del Flete</label>
+                  <label className="text-sm font-medium mb-1 block">{t('agentFilters.freightValue')}</label>
                   <div className="flex items-center">
                     <Input 
-                      placeholder="Filtrar valor" 
+                      placeholder={t('agentFilters.filterValue')} 
                       value={filters["details.freight_fees.value"]}
                       onChange={(e) => handleFilterChange("details.freight_fees.value", e.target.value)} 
                     />
@@ -135,10 +137,10 @@ const AdvancedFilters = ({
                 </div>
                 
                 <div>
-                  <label className="text-sm font-medium mb-1 block">Handling (Destino)</label>
+                  <label className="text-sm font-medium mb-1 block">{t('agentFilters.handlingDestination')}</label>
                   <div className="flex items-center">
                     <Input 
-                      placeholder="Filtrar handling" 
+                      placeholder={t('agentFilters.filterHandling')} 
                       value={filters["details.destination_fees.handling"]}
                       onChange={(e) => handleFilterChange("details.destination_fees.handling", e.target.value)} 
                     />
@@ -154,13 +156,13 @@ const AdvancedFilters = ({
             {hasAereoOffers && (
               <>
                 <div className="md:col-span-3">
-                  <h3 className="font-medium text-sm mb-2 mt-4">Filtros para envíos Aéreos</h3>
+                  <h3 className="font-medium text-sm mb-2 mt-4">{t('agentFilters.airFilters')}</h3>
                 </div>
                 <div>
-                  <label className="text-sm font-medium mb-1 block">Longitud</label>
+                  <label className="text-sm font-medium mb-1 block">{t('agentFilters.length')}</label>
                   <div className="flex items-center">
                     <Input 
-                      placeholder="Filtrar longitud" 
+                      placeholder={t('agentFilters.filterLength')} 
                       value={filters["details.freight_fees.dimensions.length"]}
                       onChange={(e) => handleFilterChange("details.freight_fees.dimensions.length", e.target.value)} 
                     />
@@ -171,10 +173,10 @@ const AdvancedFilters = ({
                 </div>
                 
                 <div>
-                  <label className="text-sm font-medium mb-1 block">Cargo de Combustible</label>
+                  <label className="text-sm font-medium mb-1 block">{t('agentFilters.fuelCharge')}</label>
                   <div className="flex items-center">
                     <Input 
-                      placeholder="Filtrar cargo de combustible" 
+                      placeholder={t('agentFilters.filterFuelCharge')} 
                       value={filters["details.additional_fees.fuel"]}
                       onChange={(e) => handleFilterChange("details.additional_fees.fuel", e.target.value)} 
                     />

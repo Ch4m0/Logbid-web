@@ -6,6 +6,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/src/components/ui/tabs'
+import { useTranslation } from '@/src/hooks/useTranslation'
 
 interface CargoTransportTabsProps {
   children1: React.ReactElement
@@ -18,6 +19,7 @@ export default function CargoTransportListAvaliableTabs({
   children2,
   children3,
 }: CargoTransportTabsProps) {
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState('sin-propuestas')
 
   const statusChildren1 = children1.props.status
@@ -65,7 +67,7 @@ export default function CargoTransportListAvaliableTabs({
             }
           }}
         >
-          Sin propuestas
+          {t('cargoList.withoutProposals')}
         </TabsTrigger>
         <TabsTrigger
           value="con-propuestas"
@@ -76,7 +78,7 @@ export default function CargoTransportListAvaliableTabs({
             }
           }}
         >
-          Con propuestas
+          {t('cargoList.withProposals')}
         </TabsTrigger>
         <TabsTrigger
           value="historico"
@@ -87,7 +89,7 @@ export default function CargoTransportListAvaliableTabs({
             }
           }}
         >
-          Histórico
+          {t('cargoList.history')}
         </TabsTrigger>
       </TabsList>
       <TabsContent value="sin-propuestas">{children1}</TabsContent>

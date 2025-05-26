@@ -3,6 +3,7 @@ import { Input } from '@/src/components/ui/input'
 import { Label } from '@/src/components/ui/label'
 import { useAuth } from '@/src/app/hooks/useAuth'
 import { guardarEnLocalStorage } from '@/src/lib/utils'
+import { useTranslation } from '@/src/hooks/useTranslation'
 import useAuthStore from '@/src/store/authStore'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -14,6 +15,7 @@ const AGENT = 3
 
 export default function Auth() {
   const { mutate: login, isError, isSuccess, error, isPending } = useAuth()
+  const { t } = useTranslation()
 
   const router = useRouter()
   const [email, setEmail] = useState('')
@@ -51,20 +53,20 @@ export default function Auth() {
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="mx-auto max-w-sm space-y-6">
         <div className="space-y-2 text-center">
-          <h1 className="text-3xl font-bold text-blue-600">Iniciar sesión</h1>
+          <h1 className="text-3xl font-bold text-blue-600">{t('auth.login')}</h1>
           <p className="text-gray-500 dark:text-gray-400">
-            Ingresa tu correo electrónico para acceder a tu cuenta.
+            {t('auth.enterEmail')}
           </p>
         </div>
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email" className="font-bold">
-              Correo electrónico
+              {t('auth.email')}
             </Label>
             <Input
               id="email"
               type="email"
-              placeholder="Correo electrónico"
+              placeholder={t('auth.emailPlaceholder')}
               autoComplete="email"
               required
               onChange={(e) => setEmail(e.target.value)}
@@ -73,14 +75,14 @@ export default function Auth() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="password" className="font-bold">
-              Contraseña
+              {t('auth.password')}
             </Label>
             <Input
               id="password"
               type="password"
-              placeholder="Contraseña"
+              placeholder={t('auth.passwordPlaceholder')}
               required
-              autoComplete="email"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -90,16 +92,16 @@ export default function Auth() {
             onClick={() => handleLogin()}
             disabled={isPending}
           >
-            {isPending ? 'Entrando...' : 'Iniciar sesión'}
+            {isPending ? t('auth.loggingIn') : t('auth.login')}
           </Button>
           <Link
             href="/"
             className="inline-block w-full text-center text-sm underline"
             prefetch={false}
           >
-            ¿Olvidaste tu contraseña?
+            {t('auth.forgotPassword')}
           </Link>
-          {isSuccess && <p className="text-[green]">Login successful!</p>}
+          {isSuccess && <p className="text-[green]">{t('auth.loginSuccess')}</p>}
           {isError && <p className="text-[red]">Error: {error.message}</p>}
         </div>
       </div>

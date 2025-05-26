@@ -16,6 +16,8 @@ import Pagination from '../../../common/components/pagination/Pagination'
 import BidInfo from './BidInfo'
 import { OfferConfirmationDialog } from '../../(home)/components/OfferConfirmacionDialog'
 import { FiltersOffer } from '@/src/models/FiltersOffer'
+import useAuthStore from '@/src/store/authStore'
+import { useTranslation } from '@/src/hooks/useTranslation'
 
 interface Offer {
   id: number
@@ -41,6 +43,7 @@ interface Bid {
 
 export function CargaProposalsList() {
   const router = useRouter()
+  const { t } = useTranslation()
   const [sort, setSort] = useState({ key: 'id', order: 'asc' })
   const params = useSearchParams()
 
@@ -109,7 +112,7 @@ export function CargaProposalsList() {
   }
 
   if (!params) {
-    return <h1>Hubo un error cargando el Detalle de la Transacción</h1>
+    return <h1>{t('proposals.errorLoading')}</h1>
   }
 
   const handleSort = (key: string) => {
@@ -212,7 +215,7 @@ export function CargaProposalsList() {
   )
 
   if (loading) {
-    return <h1>Cargando...</h1>
+    return <h1>{t('common.loading')}</h1>
   }
 
   return (
@@ -238,17 +241,17 @@ export function CargaProposalsList() {
                   d="M15 19l-7-7 7-7"
                 ></path>
               </svg>
-              Regresar
+              {t('common.back')}
             </button>
             <h2 className="text-2xl font-bold mt-4 text-blue-500">
-              Detalle viaje
+              {t('proposals.tripDetail')}
             </h2>
             <div className="grid gap-2 pb-6">
-              {bid &&  BidInfo({ bidDataForAgent: bid })}
+              {bid && <BidInfo bidDataForAgent={bid} />}
             </div>
 
             <CardTitle className="text-blue-500 font-bold text-xl">
-              Propuestas
+              {t('proposals.title')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -265,7 +268,7 @@ export function CargaProposalsList() {
           {loading && (
             <div className="text-center py-8">
               <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
-              <p className="mt-2 text-sm text-muted-foreground">Cargando ofertas...</p>
+              <p className="mt-2 text-sm text-muted-foreground">{t('proposals.loadingOffers')}</p>
             </div>
           )}
 
@@ -285,8 +288,8 @@ export function CargaProposalsList() {
           {(!paginatedList || paginatedList.length === 0) && (
               <div className="text-center py-8">
                 <DollarSign className="h-12 w-12 mx-auto text-muted-foreground" />
-                <h3 className="mt-2 text-lg font-medium">No hay propuestas</h3>
-                <p className="text-sm text-muted-foreground">No se encontraron propuestas con los filtros actuales.</p>
+                <h3 className="mt-2 text-lg font-medium">{t('proposals.noProposals')}</h3>
+                <p className="text-sm text-muted-foreground">{t('proposals.noProposalsMessage')}</p>
               </div>
             )}
             <div className="w-full flex justify-end mt-8">

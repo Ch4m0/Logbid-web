@@ -15,8 +15,10 @@ import BidInfo from "./components/BidInfo"
 import OfferCard from "./components/OfferCard"
 import ProposalModal from "./components/ProposalModal"
 import { FiltersOffer } from '@/src/models/FiltersOffer'
+import { useTranslation } from "@/src/hooks/useTranslation"
 
 const Page = () => {
+  const { t } = useTranslation()
   const searchParams = useSearchParams()
   const [bidDataForAgent, setBidDataForAgent] = useState<any>({})
   const user = useAuthStore((state) => state.user)
@@ -119,7 +121,7 @@ const Page = () => {
           console.log("Oferta creada exitosamente")
           modalService.closeModal()
           toast({
-            title: "Oferta enviada!",
+            title: t('agentOffers.offerSent'),
           })
 
           window.location.reload()
@@ -127,7 +129,7 @@ const Page = () => {
         onError: (error) => {
           console.log("Error al crear la oferta:", error)
           toast({
-            title: "Error al enviar la oferta!",
+            title: t('agentOffers.offerSentError'),
             variant: "destructive",
           })
         },
@@ -253,13 +255,13 @@ const Page = () => {
         className="bg-blue-500 text-white font-semibold py-2 px-4 rounded mb-4 flex items-center"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
-        Regresar
+        {t('common.back')}
       </button>
       <Card className="w-full">
         <CardHeader>
-          <h2 className="text-xl font-bold mt-4">INFO SUBASTA: {bidDataForAgent.uuid}</h2>
+          <h2 className="text-xl font-bold mt-4">{t('agentOffers.auctionInfo')}: {bidDataForAgent.uuid}</h2>
           <div className="grid gap-2 pb-6">
-          {bidDataForAgent && (BidInfo({ bidDataForAgent }))}
+          {bidDataForAgent && (<BidInfo bidDataForAgent={bidDataForAgent} />)}
             <div className="flex items-center gap-2 justify-center">
               <ProposalModal 
                 shippingType={shippingType}
@@ -269,7 +271,7 @@ const Page = () => {
             </div>
           </div>
 
-          <CardTitle className="text-black-500 font-bold text-xl">Propuestas</CardTitle>
+          <CardTitle className="text-black-500 font-bold text-xl">{t('agentOffers.proposals')}</CardTitle>
         </CardHeader>
         <CardContent>
           {/* Filtros avanzados como componente */}
@@ -285,7 +287,7 @@ const Page = () => {
           {loading && (
             <div className="text-center py-8">
               <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
-              <p className="mt-2 text-sm text-muted-foreground">Cargando ofertas...</p>
+              <p className="mt-2 text-sm text-muted-foreground">{t('agentOffers.loadingOffers')}</p>
             </div>
           )}
 
@@ -303,8 +305,8 @@ const Page = () => {
             {(!paginatedList || paginatedList.length === 0) && (
               <div className="text-center py-8">
                 <DollarSign className="h-12 w-12 mx-auto text-muted-foreground" />
-                <h3 className="mt-2 text-lg font-medium">No hay propuestas</h3>
-                <p className="text-sm text-muted-foreground">No se encontraron propuestas con los filtros actuales.</p>
+                <h3 className="mt-2 text-lg font-medium">{t('agentOffers.noProposals')}</h3>
+                <p className="text-sm text-muted-foreground">{t('agentOffers.noProposalsMessage')}</p>
               </div>
             )}
           </div>

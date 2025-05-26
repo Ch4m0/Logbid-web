@@ -11,6 +11,7 @@ import { Button } from '@/src/components/ui/button'
 import { DollarSign, Plus } from 'lucide-react'
 import ProposalForm from './ProposalForm'
 import ProposalFormMaritimo from './ProposalFormMaritimo'
+import { useTranslation } from '@/src/hooks/useTranslation'
 
 interface ProposalModalProps {
   shippingType: string
@@ -23,6 +24,7 @@ export default function ProposalModal({
   bidDataShippingType, 
   onSubmit 
 }: ProposalModalProps) {
+  const { t } = useTranslation()
   const [open, setOpen] = React.useState(false)
 
   const handleSubmit = (value: any) => {
@@ -40,14 +42,14 @@ export default function ProposalModal({
           size="default"
         >
           <DollarSign className="w-4 h-4 mr-2" />
-          Proponer Precio
+          {t('agentOffers.proposePrice')}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <DollarSign className="w-5 h-5 text-blue-500" />
-            Proponer Nuevo Precio
+            {t('agentOffers.proposeNewPrice')}
           </DialogTitle>
         </DialogHeader>
         <div className="mt-4">

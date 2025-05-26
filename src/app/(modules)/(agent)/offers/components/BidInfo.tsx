@@ -1,7 +1,10 @@
 import React from 'react';
 import { convertToColombiaTime } from '@/src/lib/utils';
+import { useTranslation } from '@/src/hooks/useTranslation';
 
 const BidInfo = ({ bidDataForAgent }: any) => {
+  const { t } = useTranslation();
+  
   // Función para obtener valor de mercancía de forma segura
   const getMerchandiseValue = (key: string) => {
     // Buscar en bid_details primero (donde vienen los datos según la API)
@@ -15,47 +18,47 @@ const BidInfo = ({ bidDataForAgent }: any) => {
     }
     
     // Valor por defecto
-    return "No especificado";
+    return t('common.notSpecified');
   };
 
   return (
     <div className="bg-white rounded-lg shadow-md w-full mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div className="bg-gray-50 p-4 rounded-md">
-          <h3 className="font-bold text-lg mb-3 text-blue-700">Información de Ruta</h3>
+          <h3 className="font-bold text-lg mb-3 text-blue-700">{t('bidInfo.routeInformation')}</h3>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="font-bold">Orígen:</span>
+              <span className="font-bold">{t('bidInfo.origin')}:</span>
               <span>{bidDataForAgent.origin_country + " - " + bidDataForAgent.origin_name}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-bold">Destíno:</span>
+              <span className="font-bold">{t('bidInfo.destination')}:</span>
               <span>{bidDataForAgent.destination_country + " - " + bidDataForAgent.destination_name}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-bold">Tipo de Envío:</span>
+              <span className="font-bold">{t('bidInfo.shipmentType')}:</span>
               <span>{bidDataForAgent.shipping_type}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-bold">Transporte:</span>
+              <span className="font-bold">{t('bidInfo.transport')}:</span>
               <span>{bidDataForAgent.transportation}</span>
             </div>
           </div>
         </div>
 
         <div className="bg-gray-50 p-4 rounded-md">
-          <h3 className="font-bold text-lg mb-3 text-blue-700">Fechas Importantes</h3>
+          <h3 className="font-bold text-lg mb-3 text-blue-700">{t('bidInfo.importantDates')}</h3>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="font-bold">Fecha inicio:</span>
+              <span className="font-bold">{t('bidInfo.startDate')}:</span>
               <span>{convertToColombiaTime(bidDataForAgent.inserted_at)}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-bold">Fecha Fin:</span>
+              <span className="font-bold">{t('bidInfo.endDate')}:</span>
               <span>{convertToColombiaTime(bidDataForAgent.expiration_date)}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-bold">Estado:</span>
+              <span className="font-bold">{t('bidInfo.status')}:</span>
               <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">
                 {bidDataForAgent.status}
               </span>
@@ -66,50 +69,50 @@ const BidInfo = ({ bidDataForAgent }: any) => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div className="bg-gray-50 p-4 rounded-md">
-          <h3 className="font-bold text-lg mb-3 text-blue-700">Detalles de Mercancía</h3>
+          <h3 className="font-bold text-lg mb-3 text-blue-700">{t('bidInfo.merchandiseDetails')}</h3>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="font-bold">Tipo de Mercancía:</span>
+              <span className="font-bold">{t('bidInfo.merchandiseType')}:</span>
               <span>{getMerchandiseValue('merchandise_type')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-bold">Tipo de Medida:</span>
+              <span className="font-bold">{t('bidInfo.measureType')}:</span>
               <span>{getMerchandiseValue('measure_type')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-bold">Unidades:</span>
+              <span className="font-bold">{t('bidInfo.units')}:</span>
               <span>{getMerchandiseValue('units')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-bold">Peso Total:</span>
+              <span className="font-bold">{t('bidInfo.totalWeight')}:</span>
               <span>{getMerchandiseValue('total_weight')}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-bold">Volumen:</span>
+              <span className="font-bold">{t('bidInfo.volume')}:</span>
               <span>{getMerchandiseValue('volume')}</span>
             </div>
           </div>
         </div>
 
         <div className="bg-gray-50 p-4 rounded-md">
-          <h3 className="font-bold text-lg mb-3 text-blue-700">Información de Precio</h3>
+          <h3 className="font-bold text-lg mb-3 text-blue-700">{t('bidInfo.priceInformation')}</h3>
           <div className="space-y-2">
             {/*<div className="flex items-center gap-2">
-              <span className="font-bold">Precio más bajo:</span>
+              <span className="font-bold">{t('bidInfo.lowestPrice')}:</span>
               <span className="font-semibold text-green-600">
                 {bidDataForAgent.currency} {bidDataForAgent.lowestPrice}
               </span>
             </div> */}
             <div className="flex items-center gap-2">
-              <span className="font-bold">Último precio:</span>
+              <span className="font-bold">{t('bidInfo.lastPrice')}:</span>
               <span>{bidDataForAgent.currency} {bidDataForAgent.last_price}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-bold">Valor:</span>
+              <span className="font-bold">{t('bidInfo.value')}:</span>
               <span>{bidDataForAgent.currency} {bidDataForAgent.value}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-bold">Tipo de Comex:</span>
+              <span className="font-bold">{t('bidInfo.comexType')}:</span>
               <span>{bidDataForAgent.comex_type}</span>
             </div>
           </div>
@@ -117,18 +120,18 @@ const BidInfo = ({ bidDataForAgent }: any) => {
       </div>
 
       <div className="bg-blue-50 p-4 rounded-md">
-        <h3 className="font-bold text-lg mb-3 text-blue-700">Identificación</h3>
+        <h3 className="font-bold text-lg mb-3 text-blue-700">{t('bidInfo.identification')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="font-bold">Código de Agente:</span>
+              <span className="font-bold">{t('bidInfo.agentCode')}:</span>
               <span>{bidDataForAgent.agent_code}</span>
             </div>
           </div>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="font-bold">Carga Peligrosa:</span>
-              <span>{bidDataForAgent.dangerous_march ? "Sí" : "No"}</span>
+              <span className="font-bold">{t('bidInfo.dangerousCargo')}:</span>
+              <span>{bidDataForAgent.dangerous_march ? t('bidInfo.yes') : t('bidInfo.no')}</span>
             </div>
           </div>
         </div>

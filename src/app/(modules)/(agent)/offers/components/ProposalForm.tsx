@@ -13,6 +13,7 @@ import { Separator } from '@/src/components/ui/separator'
 import { useFormik } from 'formik'
 import { useEffect, useState, memo } from 'react'
 import * as Yup from 'yup'
+import { useTranslation } from '@/src/hooks/useTranslation'
 
 interface ProposalFormProps {
   initialData?: CargoQuote
@@ -47,41 +48,6 @@ interface CargoQuote {
   }
 }
 
-const validationSchema = Yup.object().shape({
-  shipping_type: Yup.string().required('Tipo de envío requerido'),
-  freight_fees: Yup.object().shape({
-    value: Yup.number()
-      .required('Flete requerido')
-      .positive('Debe ser positivo'),
-    dimensions: Yup.object().shape({
-      height: Yup.number()
-        .required('Alto requerido')
-        .positive('El alto debe ser mayor a 0'),
-      width: Yup.number()
-        .required('Ancho requerido')
-        .positive('El ancho debe ser mayor a 0'),
-      length: Yup.number()
-        .required('Largo requerido')
-        .positive('El largo debe ser mayor a 0'),
-      units: Yup.string().required('Unidad requerida'),
-    }),
-  }),
-  additional_fees: Yup.object().shape({
-    screening: Yup.number().required('Screening fee requerido').min(0),
-    fuel: Yup.number().required('Fuel surcharge requerido').min(0),
-    airway_bill: Yup.number().required('AWB requerido').min(0),
-    origin_costs: Yup.number().required('Gastos origen requeridos').min(0),
-    destination_costs: Yup.number()
-      .required('Gastos destino requeridos')
-      .min(0),
-    cancelation_fee: Yup.number().required('Fee cancelación requerido').min(0),
-  }),
-  other_fees: Yup.object().shape({
-    collect_fee: Yup.string().required('Collect fee requerido'),
-    other_fees: Yup.number().required('Otros gastos requeridos').min(0),
-  }),
-})
-
 const SubtotalDisplay = memo(
   ({ label, amount }: { label: string; amount: number }) => (
     <div className="flex justify-between items-center py-2 px-4 mt-4 bg-gray-50">
@@ -92,6 +58,7 @@ const SubtotalDisplay = memo(
     </div>
   )
 )
+SubtotalDisplay.displayName = 'SubtotalDisplay'
 
 const FormField = memo(
   ({
@@ -129,17 +96,54 @@ const FormField = memo(
     )
   }
 )
+FormField.displayName = 'FormField'
 
 export default function ProposalForm({
   initialData,
   onSubmit,
 }: ProposalFormProps) {
+  const { t } = useTranslation()
   const [hasErrors, setHasErrors] = useState(false)
   const [subtotals, setSubtotals] = useState({
     freight: 0,
     additional: 0,
     other: 0,
     total: 0,
+  })
+
+  const validationSchema = Yup.object().shape({
+    shipping_type: Yup.string().required(t('proposalFormAir.shippingTypeRequired')),
+    freight_fees: Yup.object().shape({
+      value: Yup.number()
+        .required(t('proposalFormAir.freightRequired'))
+        .positive(t('proposalFormAir.mustBePositive')),
+      dimensions: Yup.object().shape({
+        height: Yup.number()
+          .required(t('proposalFormAir.heightRequired'))
+          .positive(t('proposalFormAir.heightMustBePositive')),
+        width: Yup.number()
+          .required(t('proposalFormAir.widthRequired'))
+          .positive(t('proposalFormAir.widthMustBePositive')),
+        length: Yup.number()
+          .required(t('proposalFormAir.lengthRequired'))
+          .positive(t('proposalFormAir.lengthMustBePositive')),
+        units: Yup.string().required(t('proposalFormAir.unitRequired')),
+      }),
+    }),
+    additional_fees: Yup.object().shape({
+      screening: Yup.number().required(t('proposalFormAir.screeningFeeRequired')).min(0),
+      fuel: Yup.number().required(t('proposalFormAir.fuelSurchargeRequired')).min(0),
+      airway_bill: Yup.number().required(t('proposalFormAir.awbRequired')).min(0),
+      origin_costs: Yup.number().required(t('proposalFormAir.originCostsRequired')).min(0),
+      destination_costs: Yup.number()
+        .required(t('proposalFormAir.destinationCostsRequired'))
+        .min(0),
+      cancelation_fee: Yup.number().required(t('proposalFormAir.cancellationFeeRequired')).min(0),
+    }),
+    other_fees: Yup.object().shape({
+      collect_fee: Yup.string().required(t('proposalFormAir.collectFeeRequired')),
+      other_fees: Yup.number().required(t('proposalFormAir.otherCostsRequired')).min(0),
+    }),
   })
 
   const formik = useFormik({
@@ -225,16 +229,16 @@ export default function ProposalForm({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Cotización de Carga</CardTitle>
+        <CardTitle>{t('proposalFormAir.cargoQuote')}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Sección de Cargos Flete */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Cargos Flete</h3>
+            <h3 className="text-lg font-medium">{t('proposalFormAir.freightCharges')}</h3>
             <div className="grid gap-4">
               <FormField
-                label="Flete"
+                label={t('proposalFormAir.freight')}
                 id="freight_fees.value"
                 type="number"
                 formik={formik}
@@ -243,7 +247,7 @@ export default function ProposalForm({
               />
               <div className="grid grid-cols-3 gap-4">
                 <FormField
-                  label="Alto"
+                  label={t('proposalFormAir.height')}
                   id="freight_fees.dimensions.height"
                   type="number"
                   formik={formik}
@@ -251,7 +255,7 @@ export default function ProposalForm({
                   touched={formik.touched.freight_fees?.dimensions?.height}
                 />
                 <FormField
-                  label="Ancho"
+                  label={t('proposalFormAir.width')}
                   id="freight_fees.dimensions.width"
                   type="number"
                   formik={formik}
@@ -259,7 +263,7 @@ export default function ProposalForm({
                   touched={formik.touched.freight_fees?.dimensions?.width}
                 />
                 <FormField
-                  label="Largo"
+                  label={t('proposalFormAir.length')}
                   id="freight_fees.dimensions.length"
                   type="number"
                   formik={formik}
@@ -269,16 +273,16 @@ export default function ProposalForm({
               </div>
             </div>
           </div>
-          <SubtotalDisplay label="Subtotal:" amount={subtotals.freight} />
+          <SubtotalDisplay label={t('proposalFormAir.subtotal')} amount={subtotals.freight} />
 
           <Separator className="my-6" />
 
           {/* Sección de Cargos Adicionales */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Cargos Adicionales</h3>
+            <h3 className="text-lg font-medium">{t('proposalFormAir.additionalCharges')}</h3>
             <div className="grid gap-4">
               <FormField
-                label="Screening fee"
+                label={t('proposalFormAir.screeningFee')}
                 id="additional_fees.screening"
                 type="number"
                 formik={formik}
@@ -286,7 +290,7 @@ export default function ProposalForm({
                 touched={formik.touched.additional_fees?.screening}
               />
               <FormField
-                label="Fuel Surcharge"
+                label={t('proposalFormAir.fuelSurcharge')}
                 id="additional_fees.fuel"
                 type="number"
                 formik={formik}
@@ -294,7 +298,7 @@ export default function ProposalForm({
                 touched={formik.touched.additional_fees?.fuel}
               />
               <FormField
-                label="Airway Bill (AWB)"
+                label={t('proposalFormAir.airwayBill')}
                 id="additional_fees.airway_bill"
                 type="number"
                 formik={formik}
@@ -302,7 +306,7 @@ export default function ProposalForm({
                 touched={formik.touched.additional_fees?.airway_bill}
               />
               <FormField
-                label="Gastos en origen"
+                label={t('proposalFormAir.originCosts')}
                 id="additional_fees.origin_costs"
                 type="number"
                 formik={formik}
@@ -310,7 +314,7 @@ export default function ProposalForm({
                 touched={formik.touched.additional_fees?.origin_costs}
               />
               <FormField
-                label="Gastos en destino"
+                label={t('proposalFormAir.destinationCosts')}
                 id="additional_fees.destination_costs"
                 type="number"
                 formik={formik}
@@ -318,7 +322,7 @@ export default function ProposalForm({
                 touched={formik.touched.additional_fees?.destination_costs}
               />
               <FormField
-                label="Cancelación"
+                label={t('proposalFormAir.cancellation')}
                 id="additional_fees.cancelation_fee"
                 type="number"
                 formik={formik}
@@ -327,23 +331,23 @@ export default function ProposalForm({
               />
             </div>
           </div>
-          <SubtotalDisplay label="Subtotal:" amount={subtotals.additional} />
+          <SubtotalDisplay label={t('proposalFormAir.subtotal')} amount={subtotals.additional} />
 
           <Separator className="my-6" />
 
           {/* Sección de Otros Gastos */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Otros Gastos</h3>
+            <h3 className="text-lg font-medium">{t('proposalFormAir.otherCosts')}</h3>
             <div className="grid gap-4">
               <FormField
-                label="Collect fee %"
+                label={t('proposalFormAir.collectFeePercent')}
                 id="other_fees.collect_fee"
                 formik={formik}
                 error={formik.errors.other_fees?.collect_fee}
                 touched={formik.touched.other_fees?.collect_fee}
               />
               <FormField
-                label="Otros Gastos"
+                label={t('proposalFormAir.otherCosts')}
                 id="other_fees.other_fees"
                 type="number"
                 formik={formik}
@@ -352,12 +356,12 @@ export default function ProposalForm({
               />
             </div>
           </div>
-          <SubtotalDisplay label="Subtotal:" amount={subtotals.other} />
+          <SubtotalDisplay label={t('proposalFormAir.subtotal')} amount={subtotals.other} />
 
           {/* Muestra el costo total */}
           <div className="bg-gray-100 rounded-lg p-4 mt-4">
             <div className="flex justify-between items-center text-lg font-medium">
-              <span>Costo Total</span>
+              <span>{t('proposalFormAir.totalCost')}</span>
               <span className="text-purple-600">
                 {subtotals.total.toFixed(2)}
               </span>
@@ -365,11 +369,11 @@ export default function ProposalForm({
           </div>
           {hasErrors && (
             <p className="text-red-500 text-sm mt-1">
-              Por favor, corrija los errores
+              {t('proposalFormAir.pleaseCorrectErrors')}
             </p>
           )}
           <div className="flex justify-end">
-            <Button type="submit">Guardar Cotización</Button>
+            <Button type="submit">{t('proposalFormAir.saveQuote')}</Button>
           </div>
         </form>
       </CardContent>

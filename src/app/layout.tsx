@@ -1,4 +1,5 @@
 import { ThemeProvider } from '@/src/components/theme-provider'
+import { I18nProvider } from '@/src/components/I18nProvider'
 import { cn } from '@/src/lib/utils'
 import type { Metadata } from 'next'
 import { Inter as FontSans } from 'next/font/google'
@@ -31,19 +32,21 @@ export default function RootLayout({
           fontSans.variable
         )}
       >
-        <ReactQueryProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
-          <CustomDrawer />
-          <CustomDialog />
-          <Toaster />
-        </ReactQueryProvider>
+        <I18nProvider>
+          <ReactQueryProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="light"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
+            <CustomDrawer />
+            <CustomDialog />
+            <Toaster />
+          </ReactQueryProvider>
+        </I18nProvider>
       </body>
     </html>
   )
