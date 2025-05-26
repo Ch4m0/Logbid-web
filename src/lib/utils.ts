@@ -54,7 +54,25 @@ export const borrarDeLocalstorage = () => {
  * @return {string} - Fecha en formato 'yyyy-MM-dd HH:mm:ss' en la hora local de Colombia
  */
 export function convertToColombiaTime(utcDateStr: string) {
-  const timeZone = 'America/Bogota'
-  const zonedDate = toZonedTime(utcDateStr, timeZone)
-  return format(zonedDate, 'yyyy-MM-dd HH:mm:ss')
+  // Validar que la fecha no esté vacía o sea null/undefined
+  if (!utcDateStr || utcDateStr.trim() === '') {
+    return 'Fecha no disponible'
+  }
+
+  try {
+    // Intentar crear una fecha válida
+    const date = new Date(utcDateStr)
+    
+    // Verificar que la fecha sea válida
+    if (isNaN(date.getTime())) {
+      return 'Fecha inválida'
+    }
+
+    const timeZone = 'America/Bogota'
+    const zonedDate = toZonedTime(utcDateStr, timeZone)
+    return format(zonedDate, 'yyyy-MM-dd HH:mm:ss')
+  } catch (error) {
+    console.error('Error converting date to Colombia time:', error)
+    return 'Error en fecha'
+  }
 }

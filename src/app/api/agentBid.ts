@@ -23,8 +23,11 @@ export const fetchListBidByMarket = async (
     destination: item.destination_country + ' - ' + item.destination_name,
     destination_name: item.destination_name,
     origin_name: item.origin_name,
+    origin_country: item.origin_country,
+    destination_country: item.destination_country,
     last_price: item.last_price,
     agent_code: item.agent_code,
+    offers_count: item.offers_count || 0,
   }))
 }
 

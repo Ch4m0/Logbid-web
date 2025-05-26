@@ -13,8 +13,8 @@ import Pagination from "../../common/components/pagination/Pagination"
 import AdvancedFilters from "./components/AdvancedFilters"
 import BidInfo from "./components/BidInfo"
 import OfferCard from "./components/OfferCard"
-import ProposalForm from "./components/ProposalForm"
-import ProposalFormMaritimo from "./components/ProposalFormMaritimo"
+import ProposalModal from "./components/ProposalModal"
+import { FiltersOffer } from '@/src/models/FiltersOffer'
 
 const Page = () => {
   const searchParams = useSearchParams()
@@ -148,7 +148,7 @@ const Page = () => {
   }
 
   // Función para acceder a propiedades anidadas de un objeto
-  const getNestedValue = (obj, path) => {
+  const getNestedValue = (obj: any, path: string) => {
     const parts = path.split('.');
     let value = obj;
     
@@ -163,7 +163,7 @@ const Page = () => {
   };
 
   // Función mejorada para filtrar ofertas
-  const filterOffers = (offers) => {
+  const filterOffers = (offers: any[]) => {
     if (!offers || !Array.isArray(offers)) return [];
     
     return offers.filter((offer) =>
@@ -202,7 +202,7 @@ const Page = () => {
   };
 
   // Función para ordenar ofertas
-  const sortOffers = (offers) => {
+  const sortOffers = (offers: any[]) => {
     if (!offers || !Array.isArray(offers)) return [];
     
     return [...offers].sort((a, b) => {
@@ -260,30 +260,12 @@ const Page = () => {
           <h2 className="text-xl font-bold mt-4">INFO SUBASTA: {bidDataForAgent.uuid}</h2>
           <div className="grid gap-2 pb-6">
           {bidDataForAgent && (BidInfo({ bidDataForAgent }))}
-            <div className="flex items-center gap-2">
-              {bidDataForAgent.shipping_type === shippingType ? (
-                <Accordion type="single" collapsible className="w-full">
-                  <AccordionItem value="item-1" className="border-none">
-                    <AccordionTrigger className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded flex justify-center items-center transition-colors">
-                      <span className="flex-1 text-center">Proponer un nuevo precio</span>
-                    </AccordionTrigger>
-                  <AccordionContent className="pt-4">
-                    <ProposalFormMaritimo onSubmit={handleCreateOffer} />
-                  </AccordionContent>
-                 </AccordionItem>
-                </Accordion>
-              ) : (
-                <Accordion type="single" collapsible className="w-full">
-                  <AccordionItem value="item-1" className="border-none">
-                    <AccordionTrigger className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded flex justify-center items-center transition-colors">
-                      <span className="flex-1 text-center">Proponer un nuevo precio</span>
-                    </AccordionTrigger>
-                  <AccordionContent className="pt-4">
-                    <ProposalForm onSubmit={handleCreateOffer} />
-                  </AccordionContent>
-                 </AccordionItem>
-                </Accordion>
-              )}
+            <div className="flex items-center gap-2 justify-center">
+              <ProposalModal 
+                shippingType={shippingType}
+                bidDataShippingType={bidDataForAgent.shipping_type}
+                onSubmit={handleCreateOffer}
+              />
             </div>
           </div>
 
