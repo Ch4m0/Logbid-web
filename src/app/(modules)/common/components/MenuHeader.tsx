@@ -106,13 +106,15 @@ const MenuHeader: React.FC = () => {
   }
 
   return (
-    <div className="flex gap-4">
+    <div className="flex items-center gap-4">
       <div
         className="flex flex-col items-center cursor-pointer transition-colors duration-200"
         onClick={() => handleSelect('sea')}
       >
         <Ship className={`h-8 w-8 ${getColorClass('sea')}`} />
       </div>
+
+      <div className="w-px" style={{ height: '1.5rem', backgroundColor: '#ccc' }}></div>
 
       <div
         className="flex flex-col items-center cursor-pointer transition-colors duration-200"
@@ -121,12 +123,16 @@ const MenuHeader: React.FC = () => {
         <Plane className={`h-8 w-8 ${getColorClass('air')}`} />
       </div>
 
+      <div className="w-px" style={{ height: '1.5rem', backgroundColor: '#ccc' }}></div>
+
       <div
         className="flex flex-col items-center cursor-pointer transition-colors duration-200"
         onClick={() => handleSelect('land')}
       >
         <Truck className={`h-8 w-8 ${getColorClass('land')}`} />
       </div>
+
+      <div className="w-px" style={{ height: '1.5rem', backgroundColor: '#ccc' }}></div>
 
       <div
         className="flex flex-col items-center cursor-pointer transition-colors duration-200"

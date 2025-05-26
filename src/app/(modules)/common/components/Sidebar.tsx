@@ -5,6 +5,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/src/components/ui/accordion'
+import { Separator } from '@/src/components/ui/separator'
 import { Ship, BarChart3 } from 'lucide-react'
 import useAuthStore from '@/src/store/authStore'
 import Link from 'next/link'
