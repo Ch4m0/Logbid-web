@@ -95,7 +95,7 @@ export default function Auth() {
             {isPending ? t('auth.loggingIn') : t('auth.login')}
           </Button>
           <Link
-            href="/"
+            href="#"
             className="inline-block w-full text-center text-sm underline"
             prefetch={false}
           >

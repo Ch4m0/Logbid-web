@@ -38,6 +38,17 @@ interface CargoTransporListProps {
   status: 'Active' | 'Closed' | 'Offering'
 }
 
+// Function to normalize shipping type to translation key
+const normalizeShippingType = (shippingType: string) => {
+  const typeMap: { [key: string]: string } = {
+    'Marítimo': 'maritime',
+    'Aéreo': 'air',
+    'Terrestre': 'land',
+    'Almacén': 'warehouse'
+  }
+  return typeMap[shippingType] || shippingType.toLowerCase()
+}
+
 export function CargoTransportListCards({ status }: CargoTransporListProps) {
   const router = useRouter()
   const user = useAuthStore((state) => state.user)
@@ -164,7 +175,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
   return (
     <Card className="w-full">
       <CardHeader className="flex justify-between flex-row w-full">
-        <CardTitle className="font-bold">{t(`transport.${shippingType.toLowerCase()}`)}</CardTitle>
+        <CardTitle className="font-bold">{t(`transport.${normalizeShippingType(shippingType)}`)}</CardTitle>
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"

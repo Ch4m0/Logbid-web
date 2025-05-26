@@ -30,9 +30,9 @@ export interface CargoQuote {
       time: number
       unit: string
     }
+    cancellation_fee: number
+    free_days: number
   }
-  cancellation_fee: number
-  free_days: number
   freight_fees: {
     value: number
     container: string

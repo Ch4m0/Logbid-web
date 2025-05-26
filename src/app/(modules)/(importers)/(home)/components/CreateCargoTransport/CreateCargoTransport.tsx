@@ -202,7 +202,7 @@ export default function CreateCargoTransport() {
     <div>
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
-          <Button onClick={() => setIsOpen(true)}>{t('common.save')}</Button>
+          <Button onClick={() => setIsOpen(true)}>{t('common.create')}</Button>
         </SheetTrigger>
 
         <SheetContent

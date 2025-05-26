@@ -1,5 +1,6 @@
 {
   "common": {
+    "create": "Create",
     "save": "Save",
     "cancel": "Cancel",
     "edit": "Edit",
@@ -403,5 +404,14 @@
     "totalCost": "Total Cost",
     "pleaseCorrectErrors": "Please correct the errors",
     "saveQuote": "Save Quote"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "footer": {
+    "allRightsReserved": "All rights reserved.",
+    "madeBy": "Made with ❤️ by",
+    "companyName": "LogBid Development Team"
   }
 } 
