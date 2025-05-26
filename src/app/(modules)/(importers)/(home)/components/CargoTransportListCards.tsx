@@ -119,15 +119,29 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
     setMarketData(marketId)
     router.push(`/detalle/?bidId=${id}&market=${marketId}`)
   }
+  console.log(bidList, 'bidList')
+  console.log(filters, 'current filters')
 
   const filteredList = bidList
     ?.filter((bid: any) =>
-      Object.keys(filters).every((key) =>
-        bid[key as keyof BidListItem]
-          ?.toString()
+      Object.keys(filters).every((key) => {
+        const filterValue = filters[key as keyof typeof filters];
+        // If filter is empty, don't apply this filter
+        if (!filterValue || filterValue.trim() === '') {
+          return true;
+        }
+        
+        const bidValue = bid[key as keyof BidListItem];
+        // Handle null/undefined values
+        if (bidValue == null) {
+          return false;
+        }
+        
+        return bidValue
+          .toString()
           .toLowerCase()
-          .includes(filters[key as keyof typeof filters].toLowerCase())
-      )
+          .includes(filterValue.toLowerCase());
+      })
     )
     .sort((a: any, b: any) => {
       const aValue = a[sort.key as keyof BidListItem]
@@ -144,10 +158,15 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
         : Number(bValue) - Number(aValue)
     })
 
+  console.log(filteredList, 'filteredList')
+  console.log('Current page:', currentPage, 'Items per page:', itemsPerPage)
+
   const paginatedList = filteredList?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   )
+
+  console.log(paginatedList, 'paginatedList')
 
   return (
     <Card className="w-full">

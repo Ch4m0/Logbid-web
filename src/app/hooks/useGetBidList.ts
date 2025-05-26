@@ -15,7 +15,7 @@ export const useGetBidList = ({
   shipping_type,
 }: Args) => {
   return useQuery({
-    queryKey: ['bids'],
+    queryKey: ['bids', user_id, market_id, status, shipping_type],
     queryFn: async () => {
       return getBidList({ user_id, market_id, status, shipping_type })
     },
