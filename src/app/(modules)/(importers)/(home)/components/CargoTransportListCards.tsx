@@ -119,8 +119,6 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
     setMarketData(marketId)
     router.push(`/detalle/?bidId=${id}&market=${marketId}`)
   }
-  console.log(bidList, 'bidList')
-  console.log(filters, 'current filters')
 
   const filteredList = bidList
     ?.filter((bid: any) =>
@@ -158,15 +156,10 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
         : Number(bValue) - Number(aValue)
     })
 
-  console.log(filteredList, 'filteredList')
-  console.log('Current page:', currentPage, 'Items per page:', itemsPerPage)
-
   const paginatedList = filteredList?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   )
-
-  console.log(paginatedList, 'paginatedList')
 
   return (
     <Card className="w-full">
