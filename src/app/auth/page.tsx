@@ -1,8 +1,6 @@
 'use client'
 import { Input } from '@/src/components/ui/input'
 import { Label } from '@/src/components/ui/label'
-import { useAuth } from '@/src/app/hooks/useAuth'
-import { guardarEnLocalStorage } from '@/src/lib/utils'
 import { useTranslation } from '@/src/hooks/useTranslation'
 import useAuthStore from '@/src/store/authStore'
 import Link from 'next/link'
@@ -11,34 +9,73 @@ import { useState } from 'react'
 import { Button } from '@/src/components/ui/button'
 import { Card, CardContent } from '@/src/components/ui/card'
 import { Ship, Package, ArrowRight, Shield, Globe, Users } from 'lucide-react'
+import { login } from '@/src/actions/auth'
+import { getUserProfileClient } from '@/src/utils/auth-client'
 
 const IMPORTER = 2
 const AGENT = 3
 
 export default function Auth() {
-  const { mutate: login, isError, isSuccess, error, isPending } = useAuth()
   const { t } = useTranslation()
-
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const setUser = useAuthStore((state) => state.setUser)
+  const { setUser, setProfile } = useAuthStore()
 
-  const handleLogin = async () => {
-    login(
-      { email, password },
-      {
-        onSuccess: ({ user }) => {
-          // Guardar usuario en Zustand
-          document.cookie = `authToken=${user.uuid}; path=/;`
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    console.log('🚀 handleLogin called')
+    console.log('📧 Email:', email)
+    console.log('🔒 Password length:', password.length)
+    
+    try {
+      setIsLoading(true)
+      setError(null)
 
-          setUser(user)
-          // Guardar usuario y contraseña en localStorage
-          handleUserRole(user.role_id, user.all_markets[0].id)
-        },
+      console.log('📤 Calling login action...')
+      const result = await login(email, password)
+      console.log('📥 Login result:', result)
+
+      if (result.error) {
+        console.error('❌ Login error:', result.error)
+        setError(result.error)
+        return
       }
-    )
+
+      if (!result.data?.user) {
+        console.error('👤 No user data received')
+        setError('No se pudo obtener la información del usuario')
+        return
+      }
+
+      console.log('✅ Login successful, user:', result.data.user)
+      
+      // Establecer el usuario en el store de Zustand
+      setUser(result.data.user as any)
+
+      // Obtener el perfil del usuario desde el cliente
+      console.log('🔍 Fetching user profile from client...')
+      const { profile, error: profileError } = await getUserProfileClient(result.data.user.id)
+      
+      if (profile && !profileError) {
+        console.log('✅ Profile fetched successfully:', profile)
+        setProfile(profile)
+      } else {
+        console.warn('⚠️ Could not fetch profile from client:', profileError)
+      }
+
+      // Si el login es exitoso, redirigir al home
+      router.push('/')
+    } catch (err) {
+      console.error('💥 Unexpected error:', err)
+      setError('Error inesperado durante el inicio de sesión')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleUserRole = (roleId: number, market_id: number) => {
@@ -119,7 +156,7 @@ export default function Auth() {
                 </p>
               </div>
 
-              <form className="space-y-6">
+              <form onSubmit={handleLogin} className="space-y-6">
                 <div>
                   <Label htmlFor="email" className="text-sm font-semibold text-gray-700 block mb-2">
                     {t('auth.email')}
@@ -130,8 +167,8 @@ export default function Auth() {
                     placeholder={t('auth.emailPlaceholder')}
                     autoComplete="email"
                     required
-                    onChange={(e) => setEmail(e.target.value)}
                     value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="h-12 border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-500/20"
                   />
                 </div>
@@ -153,12 +190,11 @@ export default function Auth() {
                 </div>
 
                 <Button
-                  type="button"
+                  type="submit"
                   className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-base rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
-                  onClick={() => handleLogin()}
-                  disabled={isPending}
+                  disabled={isLoading}
                 >
-                  {isPending ? (
+                  {isLoading ? (
                     <div className="flex items-center justify-center space-x-2">
                       <Package className="w-4 h-4 animate-spin" />
                       <span>{t('auth.loggingIn')}</span>
@@ -171,6 +207,14 @@ export default function Auth() {
                   )}
                 </Button>
 
+                {error && (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-700 text-sm text-center font-medium">
+                      {error}
+                    </p>
+                  </div>
+                )}
+
                 <div className="text-center pt-2">
                   <Link
                     href="#"
@@ -180,22 +224,6 @@ export default function Auth() {
                     {t('auth.forgotPassword')}
                   </Link>
                 </div>
-
-                {/* Status Messages */}
-                {isSuccess && (
-                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <p className="text-green-700 text-sm text-center font-medium">
-                      {t('auth.loginSuccess')}
-                    </p>
-                  </div>
-                )}
-                {isError && (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-red-700 text-sm text-center font-medium">
-                      Error: {error.message}
-                    </p>
-                  </div>
-                )}
               </form>
             </CardContent>
           </Card>

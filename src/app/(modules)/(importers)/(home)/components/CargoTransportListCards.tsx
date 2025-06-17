@@ -13,7 +13,7 @@ import { Suspense, useEffect, useState } from 'react'
 import CreateCargoTransport from './CreateCargoTransport/CreateCargoTransport'
 import { ExtendCargoTransport } from './ExtendCargoTransport'
 import { useBidStore } from '@/src/store/useBidStore'
-import { useGetBidList } from '@/src/app/hooks/useGetBidList'
+import { useGetShipments } from '@/src/app/hooks/useGetShipments'
 import Pagination from '../../../common/components/pagination/Pagination'
 import useAuthStore from '@/src/store/authStore'
 import type { BidListItem } from '@/src/models/BidListItem'
@@ -52,20 +52,24 @@ const normalizeShippingType = (shippingType: string) => {
 export function CargoTransportListCards({ status }: CargoTransporListProps) {
   const router = useRouter()
   const user = useAuthStore((state) => state.user)
+  const profile = useAuthStore((state) => state.profile)
   const { setMarketData } = useBidStore()
   const [itemsPerPage] = useState(8)
   const searchParams = useSearchParams()
   const { t } = useTranslation()
 
+  console.log('User:', user)
+  console.log('Profile:', profile)
+  
   const marketId =
     searchParams.get('market_id') ??
-    user?.all_markets[0]?.id?.toString() ??
+    profile?.all_markets?.[0]?.id?.toString() ??
     null
 
   const shippingType = searchParams.get('shipping_type') || 'Marítimo'
 
-  const { data: bidList, refetch } = useGetBidList({
-    user_id: user?.id || null,
+  const { data: shipmentList, refetch } = useGetShipments({
+    user_id: profile?.id || null,
     market_id: marketId,
     status,
     shipping_type: shippingType as ShippingType,
@@ -83,8 +87,8 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
 
   const [filters, setFilters] = useState({
     uuid: '',
-    origin_name: '',
-    destination_name: '',
+    origin: '',
+    destination: '',
     inserted_at: '',
     expiration_date: '',
     value: '',
@@ -131,8 +135,8 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
     router.push(`/detalle/?bidId=${id}&market=${marketId}`)
   }
 
-  const filteredList = bidList
-    ?.filter((bid: any) =>
+  const filteredList = shipmentList
+    ?.filter((shipment: any) =>
       Object.keys(filters).every((key) => {
         const filterValue = filters[key as keyof typeof filters];
         // If filter is empty, don't apply this filter
@@ -140,13 +144,13 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
           return true;
         }
         
-        const bidValue = bid[key as keyof BidListItem];
+        const shipmentValue = shipment[key as keyof BidListItem];
         // Handle null/undefined values
-        if (bidValue == null) {
+        if (shipmentValue == null) {
           return false;
         }
         
-        return bidValue
+        return shipmentValue
           .toString()
           .toLowerCase()
           .includes(filterValue.toLowerCase());
@@ -186,7 +190,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
             <Filter className="h-4 w-4" />
             <span>{showFilters ? t('common.hideFilters') : t('common.showFilters')}</span>
           </Button>
-          <CreateCargoTransport />
+          {/*<CreateCargoTransport />*/}
         </div>
       </CardHeader>
       <CardContent>
@@ -299,7 +303,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                 <Input
                   placeholder={t('filters.filterDestination')}
                   onChange={(e) =>
-                    handleFilterChange('destination_name', e.target.value)
+                    handleFilterChange('destination', e.target.value)
                   }
                 />
                 <Button
@@ -402,7 +406,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                           <span className="text-sm text-muted-foreground">
                             {t('cargoList.origin')}
                           </span>
-                          <span className="font-medium">{bid.origin_name}</span>
+                          <span className="font-medium">{bid.origin}</span>
                         </div>
                       </div>
                       <ArrowRight className="h-5 w-5 text-muted-foreground hidden md:block" />
@@ -413,7 +417,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                             {t('cargoList.destination')}
                           </span>
                           <span className="font-medium">
-                            {bid.destination_name}
+                            {bid.destination}
                           </span>
                         </div>
                       </div>
@@ -454,8 +458,8 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                         e.stopPropagation()
                         showExtendFinalDate(
                           bid.expiration_date,
-                          bid.origin_name,
-                          bid.destination_name,
+                          bid.origin,
+                          bid.destination,
                           bid.id.toString()
                         )
                       }}

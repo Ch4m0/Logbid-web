@@ -3,13 +3,10 @@ import Header from './common/components/Header'
 import Sidebar from './common/components/Sidebar'
 import Footer from './common/components/Footer'
 import { ChatBot } from '@/src/components/ChatBot'
-
-import useAuthStore from '@/src/store/authStore'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useAuth } from '@/src/hooks/useAuth'
 
 const LogBiddLayout = ({ children }: { children: React.ReactNode }) => {
-  const router = useRouter()
-  const user = useAuthStore((state) => state.user)
+  const { user } = useAuth()
 
   return (
     <div className="w-full flex h-full min-h-screen">

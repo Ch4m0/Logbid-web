@@ -12,8 +12,12 @@ import useAuthStore from '@/src/store/authStore'
 import Link from 'next/link'
 
 const Sidebar = () => {
-  const user = useAuthStore((state) => state.user)
+  const { user, profile } = useAuthStore()
   const { t } = useTranslation()
+
+  // Usar markets del profile o fallback si no hay profile
+  const userMarkets = profile?.all_markets || []
+  const userRole = profile?.role_id || user?.role_id
 
   return (
     <div className="w-[18rem] bg-primary border-r">
@@ -26,14 +30,16 @@ const Sidebar = () => {
         <div className="flex-1 overflow-auto h-full">
           {!user ? (
             <h1 className="text-white text-center">{t('sidebar.loading')}</h1>
+          ) : userMarkets.length === 0 ? (
+            <h1 className="text-white text-center px-4 py-2">{t('sidebar.noMarkets', 'No markets assigned')}</h1>
           ) : (
             <nav className="grid gap-1 px-4 py-2">
-              {user?.all_markets.map((market) => (
+              {userMarkets.map((market) => (
                 <MarketItem
                   key={market.id}
                   market_id={market.id}
                   market={market.name}
-                  role={user.role_id}
+                  role={userRole}
                   t={t}
                 />
               ))}
@@ -114,7 +120,7 @@ const MarketItem = ({
     <Accordion type="single" collapsible key={market}>
       <AccordionItem value="item-1">
         <AccordionTrigger className="text-white">
-          {`${t('sidebar.market')} ${market}`}
+          {market}
         </AccordionTrigger>
         <AccordionContent>
           {list[role].map((item: ListItem, index: number) => (

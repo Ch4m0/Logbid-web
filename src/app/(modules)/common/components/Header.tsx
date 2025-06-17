@@ -4,7 +4,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/src/components/ui/dropdown-menu'
 import { Badge } from '@/src/components/ui/badge'
@@ -14,6 +13,7 @@ import useAuthStore from '@/src/store/authStore'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import MenuHeader from './MenuHeader'
+import { logout } from '@/src/actions/auth'
 
 const getInitials = (name?: string, lastName?: string) => {
   const initials =
@@ -45,16 +45,44 @@ const getUserRoleVariant = (roleId?: number): "default" | "secondary" | "destruc
 
 const Header = () => {
   const router = useRouter()
-  const user = useAuthStore((state) => state.user)
-  const logout = useAuthStore((state) => state.logout)
-  const initials = getInitials(user?.name, user?.last_name)
+  const { user, profile } = useAuthStore()
+  const logoutStore = useAuthStore((state) => state.logout)
+  
+  // Usar datos del perfil si están disponibles, sino usar datos de auth
+  const displayName = profile?.name || (user as any)?.user_metadata?.name || ''
+  const displayLastName = profile?.last_name || (user as any)?.user_metadata?.last_name || ''
+  const displayEmail = profile?.email || user?.email || ''
+  const userRole = profile?.role_id
+  
+  const initials = getInitials(displayName, displayLastName)
   const { t } = useTranslation()
 
-  const handleLogout = () => {
-    logout()
-    document.cookie =
-      'authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;'
-    router.push('/auth')
+  const handleLogout = async () => {
+    try {
+      console.log('Iniciando proceso de logout...')
+      
+      // Llamar a la server action de logout
+      const result = await logout()
+      
+      if (result.error) {
+        console.error('Error al cerrar sesión:', result.error)
+        // Aún así, intentamos limpiar el estado local
+      }
+
+      console.log('Logout exitoso, limpiando estado local...')
+      
+      // Limpiar el estado local
+      logoutStore()
+      
+      // Redirigir al login
+      console.log('Redirigiendo a login...')
+      router.push('/auth')
+    } catch (error) {
+      console.error('Error en el proceso de logout:', error)
+      // Si hay error, forzamos la limpieza y redirección de todos modos
+      logoutStore()
+      router.push('/auth')
+    }
   }
 
   return (
@@ -73,10 +101,10 @@ const Header = () => {
         <LanguageSelector />
         <div className="flex flex-col items-end gap-1">
           <span className="text-sm font-bold">
-            {user?.name} {user?.last_name}
+            {displayName} {displayLastName}
           </span>
-          <Badge variant={getUserRoleVariant(user?.role_id)} className="text-xs">
-            {getUserRoleLabel(user?.role_id, t)}
+          <Badge variant={getUserRoleVariant(userRole)} className="text-xs">
+            {getUserRoleLabel(userRole, t)}
           </Badge>
         </div>
         <DropdownMenu>
@@ -90,7 +118,7 @@ const Header = () => {
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => handleLogout()}>
+            <DropdownMenuItem onClick={handleLogout}>
               {t('common.logout')}
             </DropdownMenuItem>
           </DropdownMenuContent>

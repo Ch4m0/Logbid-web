@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/src/components/ui/table'
-import { useGetBidList } from '@/src/app/hooks/useGetBidList'
+import { useGetShipments } from '@/src/app/hooks/useGetShipments'
 import useAuthStore from '@/src/store/authStore'
 import { useSearchParams } from 'next/navigation'
 import { Suspense, useState } from 'react'
@@ -24,15 +24,16 @@ import Pagination from '../../../common/components/pagination/Pagination'
 export function CargaTransportListHistory() {
   const searchParams = useSearchParams()
   const user = useAuthStore((state) => state.user)
+  const profile = useAuthStore((state) => state.profile)
   const marketId =
     searchParams.get('market_id') ??
-    user?.all_markets[0]?.id?.toString() ??
+    profile?.all_markets?.[0]?.id?.toString() ??
     null
 
   const shippingType = searchParams.get('shipping_type') as any
 
-  const { data: bidList } = useGetBidList({
-    user_id: user?.id || null,
+  const { data: shipmentList } = useGetShipments({
+    user_id: profile?.id || null,
     market_id: marketId,
     status: 'Closed',
     shipping_type: shippingType,
@@ -67,7 +68,7 @@ export function CargaTransportListHistory() {
     setFilters((prev) => ({ ...prev, [key]: value }))
   }
 
-  const filteredList = bidList
+  const filteredList = shipmentList
     ?.filter((bid: any) =>
       Object.keys(filters).every((key) =>
         bid[key as keyof any]
