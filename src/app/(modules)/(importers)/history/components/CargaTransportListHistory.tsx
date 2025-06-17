@@ -292,9 +292,9 @@ export function CargaTransportListHistory() {
               <TableRow key={item.uuid} className="text-xs">
                 <TableCell className="font-medium">{item.uuid}</TableCell>
                 <TableCell className="font-medium">
-                  {item.origin_name}
+                  {item.origin}
                 </TableCell>
-                <TableCell>{item.destination_name}</TableCell>
+                <TableCell>{item.destination}</TableCell>
                 <TableCell>{item.inserted_at}</TableCell>
                 <TableCell>{item.expiration_date}</TableCell>
                 <TableCell>USD ${item.value}</TableCell>

@@ -47,6 +47,7 @@ export function HistoricalListProposal() {
     user_id: user?.id || null,
     market_id: marketId,
     status: 'Closed',
+    shipping_type: 'Marítimo', // Add required shipping_type parameter
   })
 
   const [filters, setFilters] = useState({

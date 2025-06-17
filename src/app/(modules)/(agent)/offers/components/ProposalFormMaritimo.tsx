@@ -73,6 +73,7 @@ export const SubtotalDisplay = memo(
     </div>
   )
 )
+SubtotalDisplay.displayName = 'SubtotalDisplay'
 
 // Componente para cada campo del formulario
 export const FormField = ({
