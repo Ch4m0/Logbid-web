@@ -9,8 +9,8 @@ import {
 } from '@/src/components/ui/dialog'
 import { Button } from '@/src/components/ui/button'
 import { DollarSign, Plus } from 'lucide-react'
-import ProposalForm from './ProposalForm'
-import ProposalFormMaritimo from './ProposalFormMaritimo'
+import ProposalFormAir from './ProposalFormAir'
+import ProposalFormSea from './ProposalFormSea'
 import { useTranslation } from '@/src/hooks/useTranslation'
 
 interface ProposalModalProps {
@@ -32,7 +32,8 @@ export default function ProposalModal({
     setOpen(false) // Cerrar modal después de enviar
   }
 
-  const isMaritimo = bidDataShippingType === shippingType
+  // Use the actual shipment type to determine which form to show
+  const isMaritimo = bidDataShippingType === 'Marítimo'
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -45,18 +46,21 @@ export default function ProposalModal({
           {t('agentOffers.proposePrice')}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col p-0 [&>button]:z-20 [&>button]:bg-white [&>button]:shadow-md [&>button]:border">
+        {/* Header fijo */}
+        <DialogHeader className="sticky top-0 z-10 bg-white border-b px-6 py-4 shadow-sm">
           <DialogTitle className="flex items-center gap-2 text-xl">
             <DollarSign className="w-5 h-5 text-blue-500" />
-            {t('agentOffers.proposeNewPrice')}
+            {t('agentOffers.proposeNewPrice')} - {bidDataShippingType}
           </DialogTitle>
         </DialogHeader>
-        <div className="mt-4">
+        
+        {/* Contenido con scroll */}
+        <div className="flex-1 overflow-y-auto px-6 py-4">
           {isMaritimo ? (
-            <ProposalFormMaritimo onSubmit={handleSubmit} />
+            <ProposalFormSea onSubmit={handleSubmit} />
           ) : (
-            <ProposalForm onSubmit={handleSubmit} />
+            <ProposalFormAir onSubmit={handleSubmit} />
           )}
         </div>
       </DialogContent>

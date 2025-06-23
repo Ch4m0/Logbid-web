@@ -7,14 +7,14 @@ const BidInfo = ({ bidDataForAgent }: any) => {
   
   // Función para obtener valor de mercancía de forma segura
   const getMerchandiseValue = (key: string) => {
-    // Buscar en bid_details primero (donde vienen los datos según la API)
-    if (bidDataForAgent.bid_details && bidDataForAgent.bid_details[key] !== undefined && bidDataForAgent.bid_details[key] !== null && bidDataForAgent.bid_details[key] !== '') {
-      return bidDataForAgent.bid_details[key];
-    }
-    
-    // Buscar en el nivel principal como fallback
+    // Buscar en el nivel principal primero (datos de Supabase ya aplanados)
     if (bidDataForAgent[key] !== undefined && bidDataForAgent[key] !== null && bidDataForAgent[key] !== '') {
       return bidDataForAgent[key];
+    }
+    
+    // Buscar en bid_details como fallback (para compatibilidad con API antigua)
+    if (bidDataForAgent.bid_details && bidDataForAgent.bid_details[key] !== undefined && bidDataForAgent.bid_details[key] !== null && bidDataForAgent.bid_details[key] !== '') {
+      return bidDataForAgent.bid_details[key];
     }
     
     // Valor por defecto
@@ -122,12 +122,14 @@ const BidInfo = ({ bidDataForAgent }: any) => {
       <div className="bg-blue-50 p-4 rounded-md">
         <h3 className="font-bold text-lg mb-3 text-blue-700">{t('bidInfo.identification')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="font-bold">{t('bidInfo.agentCode')}:</span>
-              <span>{bidDataForAgent.agent_code}</span>
+          {bidDataForAgent.status === 'Closed' && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="font-bold">{t('bidInfo.agentCode')}:</span>
+                <span>{bidDataForAgent.agent_code}</span>
+              </div>
             </div>
-          </div>
+          )}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="font-bold">{t('bidInfo.dangerousCargo')}:</span>

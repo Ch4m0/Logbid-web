@@ -1,6 +1,8 @@
+'use client'
 import React, { Suspense } from 'react'
 import { CargoTransportTabs } from './components/CargoTransportTabs.tsx'
 import { CargoTransportListCards } from './components/CargoTransportListCards'
+import { ProtectedRoute } from '@/src/components/ProtectedRoute'
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center p-8">
@@ -11,17 +13,17 @@ const LoadingFallback = () => (
 
 const page = () => {
   return (
-    <>
+    <ProtectedRoute allowedRoles={['importer']}>
       <section className="flex justify-between w-full gap-8">
         <Suspense fallback={<LoadingFallback />}>
           <CargoTransportTabs
-            children1={<CargoTransportListCards status={'Active'} />}
-            children2={<CargoTransportListCards status={'Offering'} />}
-            children3={<CargoTransportListCards status={'Closed'} />}
+            children1={<CargoTransportListCards filterType={'withoutOffers'} />}
+            children2={<CargoTransportListCards filterType={'withOffers'} />}
+            children3={<CargoTransportListCards filterType={'closed'} />}
           ></CargoTransportTabs>
         </Suspense>
       </section>
-    </>
+    </ProtectedRoute>
   )
 }
 

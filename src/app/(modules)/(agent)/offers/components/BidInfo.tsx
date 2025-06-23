@@ -122,12 +122,14 @@ const BidInfo = ({ bidDataForAgent }: any) => {
       <div className="bg-blue-50 p-4 rounded-md">
         <h3 className="font-bold text-lg mb-3 text-blue-700">{t('bidInfo.identification')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="font-bold">{t('bidInfo.agentCode')}:</span>
-              <span>{bidDataForAgent.agent_code}</span>
+          {bidDataForAgent.status === 'Closed' && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="font-bold">{t('bidInfo.agentCode')}:</span>
+                <span>{bidDataForAgent.agent_code}</span>
+              </div>
             </div>
-          </div>
+          )}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <span className="font-bold">{t('bidInfo.dangerousCargo')}:</span>

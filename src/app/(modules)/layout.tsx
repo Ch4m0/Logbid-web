@@ -1,20 +1,22 @@
 'use client'
 import Header from './common/components/Header'
 import Sidebar from './common/components/Sidebar'
-import Footer from './common/components/Footer'
+import Breadcrumb from './common/components/Breadcrumb'
 import { ChatBot } from '@/src/components/ChatBot'
-import { useAuth } from '@/src/hooks/useAuth'
+
+import useAuthStore from '@/src/store/authStore'
 
 const LogBiddLayout = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuth()
+  // Solo usamos el store, no el hook completo para evitar peticiones duplicadas
+  const user = useAuthStore((state) => state.user)
 
   return (
-    <div className="w-full flex h-full min-h-screen">
+    <div className="w-full h-screen overflow-hidden">
       <Sidebar />
-      <div className="w-full flex flex-col h-full min-h-screen">
+      <div className="ml-[18rem] flex flex-col h-screen">
         <Header />
-        <main className="flex-1 p-8">{children}</main>
-        <Footer />
+        <Breadcrumb />
+        <main className="flex-1 p-8 overflow-y-auto">{children}</main>
       </div>
       <ChatBot />
     </div>

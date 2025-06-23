@@ -1,0 +1,242 @@
+'use client'
+import React from 'react'
+import { formatDistanceToNow } from 'date-fns'
+import { es, enUS } from 'date-fns/locale'
+import { 
+  Check, 
+  CheckCheck, 
+  Trash2, 
+  Eye,
+  Package,
+  DollarSign,
+  Clock,
+  RotateCcw,
+  Calendar,
+  X
+} from 'lucide-react'
+import { Button } from '@/src/components/ui/button'
+import { Badge } from '@/src/components/ui/badge'
+// import { ScrollArea } from '@/src/components/ui/scroll-area'
+import { Separator } from '@/src/components/ui/separator'
+import { useNotifications, Notification } from '@/src/hooks/useNotifications'
+import { useTranslation } from '@/src/hooks/useTranslation'
+import { cn } from '@/src/lib/utils'
+import { useRouter } from 'next/navigation'
+
+interface NotificationPanelProps {
+  onClose: () => void
+}
+
+export function NotificationPanel({ onClose }: NotificationPanelProps) {
+  const { 
+    notifications, 
+    unreadCount, 
+    isLoading, 
+    markAsRead, 
+    markAllAsRead, 
+    deleteNotification,
+    interpolateNotificationMessage,
+    interpolateNotificationTitle
+  } = useNotifications()
+  const { t, getCurrentLanguage } = useTranslation()
+  const router = useRouter()
+
+  const dateLocale = getCurrentLanguage() === 'es' ? es : enUS
+
+  // Función para obtener el color del badge según el tipo
+  const getNotificationBadgeColor = (type: string) => {
+    switch (type) {
+      case 'new_offer':
+      case 'offer_accepted':
+        return 'bg-green-100 text-green-800'
+      case 'offer_rejected':
+        return 'bg-red-100 text-red-800'
+      case 'shipment_expiring':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'shipment_status_changed':
+      case 'deadline_extended':
+        return 'bg-blue-100 text-blue-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  // Función para manejar clic en notificación
+  const handleNotificationClick = (notification: Notification) => {
+    // Marcar como leída si no lo está
+    if (!notification.read) {
+      markAsRead(notification.id)
+    }
+
+    // Navegar según el tipo de notificación
+    if (notification.shipment_id) {
+      const shipmentData = notification.data
+      if (shipmentData?.shipment_uuid) {
+        // Cerrar el panel
+        onClose()
+        // Navegar al detalle del shipment
+        router.push(`/detalle?offer_id=${shipmentData.shipment_uuid}`)
+      }
+    }
+  }
+
+  // Función para formatear la fecha relativa
+  const formatRelativeTime = (dateString: string) => {
+    return formatDistanceToNow(new Date(dateString), {
+      addSuffix: true,
+      locale: dateLocale
+    })
+  }
+
+  if (isLoading) {
+    return (
+      <div className="p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="w-full">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center gap-2">
+          <h3 className="font-semibold text-lg">🔔 {t('notifications.title')}</h3>
+          {unreadCount > 0 && (
+            <Badge variant="secondary" className="text-xs">
+              {unreadCount} {t('notifications.newNotifications')}
+            </Badge>
+          )}
+        </div>
+        <div className="flex items-center gap-1">
+          {unreadCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => markAllAsRead()}
+              className="text-xs"
+            >
+              <CheckCheck className="h-4 w-4 mr-1" />
+              {t('notifications.markAll')}
+            </Button>
+          )}
+
+        </div>
+      </div>
+
+      {/* Lista de notificaciones */}
+      <div className="h-96 overflow-y-auto">
+        {notifications.length === 0 ? (
+          <div className="p-8 text-center text-gray-500">
+            <Package className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+            <p className="text-sm">{t('notifications.noNotifications')}</p>
+          </div>
+        ) : (
+          <div className="space-y-0">
+            {notifications.map((notification, index) => (
+              <div key={notification.id}>
+                <div
+                  className={cn(
+                    "p-4 hover:bg-gray-50 cursor-pointer transition-colors",
+                    !notification.read && "bg-blue-50 border-l-4 border-l-blue-500"
+                  )}
+                  onClick={() => handleNotificationClick(notification)}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-sm font-medium text-gray-900 truncate">
+                          {interpolateNotificationTitle(notification)}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-500">
+                            {formatRelativeTime(notification.created_at)}
+                          </span>
+                          {!notification.read && (
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <p className="text-xs text-gray-600 mb-2">
+                        {interpolateNotificationMessage(notification)}
+                      </p>
+                      
+                      {/* Datos adicionales según el tipo */}
+                      {notification.data && (
+                        <div className="flex items-center gap-2 mb-2">
+                          {notification.data.shipment_uuid && (
+                            <Badge 
+                              variant="outline" 
+                              className={cn("text-xs", getNotificationBadgeColor(notification.type))}
+                            >
+                              {notification.data.shipment_uuid}
+                            </Badge>
+                          )}
+                          {notification.data.price && (
+                            <Badge variant="outline" className="text-xs">
+                              💰 {notification.data.price} {notification.data.currency || 'USD'}
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                      {!notification.read && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            markAsRead(notification.id)
+                          }}
+                          className="h-6 w-6 p-0"
+                        >
+                          <Eye className="h-3 w-3" />
+                        </Button>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          deleteNotification(notification.id)
+                        }}
+                        className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                {index < notifications.length - 1 && <Separator />}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      {notifications.length > 0 && (
+        <div className="border-t p-3 text-center">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-blue-600 hover:text-blue-800"
+            onClick={() => {
+              onClose()
+              router.push('/notifications') // Página completa de notificaciones
+            }}
+          >
+            {t('notifications.viewAll')}
+          </Button>
+        </div>
+      )}
+    </div>
+  )
+} 

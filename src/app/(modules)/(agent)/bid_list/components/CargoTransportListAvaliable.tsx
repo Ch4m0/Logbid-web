@@ -15,7 +15,7 @@ import {
   TableRow,
 } from '@/src/components/ui/table'
 import { convertToColombiaTime } from '@/src/lib/utils'
-import { useGetBidById } from '@/src/app/hooks/useGetBidById'
+
 import { useGetBidListByMarket } from '@/src/app/hooks/useGetBidListByMarket'
 import useAuthStore from '@/src/store/authStore'
 import { useBidStore } from '@/src/store/useBidStore'
@@ -37,10 +37,12 @@ interface BidByMarket {
   shipping_type: string
   origin: string
   destination: string
+  offers_count: number
+  offers: any[]
 }
 
 interface CargoTransporListProps {
-  status: 'Active' | 'Closed' | 'Offered'
+  status: 'Active' | 'Closed' | 'Offered' | 'WithoutOffers' | 'WithOffers'
 }
 
 // Function to normalize shipping type to translation key
@@ -111,17 +113,26 @@ export function CargoTransporListAvaliable({ status }: CargoTransporListProps) {
   }
 
   const filteredList = bidList
-    ?.filter((bid: BidByMarket) =>
-      Object.keys(filters).every((key) => {
+    ?.filter((bid: any) => {
+      // First filter by offer presence based on status
+      if (status === 'WithoutOffers' && bid.offers_count > 0) {
+        return false
+      }
+      if (status === 'WithOffers' && bid.offers_count === 0) {
+        return false
+      }
+      
+      // Then apply the regular filters
+      return Object.keys(filters).every((key) => {
         const filterValue = filters[key as keyof typeof filters]
           .trim() // Eliminar espacios en blanco
           .toLowerCase()
-        const bidValue = String(bid[key as keyof BidByMarket] || '')
+        const bidValue = String(bid[key as keyof any] || '')
           .trim() // Eliminar espacios en blanco en la data
           .toLowerCase()
         return bidValue.includes(filterValue)
       })
-    )
+    })
     .sort((a: any, b: any) => {
       const aValue = a[sort.key as keyof BidByMarket]
       const bValue = b[sort.key as keyof BidByMarket]

@@ -7,17 +7,20 @@ import {
   TabsTrigger,
 } from '@/src/components/ui/tabs'
 import { useTranslation } from '@/src/hooks/useTranslation'
+import MenuHeader from '../../../../common/components/MenuHeader'
 
 interface CargoTransportTabsProps {
   children1: React.ReactElement
   children2: React.ReactElement
   children3: React.ReactElement
+  children4?: React.ReactElement
 }
 
 export default function CargoTransportListAvaliableTabs({
   children1,
   children2,
   children3,
+  children4,
 }: CargoTransportTabsProps) {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState('sin-propuestas')
@@ -25,6 +28,7 @@ export default function CargoTransportListAvaliableTabs({
   const statusChildren1 = children1.props.status
   const statusChildren2 = children2.props.status
   const statusChildren3 = children3.props.status
+  const statusChildren4 = children4?.props?.status
 
   useEffect(() => {
     try {
@@ -41,6 +45,9 @@ export default function CargoTransportListAvaliableTabs({
       } else if (statusParam === statusChildren3) {
         setActiveTab('historico')
 
+      } else if (statusParam === statusChildren4) {
+        setActiveTab('mis-ofertas')
+
       }
     } catch (error) {
       console.error('Error reading URL parameters:', error)
@@ -56,8 +63,14 @@ export default function CargoTransportListAvaliableTabs({
   }
 
   return (
-    <Tabs defaultValue={activeTab} value={activeTab} className="w-full mx-auto">
-      <TabsList className="grid w-full grid-cols-3">
+    <div className="w-full mx-auto space-y-6">
+      {/* Transport Type Selection */}
+      <div className="flex justify-center">
+        <MenuHeader />
+      </div>
+      
+      <Tabs defaultValue={activeTab} value={activeTab} className="w-full">
+        <TabsList className={`grid w-full ${children4 ? 'grid-cols-4' : 'grid-cols-3'}`}>
         <TabsTrigger
           value="sin-propuestas"
           onClick={() => {
@@ -67,7 +80,7 @@ export default function CargoTransportListAvaliableTabs({
             }
           }}
         >
-          {t('cargoList.withoutProposals')}
+                        {t('cargoList.withoutOffers')}
         </TabsTrigger>
         <TabsTrigger
           value="con-propuestas"
@@ -78,7 +91,7 @@ export default function CargoTransportListAvaliableTabs({
             }
           }}
         >
-          {t('cargoList.withProposals')}
+                        {t('cargoList.withOffers')}
         </TabsTrigger>
         <TabsTrigger
           value="historico"
@@ -91,10 +104,27 @@ export default function CargoTransportListAvaliableTabs({
         >
           {t('cargoList.history')}
         </TabsTrigger>
+        {children4 && (
+          <TabsTrigger
+            value="mis-ofertas"
+            onClick={() => {
+              setActiveTab('mis-ofertas')
+              if (statusChildren4) {
+                changeUrl(statusChildren4)
+              }
+            }}
+          >
+            {t('agentOffers.myOffers')}
+          </TabsTrigger>
+        )}
       </TabsList>
       <TabsContent value="sin-propuestas">{children1}</TabsContent>
       <TabsContent value="con-propuestas">{children2}</TabsContent>
       <TabsContent value="historico">{children3}</TabsContent>
-    </Tabs>
+      {children4 && (
+        <TabsContent value="mis-ofertas">{children4}</TabsContent>
+      )}
+      </Tabs>
+    </div>
   )
 }

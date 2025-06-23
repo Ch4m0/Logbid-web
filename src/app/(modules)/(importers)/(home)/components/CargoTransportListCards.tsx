@@ -10,8 +10,8 @@ import { Input } from '@/src/components/ui/input'
 import { modalService } from '@/src/service/modalService'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
-import CreateCargoTransport from './CreateCargoTransport/CreateCargoTransport'
-import { ExtendCargoTransport } from './ExtendCargoTransport'
+import CreateShipment from './CreateShipment/CreateShipment'
+import { ExtendShipmentDeadline } from './ExtendShipmentDeadline'
 import { useBidStore } from '@/src/store/useBidStore'
 import { useGetShipments } from '@/src/app/hooks/useGetShipments'
 import Pagination from '../../../common/components/pagination/Pagination'
@@ -35,7 +35,7 @@ import { convertToColombiaTime } from '@/src/lib/utils'
 import { useTranslation } from '@/src/hooks/useTranslation'
 
 interface CargoTransporListProps {
-  status: 'Active' | 'Closed' | 'Offering'
+  filterType: 'withoutOffers' | 'withOffers' | 'closed'
 }
 
 // Function to normalize shipping type to translation key
@@ -49,7 +49,7 @@ const normalizeShippingType = (shippingType: string) => {
   return typeMap[shippingType] || shippingType.toLowerCase()
 }
 
-export function CargoTransportListCards({ status }: CargoTransporListProps) {
+export function CargoTransportListCards({ filterType }: CargoTransporListProps) {
   const router = useRouter()
   const user = useAuthStore((state) => state.user)
   const profile = useAuthStore((state) => state.profile)
@@ -58,8 +58,20 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
   const searchParams = useSearchParams()
   const { t } = useTranslation()
 
-  console.log('User:', user)
-  console.log('Profile:', profile)
+  // Map filterType to status for API call
+  const getStatusFromFilterType = (filterType: string) => {
+    switch (filterType) {
+      case 'closed':
+        return 'Closed'
+      case 'withOffers':
+      case 'withoutOffers':
+        return 'Active' // Both with and without offers use Active status, we'll filter by offers_count
+      default:
+        return 'Active'
+    }
+  }
+
+  const status = getStatusFromFilterType(filterType)
   
   const marketId =
     searchParams.get('market_id') ??
@@ -69,7 +81,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
   const shippingType = searchParams.get('shipping_type') || 'Marítimo'
 
   const { data: shipmentList, refetch } = useGetShipments({
-    user_id: profile?.id || null,
+    user_id: profile?.id ? Number(profile.id) : null,
     market_id: marketId,
     status,
     shipping_type: shippingType as ShippingType,
@@ -81,7 +93,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
 
   const currentPage = Number(searchParams.get('page')) || 1
 
-  const [sort, setSort] = useState({ key: 'id', order: 'desc' })
+  const [sort, setSort] = useState({ key: 'inserted_at', order: 'desc' })
 
   const [showFilters, setShowFilters] = useState(false)
 
@@ -96,6 +108,11 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
   })
 
   const STATUS = ['Offering', 'Closed']
+  
+  // Helper function to determine if we should show status-based elements
+  const shouldShowStatusElements = () => {
+    return filterType === 'withOffers' || filterType === 'closed'
+  }
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }))
@@ -107,9 +124,9 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
     destination: string,
     id: string
   ) => {
-    modalService.showModal({
-      component: ExtendCargoTransport,
-      props: {
+          modalService.showModal({
+        component: ExtendShipmentDeadline,
+        props: {
         expiration_date: expiration_date,
         origin: origin,
         destination: destination,
@@ -136,8 +153,22 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
   }
 
   const filteredList = shipmentList
-    ?.filter((shipment: any) =>
-      Object.keys(filters).every((key) => {
+    ?.filter((shipment: any) => {
+      // First filter by offers count based on filterType
+      let passesOfferFilter = true;
+      if (filterType === 'withoutOffers') {
+        passesOfferFilter = shipment.offers_count === 0;
+      } else if (filterType === 'withOffers') {
+        passesOfferFilter = shipment.offers_count > 0;
+      }
+      // For 'closed' filterType, we already filter by status in the API call
+      
+      if (!passesOfferFilter) {
+        return false;
+      }
+
+      // Then apply other filters
+      return Object.keys(filters).every((key) => {
         const filterValue = filters[key as keyof typeof filters];
         // If filter is empty, don't apply this filter
         if (!filterValue || filterValue.trim() === '') {
@@ -155,17 +186,26 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
           .toLowerCase()
           .includes(filterValue.toLowerCase());
       })
-    )
+    })
     .sort((a: any, b: any) => {
       const aValue = a[sort.key as keyof BidListItem]
       const bValue = b[sort.key as keyof BidListItem]
 
+      // Manejar fechas especialmente
+      if (sort.key === 'inserted_at' || sort.key === 'expiration_date') {
+        const aDate = new Date(aValue).getTime()
+        const bDate = new Date(bValue).getTime()
+        return sort.order === 'asc' ? aDate - bDate : bDate - aDate
+      }
+
+      // Manejar strings
       if (typeof aValue === 'string' && typeof bValue === 'string') {
         return sort.order === 'asc'
           ? aValue.localeCompare(bValue)
           : bValue.localeCompare(aValue)
       }
 
+      // Manejar números
       return sort.order === 'asc'
         ? Number(aValue) - Number(bValue)
         : Number(bValue) - Number(aValue)
@@ -190,7 +230,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
             <Filter className="h-4 w-4" />
             <span>{showFilters ? t('common.hideFilters') : t('common.showFilters')}</span>
           </Button>
-          {/*<CreateCargoTransport />*/}
+                     <CreateShipment />
         </div>
       </CardHeader>
       <CardContent>
@@ -238,7 +278,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                 </Button>
               </div>
             </div>
-            {STATUS.includes(status) && (
+            {shouldShowStatusElements() && (
               <div>
                 <label className="text-sm font-medium mb-1 block">
                   {t('cargoList.agentCode')}
@@ -316,7 +356,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                 </Button>
               </div>
             </div>
-            {STATUS.includes(status) && (
+            {shouldShowStatusElements() && (
               <div>
                 <label className="text-sm font-medium mb-1 block">
                   {t('cargoList.lastPrice')}
@@ -372,7 +412,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                     <Badge variant="outline" className="w-full justify-center">
                       ID: {bid.uuid.substring(0, 20)}
                     </Badge>
-                    {STATUS.includes(status) && (
+                    {shouldShowStatusElements() && (
                       <Badge
                         className="w-full justify-center"
                         variant="secondary"
@@ -380,7 +420,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                         {t('cargoList.agentCode')}: {bid.agent_code}
                       </Badge>
                     )}
-                    {STATUS.includes(status) && (
+                    {shouldShowStatusElements() && (
                       <div className="flex items-center justify-center space-x-2 mt-3 bg-primary/10 p-2 rounded-md">
                         <DollarSign className="h-4 w-4 text-primary" />
                         <span className="text-sm font-medium">
@@ -448,7 +488,7 @@ export function CargoTransportListCards({ status }: CargoTransporListProps) {
                   </div>
                 </div>
 
-                {status !== 'Closed' && (
+                {filterType !== 'closed' && (
                   <div className="md:col-span-3 p-4 flex items-center justify-center border-t md:border-t-0 md:border-l">
                     <Button
                       variant="outline"

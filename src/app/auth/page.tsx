@@ -9,7 +9,7 @@ import { useState } from 'react'
 import { Button } from '@/src/components/ui/button'
 import { Card, CardContent } from '@/src/components/ui/card'
 import { Ship, Package, ArrowRight, Shield, Globe, Users } from 'lucide-react'
-import { login } from '@/src/actions/auth'
+import { createSupabaseClient } from '@/src/utils/supabase/client'
 import { getUserProfileClient } from '@/src/utils/auth-client'
 
 const IMPORTER = 2
@@ -25,10 +25,13 @@ export default function Auth() {
 
   const { setUser, setProfile } = useAuthStore()
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleLogin = async (e?: React.FormEvent | React.MouseEvent) => {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
     
-    console.log('🚀 handleLogin called')
+    console.log('🚀 CLIENT-SIDE handleLogin called')
     console.log('📧 Email:', email)
     console.log('🔒 Password length:', password.length)
     
@@ -36,42 +39,58 @@ export default function Auth() {
       setIsLoading(true)
       setError(null)
 
-      console.log('📤 Calling login action...')
-      const result = await login(email, password)
-      console.log('📥 Login result:', result)
+      console.log('🏗️ Creating Supabase client...')
+      const supabase = createSupabaseClient()
+      console.log('✅ Supabase client created')
 
-      if (result.error) {
-        console.error('❌ Login error:', result.error)
-        setError(result.error)
+      console.log('🔍 Attempting sign in with client...')
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+      
+      console.log('📊 Client auth response:', { 
+        hasData: !!authData, 
+        hasUser: !!authData?.user, 
+        hasError: !!authError,
+        errorMessage: authError?.message 
+      })
+
+      if (authError) {
+        console.error('❌ Client login error:', authError)
+        setError(authError.message)
         return
       }
 
-      if (!result.data?.user) {
-        console.error('👤 No user data received')
+      if (!authData.user) {
+        console.error('👤 No user in client auth response')
         setError('No se pudo obtener la información del usuario')
         return
       }
 
-      console.log('✅ Login successful, user:', result.data.user)
+      console.log('✅ CLIENT Authentication successful')
+      console.log('👤 User authenticated:', authData.user.email)
       
       // Establecer el usuario en el store de Zustand
-      setUser(result.data.user as any)
+      setUser(authData.user as any)
 
       // Obtener el perfil del usuario desde el cliente
       console.log('🔍 Fetching user profile from client...')
-      const { profile, error: profileError } = await getUserProfileClient(result.data.user.id)
+      const { profile, error: profileError } = await getUserProfileClient(authData.user.id)
       
       if (profile && !profileError) {
         console.log('✅ Profile fetched successfully:', profile)
-        setProfile(profile)
+        setProfile(profile as any)
       } else {
-        console.warn('⚠️ Could not fetch profile from client:', profileError)
+        console.error('⚠️ Could not fetch profile from client:', profileError)
+        console.log('📧 User email from auth:', authData.user.email)
       }
 
-      // Si el login es exitoso, redirigir al home
-      router.push('/')
+      console.log('🎉 CLIENT Login successful, redirecting...')
+      // Si el login es exitoso, redirigir al dashboard
+      router.push('/graphics')
     } catch (err) {
-      console.error('💥 Unexpected error:', err)
+      console.error('💥 CLIENT Unexpected error:', err)
       setError('Error inesperado durante el inicio de sesión')
     } finally {
       setIsLoading(false)
@@ -156,7 +175,7 @@ export default function Auth() {
                 </p>
               </div>
 
-              <form onSubmit={handleLogin} className="space-y-6">
+              <form onSubmit={handleLogin} action="#" method="post" className="space-y-6">
                 <div>
                   <Label htmlFor="email" className="text-sm font-semibold text-gray-700 block mb-2">
                     {t('auth.email')}
@@ -190,7 +209,8 @@ export default function Auth() {
                 </div>
 
                 <Button
-                  type="submit"
+                  type="button"
+                  onClick={handleLogin}
                   className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-base rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
                   disabled={isLoading}
                 >
@@ -215,13 +235,20 @@ export default function Auth() {
                   </div>
                 )}
 
-                <div className="text-center pt-2">
+                <div className="text-center pt-2 space-y-2">
                   <Link
                     href="#"
-                    className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                    className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors block"
                     prefetch={false}
                   >
                     {t('auth.forgotPassword')}
+                  </Link>
+                  <Link
+                    href="/auth/register"
+                    className="text-sm text-green-600 hover:text-green-800 font-medium transition-colors block"
+                    prefetch={false}
+                  >
+                    ¿No tienes cuenta? Regístrate
                   </Link>
                 </div>
               </form>

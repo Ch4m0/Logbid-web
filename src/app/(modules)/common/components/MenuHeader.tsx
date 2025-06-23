@@ -53,8 +53,10 @@ const MenuHeader: React.FC = () => {
   const getBaseRoute = (): string => {
     if (!user) return '/'
     
-    // Role 2 = Importer, Role 3 = Agent
-    if (user.role_id === 3) {
+    // Check user.profile.role (from Supabase) or fallback to user.role_id (legacy)
+    const userRole = user.profile?.role
+    
+    if (userRole === 'agent') {
       return '/bid_list'
     } else {
       return '/'

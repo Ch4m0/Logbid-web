@@ -53,7 +53,7 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
               size="sm"
               className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-1"
               onClick={handleAcceptOffer}
-              disabled={isAccepting || offer.status !== "Active"}
+              disabled={isAccepting || offer.status !== "pending"}
             >
               <CheckCircle className="h-4 w-4" />
               {isAccepting ? t('offerCard.accepting') : t('offerCard.acceptOffer')}
@@ -82,10 +82,14 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
 
               <Badge
                 className={
-                  offer.status === "Active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                  offer.status === "pending" ? "bg-green-100 text-green-800" : 
+                  offer.status === "accepted" ? "bg-blue-100 text-blue-800" :
+                  "bg-gray-100 text-gray-800"
                 }
               >
-                {offer.status}
+                {offer.status === "pending" ? "Pendiente" : 
+                 offer.status === "accepted" ? "Aceptada" :
+                 offer.status === "rejected" ? "Rechazada" : offer.status}
               </Badge>
             </div>
           </div>

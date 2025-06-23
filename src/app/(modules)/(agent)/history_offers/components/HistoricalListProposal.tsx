@@ -103,7 +103,7 @@ export function HistoricalListProposal() {
     <Card className="w-full">
       <CardHeader>
         <CardTitle className="font-bold">
-          Histórico propuesta viajes de Carga
+          Histórico propuesta shipments
         </CardTitle>
       </CardHeader>
       <CardContent>

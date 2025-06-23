@@ -18,16 +18,15 @@ interface Company {
 }
 
 interface UserProfile {
-  id: number
-  uuid: string
+  id: string
   email: string
-  name?: string
-  last_name?: string
-  id_number?: string
+  full_name?: string
+  phone?: string
   company_name?: string
-  role_id?: any // user_role type
+  role?: string
+  language?: string
   company_id?: number
-  inserted_at: string
+  created_at: string
   updated_at: string
   auth_id: string
   // Relaciones
@@ -55,7 +54,7 @@ const useAuthStore = create<AuthState>()(
       profile: null,
       isAuthenticated: false,
       setUser: (user: AuthUser) => {
-        console.log('🔄 Setting user in store:', user)
+    
         set({ 
           user, 
           profile: user.profile || null,
@@ -63,7 +62,7 @@ const useAuthStore = create<AuthState>()(
         })
       },
       setProfile: (profile: UserProfile) => {
-        console.log('🔄 Setting profile in store:', profile)
+    
         const currentUser = get().user
         set({ 
           profile,
@@ -71,7 +70,7 @@ const useAuthStore = create<AuthState>()(
         })
       },
       logout: () => {
-        console.log('🚪 Clearing auth store')
+    
         set({ 
           user: null, 
           profile: null,

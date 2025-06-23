@@ -1,6 +1,6 @@
 "use client"
 import { useCreateOffer } from "@/src/app/hooks/useCreateOffer"
-import { useGetBidById } from "@/src/app/hooks/useGetBidById"
+import { useGetShipment } from "@/src/app/hooks/useGetShipment"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/src/components/ui/accordion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { toast } from "@/src/components/ui/use-toast"
@@ -20,14 +20,17 @@ import { useTranslation } from "@/src/hooks/useTranslation"
 const Page = () => {
   const { t } = useTranslation()
   const searchParams = useSearchParams()
-  const [bidDataForAgent, setBidDataForAgent] = useState<any>({})
   const user = useAuthStore((state) => state.user)
 
-  const shippingType = 'Marítimo'
   const offer_id = searchParams.get('offer_id')
 
   const { mutate: createOffer } = useCreateOffer()
-  const { mutate: fetchDetailById, isPending: loading } = useGetBidById()
+  const { data: bidDataForAgent, isPending: loading } = useGetShipment({ shipment_id: offer_id })
+
+  // Use the actual shipping type from the shipment data, fallback to URL param
+  const shippingType = bidDataForAgent?.shipping_type || searchParams.get('shipping_type') || 'Marítimo'
+
+
 
   const currentPage = Number(searchParams.get("page")) || 1
   const [sort, setSort] = useState({ key: "id", order: "asc" })
@@ -51,25 +54,7 @@ const Page = () => {
   const router = useRouter()
   const [expandedOffers, setExpandedOffers] = useState<Record<string, boolean>>({})
 
-  // Cargar detalles de la subasta
-  const loadDetaildBidByid = (uuid: any) => {
-    if (!uuid) return;
-    
-    fetchDetailById(
-      {
-        bid_id: uuid,
-      },
-      {
-        onSuccess: (data) => {
-          console.log(data, 'data')
-          setBidDataForAgent(data)
-        },
-        onError: (error) => {
-          console.log(error)
-        },
-      },
-    )
-  }
+  // Esta función ya no es necesaria porque useGetShipment maneja todo automáticamente
 
   // Manejar cambios en los filtros
   const handleFilterChange = (key: string, value: string) => {
@@ -114,8 +99,13 @@ const Page = () => {
   const sendOffer = (info: any) => {
     console.log(JSON.stringify(info), "info")
     
+    if (!bidDataForAgent) {
+      console.error('No bid data available')
+      return
+    }
+    
     createOffer(
-      { ...info, ...{ bid_id: bidDataForAgent.id, agent_id: user?.id } },
+      { ...info, bid_id: bidDataForAgent.id, agent_id: user?.id },
       {
         onSuccess: () => {
           console.log("Oferta creada exitosamente")
@@ -123,8 +113,6 @@ const Page = () => {
           toast({
             title: t('agentOffers.offerSent'),
           })
-
-          window.location.reload()
         },
         onError: (error) => {
           console.log("Error al crear la oferta:", error)
@@ -243,10 +231,7 @@ const Page = () => {
     return sortedOffers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   }, [sortedOffers, currentPage, itemsPerPage]);
 
-  // Efecto para cargar datos al montar el componente o cambiar offer_id
-  useEffect(() => {
-    loadDetaildBidByid(offer_id);
-  }, [offer_id]);
+  // useGetShipment maneja automáticamente la carga de datos cuando cambia offer_id
 
   return (
     <>
@@ -259,16 +244,17 @@ const Page = () => {
       </button>
       <Card className="w-full">
         <CardHeader>
-          <h2 className="text-xl font-bold mt-4">{t('agentOffers.auctionInfo')}: {bidDataForAgent.uuid}</h2>
-          <div className="grid gap-2 pb-6">
-          {bidDataForAgent && (<BidInfo bidDataForAgent={bidDataForAgent} />)}
-            <div className="flex items-center gap-2 justify-center">
-              <ProposalModal 
-                shippingType={shippingType}
-                bidDataShippingType={bidDataForAgent.shipping_type}
-                onSubmit={handleCreateOffer}
-              />
-            </div>
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <h2 className="text-xl font-bold">{t('agentOffers.auctionInfo')}: {bidDataForAgent?.uuid || 'Loading...'}</h2>
+            <ProposalModal 
+              shippingType={shippingType}
+              bidDataShippingType={bidDataForAgent?.shipping_type || shippingType}
+              onSubmit={handleCreateOffer}
+            />
+          </div>
+          
+          <div className="grid gap-2 pb-6 mt-4">
+            {bidDataForAgent && (<BidInfo bidDataForAgent={bidDataForAgent} />)}
           </div>
 
           <CardTitle className="text-black-500 font-bold text-xl">{t('agentOffers.proposals')}</CardTitle>

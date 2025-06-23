@@ -11,25 +11,28 @@ import {
 } from "@/src/components/ui/dialog"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
-import { CheckCircle, X, AlertCircle, Ship, MapPin, DollarSign, Package, Calendar } from "lucide-react"
+import { CheckCircle, X, AlertCircle, Ship, Plane, MapPin, DollarSign, Package, Calendar } from "lucide-react"
 import { useBidStore } from "@/src/store/useBidStore"
 import { useCloseBid } from "@/src/app/hooks/useCloseBid"
 import { modalService } from "@/src/service/modalService"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { useTranslation } from "@/src/hooks/useTranslation"
+import { useSendOfferAcceptedEmails } from "@/src/hooks/useSendOfferAcceptedEmails"
 
 interface OfferConfirmationProps {
   offerData: any
 }
 
 export function OfferConfirmationDialog(offerData: any) {
-  console.log(JSON.stringify(offerData), 'OfferData')
+  console.log('OfferData received:', offerData)
+  console.log('OfferData stringified:', JSON.stringify(offerData, null, 2))
   const { t } = useTranslation()
   const router = useRouter()
   const [isConfirming, setIsConfirming] = useState(false)
   const { setBidData } = useBidStore()
   const { mutate: closeBid } = useCloseBid()
+  const { mutate: sendEmails } = useSendOfferAcceptedEmails()
 
  
   const handleConfirm = () => {
@@ -41,6 +44,20 @@ export function OfferConfirmationDialog(offerData: any) {
         onSuccess: (res) => {
           console.log('Subasta cerrada correctamente')
 
+          // Enviar emails de notificación
+          sendEmails(
+            { bid_id: offerData.bidId, offer_id: offerData.id },
+            {
+              onSuccess: (emailRes) => {
+                console.log('✅ Emails enviados exitosamente:', emailRes)
+              },
+              onError: (emailError) => {
+                console.error('❌ Error enviando emails:', emailError)
+                // No bloquear el flujo si fallan los emails
+              }
+            }
+          )
+
           setBidData({
            ...offerData,
           })
@@ -49,6 +66,7 @@ export function OfferConfirmationDialog(offerData: any) {
         },
         onError: () => {
           console.error('Hubo un error tratando de cerrar la subasta')
+          setIsConfirming(false)
         },
       }
     )
@@ -83,7 +101,11 @@ export function OfferConfirmationDialog(offerData: any) {
       {/* Route information */}
       <div className="bg-muted/30 rounded-lg p-4">
         <div className="flex items-center gap-2 mb-2">
-          <Ship className="h-5 w-5 text-primary" />
+          {offerData.shipping_type === "Aéreo" ? (
+            <Plane className="h-5 w-5 text-primary" />
+          ) : (
+            <Ship className="h-5 w-5 text-primary" />
+          )}
           <span className="font-medium">
             {t('offerConfirmation.route')} {offerData.shipping_type === "Aéreo" ? t('offerConfirmation.air') : t('offerConfirmation.maritime')}
           </span>
@@ -93,14 +115,22 @@ export function OfferConfirmationDialog(offerData: any) {
             <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
             <div>
               <p className="text-sm text-muted-foreground">{t('offerConfirmation.origin')}</p>
-              <p className="font-medium">{offerData.originBid}</p>
+              <p className="font-medium">
+                {offerData.origin_country && offerData.origin_name 
+                  ? `${offerData.origin_country} - ${offerData.origin_name}`
+                  : offerData.originBid || 'No especificado'}
+              </p>
             </div>
           </div>
           <div className="flex items-start gap-2">
             <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
             <div>
               <p className="text-sm text-muted-foreground">{t('offerConfirmation.destination')}</p>
-              <p className="font-medium">{offerData.finishBid}</p>
+              <p className="font-medium">
+                {offerData.destination_country && offerData.destination_name 
+                  ? `${offerData.destination_country} - ${offerData.destination_name}`
+                  : offerData.finishBid || 'No especificado'}
+              </p>
             </div>
           </div>
         </div>
@@ -114,7 +144,9 @@ export function OfferConfirmationDialog(offerData: any) {
             <div>
               <p className="text-sm text-muted-foreground">{t('common.totalPrice')}</p>
               <p className="font-medium text-lg">
-                {offerData.price || `USD ${offerData.details.freight_fees?.value}`}
+                {offerData.price ? `$${offerData.price}` : 
+                 offerData.details?.freight_fees?.value ? `USD ${offerData.details.freight_fees.value}` :
+                 'Precio no disponible'}
               </p>
             </div>
           </div>

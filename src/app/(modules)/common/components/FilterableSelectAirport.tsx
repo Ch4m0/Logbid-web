@@ -4,8 +4,8 @@ import React, { useState, useEffect, useRef } from 'react'
 interface Option {
   airport_name: string
   country: string
-  iata: string
-  icao: string
+  iata?: string
+  icao?: string
   id: number
 }
 
@@ -139,7 +139,7 @@ export default function FilterableSelectAirport({
                     isSearching ? 'opacity-50 pointer-events-none' : ''
                   }`}
                 >
-                  {option.country} - {option.airport_name} ({option.iata})
+                  {option.country} - {option.airport_name} {option.iata ? `(${option.iata})` : ''}
                 </div>
               ))}
               {isFetchingNextPage && (

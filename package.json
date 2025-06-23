@@ -47,6 +47,7 @@
     "react-hook-form": "^7.52.0",
     "react-i18next": "^15.5.2",
     "react-markdown": "^10.1.0",
+    "recharts": "^2.15.4",
     "rxjs": "^7.8.1",
     "sass": "^1.77.6",
     "styled-components": "^6.1.13",

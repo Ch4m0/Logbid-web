@@ -4,9 +4,9 @@ import React, { useState, useEffect, useRef } from 'react'
 
 interface Option {
   port_name: string
-  country_code: string
-  port_code: string
-  un_code: string
+  country_code?: string
+  port_code?: string
+  un_code?: string
   id: number
   country: string
 }
@@ -141,7 +141,7 @@ export default function FilterableSelectMaritimePort({
                     isSearching ? 'opacity-50 pointer-events-none' : ''
                   }`}
                 >
-                  {option.port_name} - {option.country} ({option.un_code})
+                  {option.port_name} - {option.country} {option.un_code ? `(${option.un_code})` : ''}
                 </div>
               ))}
               {isFetchingNextPage && (

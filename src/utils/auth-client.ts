@@ -3,26 +3,25 @@ import { supabase } from './supabase/client'
 // Función para obtener el perfil del usuario desde el cliente
 export async function getUserProfileClient(userId: string) {
     try {
-        console.log('👤 Fetching user profile from client for ID:', userId)
+        console.log('🔍 Fetching user profile for:', userId)
         
         // Primero obtener los datos básicos del usuario
         const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select(`
                 id,
-                uuid,
                 email,
-                name,
-                last_name,
-                id_number,
+                full_name,
+                phone,
                 company_name,
-                role_id,
+                role,
+                language,
                 company_id,
-                inserted_at,
+                created_at,
                 updated_at,
                 auth_id
             `)
-            .eq('auth_id', 'faba3ad9-50bb-479e-ba8c-155fced962ad')
+            .eq('auth_id', userId)
             .single()
 
         if (profileError) {
@@ -30,9 +29,12 @@ export async function getUserProfileClient(userId: string) {
             return { profile: null, error: profileError.message }
         }
 
+        console.log('✅ Profile found:', profile.id)
+
         // Obtener los markets del usuario
         let userMarkets: any[] = []
         if (profile) {
+            console.log('📊 Fetching user markets for profile:', profile.id)
             const { data: marketsData, error: marketsError } = await supabase
                 .from('user_markets')
                 .select(`
@@ -44,10 +46,13 @@ export async function getUserProfileClient(userId: string) {
                         updated_at
                     )
                 `)
-                .eq('profile_id', profile.id)
+                .eq('user_id', profile.id)
 
             if (!marketsError && marketsData) {
-                userMarkets = marketsData.map(um => um.markets).filter(Boolean)
+                userMarkets = marketsData.map((um: any) => um.markets).filter(Boolean)
+                console.log('✅ Markets loaded:', userMarkets.length)
+            } else {
+                console.warn('⚠️ Could not fetch markets:', marketsError)
             }
         }
 
@@ -77,7 +82,7 @@ export async function getUserProfileClient(userId: string) {
             company: companyInfo
         }
 
-        console.log('✅ User profile with relations fetched successfully')
+        console.log('✅ Enhanced profile prepared with', userMarkets.length, 'markets')
         return { profile: enhancedProfile, error: null }
     } catch (error) {
         console.error('💥 Unexpected error fetching profile:', error)
@@ -88,7 +93,7 @@ export async function getUserProfileClient(userId: string) {
 // Función para actualizar el perfil del usuario
 export async function updateUserProfile(userId: string, updates: any) {
     try {
-        console.log('🔄 Updating user profile for ID:', userId)
+      
         
         const { data: profile, error } = await supabase
             .from('profiles')
@@ -102,7 +107,7 @@ export async function updateUserProfile(userId: string, updates: any) {
             return { profile: null, error: error.message }
         }
 
-        console.log('✅ User profile updated successfully')
+    
         return { profile, error: null }
     } catch (error) {
         console.error('💥 Unexpected error updating profile:', error)

@@ -49,7 +49,7 @@ export class TransFormDataToCreateBid {
   constructor() {}
 
   transform(input: InputData): OutputData {
-    console.log(input, 'input')
+    
     return {
       user_id: input.user_id, // Asignar un id de usuario fijo
       origin_id: input.origen, // Mantener el id de origen

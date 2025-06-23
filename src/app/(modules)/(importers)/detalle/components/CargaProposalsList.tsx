@@ -1,5 +1,5 @@
 'use client'
-import { useGetBidById } from '@/src/app/hooks/useGetBidById'
+import { useGetShipment } from '@/src/app/hooks/useGetShipment'
 import {
   Card,
   CardContent,
@@ -27,18 +27,31 @@ interface Offer {
   inserted_at: string
 }
 
-interface Bid {
+interface Shipment {
   id: number
   uuid: string
   origin_country: string
   origin_name: string
   destination_country: string
   destination_name: string
+  transportation: string
+  comex_type: string
+  shipping_type: string
   inserted_at: string
   expiration_date: string
   offers: Offer[]
   currency: string
+  value: string
   lowestPrice: string
+  last_price: string
+  total_weight: number
+  measure_type: string
+  volume: number
+  units: number
+  merchandise_type: string
+  dangerous_march: boolean
+  tariff_item: string
+  agent_code: string
 }
 
 export function CargaProposalsList() {
@@ -48,15 +61,14 @@ export function CargaProposalsList() {
   const params = useSearchParams()
 
   const currentPage = Number(params.get('page')) || 1
-  const bidId = params.get('bidId') || ''
+  const shipmentId = params.get('bidId') || '' // Mantenemos el nombre del param para compatibilidad
   const marketId = params.get('market') || ''
 
-  const { mutate: fetchDetailById, isPending: loading } = useGetBidById()
+  const { data: shipment, isPending: loading } = useGetShipment({ shipment_id: shipmentId })
   const [itemsPerPage] = useState(20)
-  const [bid, setBid] = useState<Bid | null>(null)
 
   const [expandedOffers, setExpandedOffers] = useState<Record<string, boolean>>({})
-  const [bidDataForAgent, setBidDataForAgent] = useState<any>({})
+  const [shipmentDataForAgent, setShipmentDataForAgent] = useState<any>({})
 
   const [filters, setFilters] = useState<FiltersOffer>({
     inserted_at: '',
@@ -83,26 +95,10 @@ export function CargaProposalsList() {
   }
 
   useEffect(() => {
-    fetchDetailById(
-      {
-        bid_id: bidId,
-      },
-      {
-        onSuccess: (bid) => {
-          console.log(bid, 'success')
-          
-          if (bid.status === 'Closed') {
-            window.location.href = '/?market=' + marketId
-          }
-
-          setBid(bid)
-        },
-        onError: () => {
-          console.log('error')
-        },
-      }
-    )
-  }, [])
+    if (shipment && shipment.status === 'Closed') {
+      window.location.href = '/?market=' + marketId
+    }
+  }, [shipment, marketId])
 
   const toggleOfferDetails = (offerId: string) => {
     setExpandedOffers((prev) => ({
@@ -129,15 +125,33 @@ export function CargaProposalsList() {
   const openModal = (
     offer: any
   ) => {
+    // Estructurar los datos según lo que espera el modal
+    const modalData = {
+      id: offer.id,
+      uuid: offer.uuid,
+      agent_code: offer.agent_code,
+      price: offer.price,
+      shipping_type: shipment?.shipping_type || offer.shipping_type,
+      details: offer.details,
+      status: offer.status,
+      origin_country: shipment?.origin_country,
+      origin_name: shipment?.origin_name,
+      destination_country: shipment?.destination_country,
+      destination_name: shipment?.destination_name,
+      shipment_uuid: shipment?.uuid,
+      shipment_id: shipment?.id,
+      // Campos legacy para compatibilidad
+      originBid: shipment?.origin_country + ' - ' + shipment?.origin_name,
+      finishBid: shipment?.destination_country + ' - ' + shipment?.destination_name,
+      codeBid: shipment?.uuid,
+      bidId: shipment?.id,
+    }
+    
+    console.log('Modal data being passed:', modalData)
+    
     modalService.showModal({
       component: OfferConfirmationDialog,
-      props: {
-        originBid: bid?.origin_country + ' - ' + bid?.origin_name,
-        finishBid: bid?.destination_country + ' - ' + bid?.destination_name,
-        codeBid: bid?.uuid,
-        bidId: bid?.id,
-        ...offer,
-      },
+      props: modalData,
     })
   }
 
@@ -153,7 +167,7 @@ export function CargaProposalsList() {
   }
 
   // Filtrado y ordenamiento aplicado a la lista de ofertas
-  const filteredOffers = bid?.offers
+  const filteredOffers = shipment?.offers
     ?.filter((offer: any) => {
       // Si no hay filtros aplicados, mostrar todas las ofertas
       const hasActiveFilters = Object.values(filters).some(value => value && value.trim() !== '');
@@ -207,7 +221,7 @@ export function CargaProposalsList() {
         : Number(bValue) - Number(aValue)
     })
 
-  console.log(bid, 'bid')
+  console.log(shipment, 'shipment')
 
   const paginatedList = filteredOffers?.slice(
     (currentPage - 1) * itemsPerPage,
@@ -220,7 +234,7 @@ export function CargaProposalsList() {
 
   return (
     <>
-      {bid && (
+      {shipment && (
         <Card className="w-full">
           <CardHeader>
             <button
@@ -247,7 +261,7 @@ export function CargaProposalsList() {
               {t('proposals.tripDetail')}
             </h2>
             <div className="grid gap-2 pb-6">
-              {bid && <BidInfo bidDataForAgent={bid} />}
+              {shipment && <BidInfo bidDataForAgent={shipment} />}
             </div>
 
             <CardTitle className="text-blue-500 font-bold text-xl">
@@ -261,7 +275,7 @@ export function CargaProposalsList() {
             handleFilterChange={handleFilterChange} 
             handleSort={handleSort} 
             resetFilters={resetFilters}
-            bidDataForAgent={bidDataForAgent}
+            bidDataForAgent={shipmentDataForAgent}
           />
 
           {/* Estado de carga */}

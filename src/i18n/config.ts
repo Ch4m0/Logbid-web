@@ -31,7 +31,10 @@ i18n
       lookupLocalStorage: 'logbid-language',
       lookupCookie: 'logbid-language',
       caches: ['localStorage', 'cookie']
-    }
+    },
+
+    // Esta opción hace que 'es-419' se mapee automáticamente a 'es'
+    load: 'languageOnly'
   })
 
 export default i18n 

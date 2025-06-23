@@ -31,7 +31,7 @@ const FormSchema = z.object({
   }),
 })
 
-export function ExtendCargoTransport({
+export function ExtendShipmentDeadline({
   expiration_date,
   origin,
   destination,
@@ -182,4 +182,4 @@ export function ExtendCargoTransport({
       </CardContent>
     </Card>
   )
-}
+} 
