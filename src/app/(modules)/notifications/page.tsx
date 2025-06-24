@@ -28,6 +28,7 @@ import { useTranslation } from '@/src/hooks/useTranslation'
 import { cn } from '@/src/lib/utils'
 import { useRouter } from 'next/navigation'
 import { ProtectedRoute } from '@/src/components/ProtectedRoute'
+import useAuthStore from '@/src/store/authStore'
 
 export default function NotificationsPage() {
   const { 
@@ -42,6 +43,7 @@ export default function NotificationsPage() {
   } = useNotifications()
   const { t, getCurrentLanguage } = useTranslation()
   const router = useRouter()
+  const profile = useAuthStore((state) => state.profile)
   
   const [searchQuery, setSearchQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
@@ -97,13 +99,28 @@ export default function NotificationsPage() {
     if (!notification.read) {
       markAsRead(notification.id)
     }
+    console.log(notification, 'notification')
 
     // Navegar según el tipo de notificación
     if (notification.shipment_id) {
       const shipmentData = notification.data
+      console.log(profile, 'profile')
+      const userRole = profile?.role
+
       if (shipmentData?.shipment_uuid) {
-        // Navegar al detalle del shipment
-        router.push(`/detalle?offer_id=${shipmentData.shipment_uuid}`)
+        if (userRole === 'admin') {
+          // Para customers: navegar a detalle con bidId y market
+          const market_id = shipmentData.market_id || profile?.all_markets?.[0]?.id || '4'
+          router.push(`/detalle?bidId=${shipmentData.shipment_uuid}&market=${market_id}`)
+        } else if (userRole === 'agent') {
+          // Para agentes: navegar a offers con offer_id
+          const market_id = shipmentData.market_id || profile?.all_markets?.[0]?.id || '4'
+          const shipping_type = shipmentData.shipping_type || 'Marítimo'
+          router.push(`/offers?offer_id=${shipmentData.shipment_uuid}&market_id=${market_id}&shipping_type=${shipping_type}`)
+        } else {
+          // Fallback por defecto
+          router.push(`/detalle?offer_id=${shipmentData.shipment_uuid}`)
+        }
       }
     }
   }

@@ -22,6 +22,7 @@ import { useNotifications, Notification } from '@/src/hooks/useNotifications'
 import { useTranslation } from '@/src/hooks/useTranslation'
 import { cn } from '@/src/lib/utils'
 import { useRouter } from 'next/navigation'
+import useAuthStore from '@/src/store/authStore'
 
 interface NotificationPanelProps {
   onClose: () => void
@@ -71,11 +72,26 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
     // Navegar según el tipo de notificación
     if (notification.shipment_id) {
       const shipmentData = notification.data
+      const profile = useAuthStore.getState().profile
+      const userRole = profile?.role
+
       if (shipmentData?.shipment_uuid) {
         // Cerrar el panel
         onClose()
-        // Navegar al detalle del shipment
-        router.push(`/detalle?offer_id=${shipmentData.shipment_uuid}`)
+        
+        if (userRole === 'admin') {
+          // Para admin: navegar a detalle con bidId y market
+          const market_id = shipmentData.market_id || profile?.all_markets?.[0]?.id || '4'
+          router.push(`/detalle?bidId=${shipmentData.shipment_uuid}&market=${market_id}`)
+        } else if (userRole === 'agent') {
+          // Para agentes: navegar a offers con offer_id
+          const market_id = shipmentData.market_id || profile?.all_markets?.[0]?.id || '4'
+          const shipping_type = shipmentData.shipping_type || 'Marítimo'
+          router.push(`/offers?offer_id=${shipmentData.shipment_uuid}&market_id=${market_id}&shipping_type=${shipping_type}`)
+        } else {
+          // Fallback por defecto
+          router.push(`/detalle?offer_id=${shipmentData.shipment_uuid}`)
+        }
       }
     }
   }

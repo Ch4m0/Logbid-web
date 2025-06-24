@@ -246,11 +246,13 @@ const Page = () => {
         <CardHeader>
           <div className="flex items-center justify-between flex-wrap gap-4">
             <h2 className="text-xl font-bold">{t('agentOffers.auctionInfo')}: {bidDataForAgent?.uuid || 'Loading...'}</h2>
-            <ProposalModal 
-              shippingType={shippingType}
-              bidDataShippingType={bidDataForAgent?.shipping_type || shippingType}
-              onSubmit={handleCreateOffer}
-            />
+            {bidDataForAgent?.status !== 'Closed' && (
+              <ProposalModal 
+                shippingType={shippingType}
+                bidDataShippingType={bidDataForAgent?.shipping_type || shippingType}
+                onSubmit={handleCreateOffer}
+              />
+            )}
           </div>
           
           <div className="grid gap-2 pb-6 mt-4">
