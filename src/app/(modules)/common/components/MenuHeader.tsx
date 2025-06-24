@@ -1,5 +1,5 @@
 import { Plane, Ship, Truck, Warehouse } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import useAuthStore from '@/src/store/authStore'
 
@@ -19,7 +19,7 @@ interface ColorMap {
   warehouse: string
 }
 
-const MenuHeader: React.FC = () => {
+const MenuHeaderContent: React.FC = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const user = useAuthStore((state) => state.user)
@@ -143,6 +143,24 @@ const MenuHeader: React.FC = () => {
         <Warehouse className={`h-8 w-8 ${getColorClass('warehouse')}`} />
       </div>
     </div>
+  )
+}
+
+const MenuHeader: React.FC = () => {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center gap-4">
+        <div className="h-8 w-8 bg-gray-200 rounded animate-pulse"></div>
+        <div className="w-px h-6 bg-gray-200"></div>
+        <div className="h-8 w-8 bg-gray-200 rounded animate-pulse"></div>
+        <div className="w-px h-6 bg-gray-200"></div>
+        <div className="h-8 w-8 bg-gray-200 rounded animate-pulse"></div>
+        <div className="w-px h-6 bg-gray-200"></div>
+        <div className="h-8 w-8 bg-gray-200 rounded animate-pulse"></div>
+      </div>
+    }>
+      <MenuHeaderContent />
+    </Suspense>
   )
 }
 

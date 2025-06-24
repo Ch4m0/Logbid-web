@@ -266,7 +266,7 @@ export const useNotifications = () => {
       console.error('Error interpolating notification message:', error);
       return notification.message; // Fallback al mensaje original
     }
-  }, [t]);
+  }, []);
 
   // Función para mostrar toast basado en el tipo de notificación
   const showNotificationToast = useCallback((notification: Notification) => {

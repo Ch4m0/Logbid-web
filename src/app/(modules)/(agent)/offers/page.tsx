@@ -8,7 +8,7 @@ import { modalService } from "@/src/service/modalService"
 import useAuthStore from "@/src/store/authStore"
 import { ArrowLeft, DollarSign } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Suspense, useEffect, useMemo, useState } from "react"
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react"
 import Pagination from "../../common/components/pagination/Pagination"
 import AdvancedFilters from "./components/AdvancedFilters"
 import BidInfo from "./components/BidInfo"
@@ -17,7 +17,7 @@ import ProposalModal from "./components/ProposalModal"
 import { FiltersOffer } from '@/src/models/FiltersOffer'
 import { useTranslation } from "@/src/hooks/useTranslation"
 
-const Page = () => {
+const OffersPageContent = () => {
   const { t } = useTranslation()
   const searchParams = useSearchParams()
   const user = useAuthStore((state) => state.user)
@@ -153,7 +153,7 @@ const Page = () => {
   };
 
   // Función mejorada para filtrar ofertas
-  const filterOffers = (offers: any[]) => {
+  const filterOffers = useCallback((offers: any[]) => {
     if (!offers || !Array.isArray(offers)) return [];
     
     return offers.filter((offer) =>
@@ -189,10 +189,10 @@ const Page = () => {
         }
       })
     );
-  };
+  }, [filters]);
 
   // Función para ordenar ofertas
-  const sortOffers = (offers: any[]) => {
+  const sortOffers = useCallback((offers: any[]) => {
     if (!offers || !Array.isArray(offers)) return [];
     
     return [...offers].sort((a, b) => {
@@ -216,16 +216,16 @@ const Page = () => {
       
       return sort.order === "asc" ? aValue - bValue : bValue - aValue;
     });
-  };
+  }, [sort]);
 
   // Optimización con useMemo
   const filteredOffers = useMemo(() => {
     return filterOffers(bidDataForAgent?.offers || []);
-  }, [bidDataForAgent?.offers, filters]);
+  }, [bidDataForAgent?.offers, filters, filterOffers]);
 
   const sortedOffers = useMemo(() => {
     return sortOffers(filteredOffers);
-  }, [filteredOffers, sort]);
+  }, [filteredOffers, sort, sortOffers]);
 
   const paginatedList = useMemo(() => {
     return sortedOffers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -308,6 +308,17 @@ const Page = () => {
         </CardContent>
       </Card>
     </>
+  )
+}
+
+const Page = () => {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center p-8">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <span className="ml-2">Loading...</span>
+    </div>}>
+      <OffersPageContent />
+    </Suspense>
   )
 }
 

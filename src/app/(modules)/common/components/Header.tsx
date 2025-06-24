@@ -8,6 +8,7 @@ import { useTranslation } from '@/src/hooks/useTranslation'
 import useAuthStore from '@/src/store/authStore'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 
 
 
@@ -54,7 +55,7 @@ const getUserRoleCustomClasses = (role?: string): string => {
   }
 }
 
-const Header = () => {
+const HeaderContent = () => {
   const { user, profile } = useAuthStore()
   const searchParams = useSearchParams()
   const { t } = useTranslation()
@@ -119,6 +120,23 @@ const Header = () => {
         </Avatar>
       </div>
     </header>
+  )
+}
+
+const Header = () => {
+  return (
+    <Suspense fallback={
+      <header className="flex items-center h-16 px-4 shrink-0 md:px-6 mx-auto w-full">
+        <div className="flex-1 flex justify-center"></div>
+        <div className="ml-auto flex items-center gap-4">
+          <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-4 w-4 bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-9 w-9 bg-gray-200 rounded-full animate-pulse"></div>
+        </div>
+      </header>
+    }>
+      <HeaderContent />
+    </Suspense>
   )
 }
 

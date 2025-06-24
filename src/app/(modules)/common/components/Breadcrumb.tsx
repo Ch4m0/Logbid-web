@@ -3,8 +3,9 @@ import { useSearchParams, usePathname } from 'next/navigation'
 import useAuthStore from '@/src/store/authStore'
 import { useTranslation } from '@/src/hooks/useTranslation'
 import { ChevronRight, MapPin } from 'lucide-react'
+import { Suspense } from 'react'
 
-const Breadcrumb = () => {
+const BreadcrumbContent = () => {
   const { profile } = useAuthStore()
   const searchParams = useSearchParams()
   const pathname = usePathname()
@@ -57,6 +58,23 @@ const Breadcrumb = () => {
         <span className="text-gray-700 font-medium">{shippingType}</span>
       </nav>
     </div>
+  )
+}
+
+const Breadcrumb = () => {
+  return (
+    <Suspense fallback={
+      <div className="bg-gray-50 border-b px-6 py-3">
+        <nav className="flex items-center space-x-2 text-sm text-gray-600">
+          <div className="h-4 w-4 bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-4 w-4 bg-gray-200 rounded animate-pulse"></div>
+          <div className="h-4 w-12 bg-gray-200 rounded animate-pulse"></div>
+        </nav>
+      </div>
+    }>
+      <BreadcrumbContent />
+    </Suspense>
   )
 }
 
