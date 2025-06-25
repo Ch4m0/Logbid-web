@@ -79,11 +79,7 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
         // Cerrar el panel
         onClose()
         
-        if (userRole === 'admin') {
-          // Para admin: navegar a detalle con bidId y market
-          const market_id = shipmentData.market_id || profile?.all_markets?.[0]?.id || '4'
-          router.push(`/detalle?bidId=${shipmentData.shipment_uuid}&market=${market_id}`)
-        } else if (userRole === 'agent') {
+        if (userRole === 'agent') {
           // Para agentes: navegar a offers con offer_id
           const market_id = shipmentData.market_id || profile?.all_markets?.[0]?.id || '4'
           const shipping_type = shipmentData.shipping_type || 'Marítimo'

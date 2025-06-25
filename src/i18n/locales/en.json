@@ -79,7 +79,7 @@
   },
   "header": {
     "userRole": {
-      "importer": "Importer/Exporter",
+      "customer": "Importer/Exporter",
       "agent": "Agent",
       "user": "User"
     }
@@ -114,7 +114,7 @@
     "invalidRole": "Invalid role"
   },
   "dashboard": {
-    "importer": {
+    "customer": {
       "title": "Importer Dashboard",
       "subtitle": "Cost analysis and logistics performance",
       "loading": "Loading dashboard...",
@@ -919,6 +919,7 @@
     "companyName": "LogBid Development Team"
   },
   "breadcrumb": {
+    "dashboard": "Dashboard",
     "shipments": "Shipments",
     "offers": "Offers",
     "history": "History",

@@ -58,13 +58,13 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Package className="h-5 w-5" />
-            📦 {t('dashboard.importer.shipmentStatus.title')}
+            📦 {t('dashboard.customer.shipmentStatus.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center p-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <span className="ml-2">{t('dashboard.importer.shipmentStatus.loading')}</span>
+            <span className="ml-2">{t('dashboard.customer.shipmentStatus.loading')}</span>
           </div>
         </CardContent>
       </Card>
@@ -77,12 +77,12 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Package className="h-5 w-5" />
-            📦 {t('dashboard.importer.shipmentStatus.title')}
+            📦 {t('dashboard.customer.shipmentStatus.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center p-8">
-            <p className="text-red-500">{t('dashboard.importer.shipmentStatus.error')}</p>
+            <p className="text-red-500">{t('dashboard.customer.shipmentStatus.error')}</p>
           </div>
         </CardContent>
       </Card>
@@ -95,12 +95,12 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Package className="h-5 w-5" />
-            📦 {t('dashboard.importer.shipmentStatus.title')}
+            📦 {t('dashboard.customer.shipmentStatus.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center p-8">
-            <p className="text-gray-500">{t('dashboard.importer.shipmentStatus.noData')}</p>
+            <p className="text-gray-500">{t('dashboard.customer.shipmentStatus.noData')}</p>
           </div>
         </CardContent>
       </Card>
@@ -113,7 +113,7 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            {t('dashboard.importer.shipmentStatus.activeShipments')}
+            {t('dashboard.customer.shipmentStatus.activeShipments')}
           </CardTitle>
           <Activity className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -123,11 +123,11 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
           </div>
           <div className="flex items-center mt-2">
             <Badge variant="outline" className="text-xs">
-              {formatPercentage(metrics.activePercentage)} {t('dashboard.importer.shipmentStatus.ofActiveShipments')}
+              {formatPercentage(metrics.activePercentage)} {t('dashboard.customer.shipmentStatus.ofActiveShipments')}
             </Badge>
           </div>
           <p className="text-xs text-muted-foreground mt-1">
-            {t('dashboard.importer.shipmentStatus.totalShipments')}: {metrics.totalShipments}
+            {t('dashboard.customer.shipmentStatus.totalShipments')}: {metrics.totalShipments}
           </p>
         </CardContent>
       </Card>
@@ -136,7 +136,7 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            {t('dashboard.importer.shipmentStatus.closedShipments')}
+            {t('dashboard.customer.shipmentStatus.closedShipments')}
           </CardTitle>
           <PackageCheck className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -147,11 +147,11 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
                      <div className="flex items-center mt-2">
              <CheckCircle className="h-3 w-3 text-green-500 mr-1" />
              <span className="text-xs text-green-600">
-               {formatPercentage(metrics.closedPercentage)} {t('dashboard.importer.shipmentStatus.completed')}
+               {formatPercentage(metrics.closedPercentage)} {t('dashboard.customer.shipmentStatus.completed')}
              </span>
            </div>
           <p className="text-xs text-muted-foreground mt-1">
-            {t('dashboard.importer.shipmentStatus.totalShipments')}: {metrics.totalShipments}
+            {t('dashboard.customer.shipmentStatus.totalShipments')}: {metrics.totalShipments}
           </p>
         </CardContent>
       </Card>
@@ -160,7 +160,7 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            {t('dashboard.importer.shipmentStatus.withoutOffers')}
+            {t('dashboard.customer.shipmentStatus.withoutOffers')}
           </CardTitle>
           <AlertTriangle className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -171,11 +171,11 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
           <div className="flex items-center mt-2">
             <AlertCircle className="h-3 w-3 text-yellow-500 mr-1" />
             <span className="text-xs text-yellow-600">
-              {formatPercentage(metrics.withoutOffersPercentage)} {t('dashboard.importer.shipmentStatus.ofActiveShipments')}
+              {formatPercentage(metrics.withoutOffersPercentage)} {t('dashboard.customer.shipmentStatus.ofActiveShipments')}
             </span>
           </div>
           <p className="text-xs text-muted-foreground mt-1">
-            {t('dashboard.importer.shipmentStatus.noOffersReceived')}
+            {t('dashboard.customer.shipmentStatus.noOffersReceived')}
           </p>
         </CardContent>
       </Card>
@@ -184,7 +184,7 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            {t('dashboard.importer.shipmentStatus.expiringSoon')}
+            {t('dashboard.customer.shipmentStatus.expiringSoon')}
           </CardTitle>
           <Clock className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -195,11 +195,11 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
           <div className="flex items-center mt-2">
             <Clock className="h-3 w-3 text-red-500 mr-1" />
             <span className="text-xs text-red-600">
-              {formatPercentage(metrics.expiringPercentage)} {t('dashboard.importer.shipmentStatus.ofActiveShipments')}
+              {formatPercentage(metrics.expiringPercentage)} {t('dashboard.customer.shipmentStatus.ofActiveShipments')}
             </span>
           </div>
           <p className="text-xs text-muted-foreground mt-1">
-            {t('dashboard.importer.shipmentStatus.within24Hours')}
+            {t('dashboard.customer.shipmentStatus.within24Hours')}
           </p>
         </CardContent>
       </Card>
@@ -209,7 +209,7 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
                  <CardHeader>
            <CardTitle className="flex items-center gap-2">
              <Package className="h-5 w-5" />
-             {t('dashboard.importer.shipmentStatus.statusSummary')}
+             {t('dashboard.customer.shipmentStatus.statusSummary')}
            </CardTitle>
          </CardHeader>
         <CardContent>
@@ -218,17 +218,17 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
             <div className="flex items-center justify-between p-4 border rounded-lg bg-yellow-50">
               <div>
                 <h3 className="font-medium text-yellow-800">
-                  {t('dashboard.importer.shipmentStatus.needsAttention')}
+                  {t('dashboard.customer.shipmentStatus.needsAttention')}
                 </h3>
                 <p className="text-2xl font-bold text-yellow-600">
                   {metrics.summary.needsAttention}
                 </p>
                                  <p className="text-xs text-yellow-700">
-                   {t('dashboard.importer.shipmentStatus.withoutOffersAndExpiring')}
+                   {t('dashboard.customer.shipmentStatus.withoutOffersAndExpiring')}
                  </p>
                </div>
                <Badge variant={getStatusBadgeVariant('warning')}>
-                 {metrics.summary.needsAttention > 0 ? t('dashboard.importer.shipmentStatus.actionRequired') : 'OK'}
+                 {metrics.summary.needsAttention > 0 ? t('dashboard.customer.shipmentStatus.actionRequired') : 'OK'}
                </Badge>
             </div>
 
@@ -236,17 +236,17 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
             <div className="flex items-center justify-between p-4 border rounded-lg bg-red-50">
               <div>
                 <h3 className="font-medium text-red-800">
-                  {t('dashboard.importer.shipmentStatus.criticalAlerts')}
+                  {t('dashboard.customer.shipmentStatus.criticalAlerts')}
                 </h3>
                 <p className="text-2xl font-bold text-red-600">
                   {metrics.summary.criticalAlerts}
                 </p>
                 <p className="text-xs text-red-700">
-                  {t('dashboard.importer.shipmentStatus.requiresImmediate')}
+                  {t('dashboard.customer.shipmentStatus.requiresImmediate')}
                 </p>
               </div>
                              <Badge variant={getStatusBadgeVariant('critical')}>
-                 {metrics.summary.criticalAlerts > 0 ? t('dashboard.importer.shipmentStatus.urgent') : t('dashboard.importer.shipmentStatus.noAlerts')}
+                 {metrics.summary.criticalAlerts > 0 ? t('dashboard.customer.shipmentStatus.urgent') : t('dashboard.customer.shipmentStatus.noAlerts')}
                </Badge>
             </div>
 
@@ -254,17 +254,17 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
             <div className="flex items-center justify-between p-4 border rounded-lg bg-green-50">
               <div>
                 <h3 className="font-medium text-green-800">
-                  {t('dashboard.importer.shipmentStatus.healthyShipments')}
+                  {t('dashboard.customer.shipmentStatus.healthyShipments')}
                 </h3>
                 <p className="text-2xl font-bold text-green-600">
                   {metrics.summary.healthyShipments}
                 </p>
                                  <p className="text-xs text-green-700">
-                   {t('dashboard.importer.shipmentStatus.withOffersAndTime')}
+                   {t('dashboard.customer.shipmentStatus.withOffersAndTime')}
                  </p>
                </div>
                <Badge variant={getStatusBadgeVariant('success')}>
-                 {t('dashboard.importer.shipmentStatus.inOrder')}
+                 {t('dashboard.customer.shipmentStatus.inOrder')}
                </Badge>
             </div>
           </div>

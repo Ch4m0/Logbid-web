@@ -131,18 +131,11 @@ interface ListItem {
 
 interface List {
   customer: ListItem[]
-  admin: ListItem[]
   agent: ListItem[]
 }
 
 const list: List = {
   customer: [
-    {
-      url: '/',
-      nameKey: 'sidebar.cargoTrips',
-    },
-  ],
-  admin: [
     {
       url: '/',
       nameKey: 'sidebar.cargoTrips',

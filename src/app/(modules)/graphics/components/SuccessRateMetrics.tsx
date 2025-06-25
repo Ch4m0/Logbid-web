@@ -101,7 +101,7 @@ export function SuccessRateMetrics({ filters }: SuccessRateMetricsProps) {
     if (!metrics?.shipmentStages) return []
     
     return metrics.shipmentStages.map(stage => ({
-      name: t(`dashboard.importer.successRate.stages.${stage.stage}`),
+      name: t(`dashboard.customer.successRate.stages.${stage.stage}`),
       value: stage.count,
       percentage: stage.percentage,
       fill: STAGE_COLORS[stage.stage as keyof typeof STAGE_COLORS] || '#94a3b8'
@@ -146,13 +146,13 @@ export function SuccessRateMetrics({ filters }: SuccessRateMetricsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5" />
-            🎯 {t('dashboard.importer.successRate.title')}
+            🎯 {t('dashboard.customer.successRate.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center p-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <span className="ml-2">{t('dashboard.importer.successRate.loading')}</span>
+            <span className="ml-2">{t('dashboard.customer.successRate.loading')}</span>
           </div>
         </CardContent>
       </Card>
@@ -165,12 +165,12 @@ export function SuccessRateMetrics({ filters }: SuccessRateMetricsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5" />
-            🎯 {t('dashboard.importer.successRate.title')}
+            🎯 {t('dashboard.customer.successRate.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center p-8">
-            <p className="text-red-500">{t('dashboard.importer.successRate.error')}</p>
+            <p className="text-red-500">{t('dashboard.customer.successRate.error')}</p>
           </div>
         </CardContent>
       </Card>
@@ -183,12 +183,12 @@ export function SuccessRateMetrics({ filters }: SuccessRateMetricsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Target className="h-5 w-5" />
-            🎯 {t('dashboard.importer.successRate.title')}
+            🎯 {t('dashboard.customer.successRate.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center p-8">
-            <p className="text-gray-500">{t('dashboard.importer.successRate.noData')}</p>
+            <p className="text-gray-500">{t('dashboard.customer.successRate.noData')}</p>
           </div>
         </CardContent>
       </Card>
@@ -203,7 +203,7 @@ export function SuccessRateMetrics({ filters }: SuccessRateMetricsProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('dashboard.importer.successRate.successRate')}
+              {t('dashboard.customer.successRate.successRate')}
             </CardTitle>
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -213,7 +213,7 @@ export function SuccessRateMetrics({ filters }: SuccessRateMetricsProps) {
             </div>
             <div className="flex items-center mt-2">
               <Badge variant={getPerformanceBadge(metrics.summary.performanceLevel) as any}>
-                {t(`dashboard.importer.successRate.performance.${metrics.summary.performanceLevel}`)}
+                {t(`dashboard.customer.successRate.performance.${metrics.summary.performanceLevel}`)}
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
@@ -226,7 +226,7 @@ export function SuccessRateMetrics({ filters }: SuccessRateMetricsProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('dashboard.importer.successRate.activeAgents')}
+              {t('dashboard.customer.successRate.activeAgents')}
             </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -244,7 +244,7 @@ export function SuccessRateMetrics({ filters }: SuccessRateMetricsProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('dashboard.importer.successRate.avgOffersPerShipment')}
+              {t('dashboard.customer.successRate.avgOffersPerShipment')}
             </CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -254,7 +254,7 @@ export function SuccessRateMetrics({ filters }: SuccessRateMetricsProps) {
             </div>
             <div className="flex items-center mt-2">
               <Badge variant="outline">
-                {t(`dashboard.importer.successRate.engagement.${metrics.summary.agentEngagement}`)}
+                {t(`dashboard.customer.successRate.engagement.${metrics.summary.agentEngagement}`)}
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
@@ -267,7 +267,7 @@ export function SuccessRateMetrics({ filters }: SuccessRateMetricsProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('dashboard.importer.successRate.topAgent')}
+              {t('dashboard.customer.successRate.topAgent')}
             </CardTitle>
             <Award className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -276,7 +276,7 @@ export function SuccessRateMetrics({ filters }: SuccessRateMetricsProps) {
               {metrics.summary.topAgent}
             </div>
             <p className="text-xs text-muted-foreground">
-              {t(`dashboard.importer.successRate.engagementDesc.${metrics.summary.agentEngagement}`)}
+              {t(`dashboard.customer.successRate.engagementDesc.${metrics.summary.agentEngagement}`)}
             </p>
           </CardContent>
         </Card>
@@ -289,7 +289,7 @@ export function SuccessRateMetrics({ filters }: SuccessRateMetricsProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5" />
-              {t('dashboard.importer.successRate.shipmentStages')}
+              {t('dashboard.customer.successRate.shipmentStages')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -347,7 +347,7 @@ export function SuccessRateMetrics({ filters }: SuccessRateMetricsProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5" />
-              {t('dashboard.importer.successRate.weeklyActivity')}
+              {t('dashboard.customer.successRate.weeklyActivity')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -364,13 +364,13 @@ export function SuccessRateMetrics({ filters }: SuccessRateMetricsProps) {
                     formatter={(value, name) => {
                       switch (name) {
                         case 'shipments':
-                          return [value, t('dashboard.importer.successRate.shipments')]
+                          return [value, t('dashboard.customer.successRate.shipments')]
                         case 'offers':
                           return [value, 'Ofertas']
                         case 'completed':
-                          return [value, t('dashboard.importer.successRate.completions')]
+                          return [value, t('dashboard.customer.successRate.completions')]
                         case 'avgOffers':
-                          return [`${value} por envío`, t('dashboard.importer.successRate.avgOffers')]
+                          return [`${value} por envío`, t('dashboard.customer.successRate.avgOffers')]
                         default:
                           return [value, name]
                       }
@@ -413,7 +413,7 @@ export function SuccessRateMetrics({ filters }: SuccessRateMetricsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
-            {t('dashboard.importer.successRate.agentRanking')}
+            {t('dashboard.customer.successRate.agentRanking')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -423,12 +423,12 @@ export function SuccessRateMetrics({ filters }: SuccessRateMetricsProps) {
                 <thead>
                   <tr className="border-b">
                     <th className="text-left p-2">#</th>
-                    <th className="text-left p-2">{t('dashboard.importer.successRate.agentName')}</th>
-                    <th className="text-right p-2">{t('dashboard.importer.successRate.totalOffersCount')}</th>
-                    <th className="text-right p-2">{t('dashboard.importer.successRate.acceptedCount')}</th>
-                    <th className="text-right p-2">{t('dashboard.importer.successRate.successRatePercent')}</th>
-                    <th className="text-right p-2">{t('dashboard.importer.successRate.avgPrice')}</th>
-                    <th className="text-center p-2">{t('dashboard.importer.successRate.activity')}</th>
+                    <th className="text-left p-2">{t('dashboard.customer.successRate.agentName')}</th>
+                    <th className="text-right p-2">{t('dashboard.customer.successRate.totalOffersCount')}</th>
+                    <th className="text-right p-2">{t('dashboard.customer.successRate.acceptedCount')}</th>
+                    <th className="text-right p-2">{t('dashboard.customer.successRate.successRatePercent')}</th>
+                    <th className="text-right p-2">{t('dashboard.customer.successRate.avgPrice')}</th>
+                    <th className="text-center p-2">{t('dashboard.customer.successRate.activity')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -471,7 +471,7 @@ export function SuccessRateMetrics({ filters }: SuccessRateMetricsProps) {
                             agent.activityStatus === 'recent' ? 'bg-yellow-500' : 'bg-red-500'
                           }`} />
                           <span className="text-xs text-muted-foreground">
-                            {agent.lastActivityDays} {t('dashboard.importer.successRate.daysAgo')}
+                            {agent.lastActivityDays} {t('dashboard.customer.successRate.daysAgo')}
                           </span>
                         </div>
                       </td>
@@ -482,7 +482,7 @@ export function SuccessRateMetrics({ filters }: SuccessRateMetricsProps) {
             </div>
           ) : (
             <div className="text-center p-8">
-              <p className="text-gray-500">{t('dashboard.importer.successRate.noAgentsData')}</p>
+              <p className="text-gray-500">{t('dashboard.customer.successRate.noAgentsData')}</p>
             </div>
           )}
         </CardContent>
@@ -494,23 +494,23 @@ export function SuccessRateMetrics({ filters }: SuccessRateMetricsProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CheckCircle className="h-5 w-5" />
-              {t('dashboard.importer.successRate.successAnalysis')}
+              {t('dashboard.customer.successRate.successAnalysis')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">{t('dashboard.importer.successRate.performanceLevel')}</span>
+                <span className="text-sm font-medium">{t('dashboard.customer.successRate.performanceLevel')}</span>
                 <Badge variant={getPerformanceBadge(metrics.summary.performanceLevel) as any}>
-                  {t(`dashboard.importer.successRate.performance.${metrics.summary.performanceLevel}`)}
+                  {t(`dashboard.customer.successRate.performance.${metrics.summary.performanceLevel}`)}
                 </Badge>
               </div>
               <div className="text-sm text-muted-foreground">
-                {t(`dashboard.importer.successRate.performanceDesc.${metrics.summary.performanceLevel}`)}
+                {t(`dashboard.customer.successRate.performanceDesc.${metrics.summary.performanceLevel}`)}
               </div>
               <div className="border-t pt-4">
                 <div className="text-xs text-muted-foreground">
-                  {t('dashboard.importer.successRate.period')}: {metrics.period.days} {t('dashboard.importer.successRate.days')}
+                  {t('dashboard.customer.successRate.period')}: {metrics.period.days} {t('dashboard.customer.successRate.days')}
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {new Date(metrics.period.startDate).toLocaleDateString()} - {new Date(metrics.period.endDate).toLocaleDateString()}
@@ -524,23 +524,23 @@ export function SuccessRateMetrics({ filters }: SuccessRateMetricsProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Activity className="h-5 w-5" />
-              {t('dashboard.importer.successRate.agentActivity')}
+              {t('dashboard.customer.successRate.agentActivity')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">{t('dashboard.importer.successRate.agentEngagement')}</span>
+                <span className="text-sm font-medium">{t('dashboard.customer.successRate.agentEngagement')}</span>
                 <Badge variant="outline" className={getEngagementColor(metrics.summary.agentEngagement)}>
-                  {t(`dashboard.importer.successRate.engagement.${metrics.summary.agentEngagement}`)}
+                  {t(`dashboard.customer.successRate.engagement.${metrics.summary.agentEngagement}`)}
                 </Badge>
               </div>
               <div className="text-sm text-muted-foreground">
-                {t(`dashboard.importer.successRate.engagementDesc.${metrics.summary.agentEngagement}`)}
+                {t(`dashboard.customer.successRate.engagementDesc.${metrics.summary.agentEngagement}`)}
               </div>
               <div className="border-t pt-4">
                 <div className="text-xs text-muted-foreground">
-                  {t('dashboard.importer.successRate.topAgent')}: {metrics.summary.topAgent}
+                  {t('dashboard.customer.successRate.topAgent')}: {metrics.summary.topAgent}
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {metrics.avgOffersPerShipment.toFixed(1)} ofertas promedio por envío

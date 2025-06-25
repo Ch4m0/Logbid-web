@@ -22,19 +22,17 @@ const getInitials = (name?: string, lastName?: string) => {
 const getUserRoleLabel = (role?: string, t?: (key: string) => string) => {
   switch (role) {
     case 'customer':
-    case 'admin':  // Admin se muestra como Importador/Exportador
-      return t?.('header.userRole.importer') || 'Importador/Exportador'
+      return t?.('header.userRole.customer') || 'Importador/Exportador'
     case 'agent':
       return t?.('header.userRole.agent') || 'Agente'
     default:
-      return t?.('header.userRole.importer') || 'Importador/Exportador'
+      return t?.('header.userRole.customer') || 'Importador/Exportador'
   }
 }
 
 const getUserRoleVariant = (role?: string): "default" | "secondary" | "destructive" | "outline" => {
   switch (role) {
     case 'customer':
-    case 'admin':  // Admin usa el mismo color que customer (Importador/Exportador)
       return 'default'
     case 'agent':
       return 'secondary'
@@ -46,7 +44,6 @@ const getUserRoleVariant = (role?: string): "default" | "secondary" | "destructi
 const getUserRoleCustomClasses = (role?: string): string => {
   switch (role) {
     case 'customer':
-    case 'admin':
       return 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200'
     case 'agent':
       return 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200'

@@ -36,9 +36,9 @@ export function ResponseTimeMetrics({ filters }: ResponseTimeMetricsProps) {
 
   const formatHours = (hours: number) => {
     if (hours < 24) {
-      return `${hours.toFixed(1)} ${t('dashboard.importer.responseTime.hours')}`
+      return `${hours.toFixed(1)} ${t('dashboard.customer.responseTime.hours')}`
     }
-    return `${(hours / 24).toFixed(1)} ${t('dashboard.importer.responseTime.days')}`
+    return `${(hours / 24).toFixed(1)} ${t('dashboard.customer.responseTime.days')}`
   }
 
   const getResponseRateColor = (rate: number) => {
@@ -48,9 +48,9 @@ export function ResponseTimeMetrics({ filters }: ResponseTimeMetricsProps) {
   }
 
   const getResponseRateLabel = (rate: number) => {
-    if (rate >= 80) return t('dashboard.importer.responseTime.excellent')
-    if (rate >= 60) return t('dashboard.importer.responseTime.good')
-    return t('dashboard.importer.responseTime.poor')
+    if (rate >= 80) return t('dashboard.customer.responseTime.excellent')
+    if (rate >= 60) return t('dashboard.customer.responseTime.good')
+    return t('dashboard.customer.responseTime.poor')
   }
 
   const getResponseRateBadge = (rate: number) => {
@@ -82,13 +82,13 @@ export function ResponseTimeMetrics({ filters }: ResponseTimeMetricsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Clock className="h-5 w-5" />
-            ⚡ {t('dashboard.importer.responseTime.title')}
+            ⚡ {t('dashboard.customer.responseTime.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center p-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <span className="ml-2">{t('dashboard.importer.responseTime.loading')}</span>
+            <span className="ml-2">{t('dashboard.customer.responseTime.loading')}</span>
           </div>
         </CardContent>
       </Card>
@@ -101,12 +101,12 @@ export function ResponseTimeMetrics({ filters }: ResponseTimeMetricsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Clock className="h-5 w-5" />
-            ⚡ {t('dashboard.importer.responseTime.title')}
+            ⚡ {t('dashboard.customer.responseTime.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center p-8">
-            <p className="text-red-500">{t('dashboard.importer.responseTime.error')}</p>
+            <p className="text-red-500">{t('dashboard.customer.responseTime.error')}</p>
           </div>
         </CardContent>
       </Card>
@@ -119,12 +119,12 @@ export function ResponseTimeMetrics({ filters }: ResponseTimeMetricsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Clock className="h-5 w-5" />
-            ⚡ {t('dashboard.importer.responseTime.title')}
+            ⚡ {t('dashboard.customer.responseTime.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center p-8">
-            <p className="text-gray-500">{t('dashboard.importer.responseTime.noData')}</p>
+            <p className="text-gray-500">{t('dashboard.customer.responseTime.noData')}</p>
           </div>
         </CardContent>
       </Card>
@@ -139,7 +139,7 @@ export function ResponseTimeMetrics({ filters }: ResponseTimeMetricsProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('dashboard.importer.responseTime.averageFirstOffer')}
+              {t('dashboard.customer.responseTime.averageFirstOffer')}
             </CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -155,13 +155,13 @@ export function ResponseTimeMetrics({ filters }: ResponseTimeMetricsProps) {
               )}
               <span className={`text-xs ${metrics.summary.fastResponse ? 'text-green-600' : 'text-yellow-600'}`}>
                 {metrics.summary.fastResponse 
-                  ? t('dashboard.importer.responseTime.within24Hours')
-                  : t('dashboard.importer.responseTime.moreThan24Hours')
+                  ? t('dashboard.customer.responseTime.within24Hours')
+                  : t('dashboard.customer.responseTime.moreThan24Hours')
                 }
               </span>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {t('dashboard.importer.responseTime.last7Days')}
+              {t('dashboard.customer.responseTime.last7Days')}
             </p>
           </CardContent>
         </Card>
@@ -170,7 +170,7 @@ export function ResponseTimeMetrics({ filters }: ResponseTimeMetricsProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('dashboard.importer.responseTime.noOffersAfterDays')} {metrics.daysThreshold} {t('dashboard.importer.responseTime.days')}
+              {t('dashboard.customer.responseTime.noOffersAfterDays')} {metrics.daysThreshold} {t('dashboard.customer.responseTime.days')}
             </CardTitle>
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -186,13 +186,13 @@ export function ResponseTimeMetrics({ filters }: ResponseTimeMetricsProps) {
               )}
               <span className={`text-xs ${metrics.shipmentsNoOffersAfterXDays > 0 ? 'text-red-600' : 'text-green-600'}`}>
                 {metrics.shipmentsNoOffersAfterXDays > 0 
-                  ? t('dashboard.importer.responseTime.needsAttention')
-                  : t('dashboard.importer.responseTime.excellent')
+                  ? t('dashboard.customer.responseTime.needsAttention')
+                  : t('dashboard.customer.responseTime.excellent')
                 }
               </span>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              de {metrics.totalActiveShipments} {t('dashboard.importer.responseTime.shipments')}
+              de {metrics.totalActiveShipments} {t('dashboard.customer.responseTime.shipments')}
             </p>
           </CardContent>
         </Card>
@@ -201,7 +201,7 @@ export function ResponseTimeMetrics({ filters }: ResponseTimeMetricsProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('dashboard.importer.responseTime.marketResponseRate')}
+              {t('dashboard.customer.responseTime.marketResponseRate')}
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -226,7 +226,7 @@ export function ResponseTimeMetrics({ filters }: ResponseTimeMetricsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            {t('dashboard.importer.responseTime.responseTimeline')} - {t('dashboard.importer.responseTime.last7Days')}
+            {t('dashboard.customer.responseTime.responseTimeline')} - {t('dashboard.customer.responseTime.last7Days')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -252,11 +252,11 @@ export function ResponseTimeMetrics({ filters }: ResponseTimeMetricsProps) {
                   formatter={(value, name) => {
                     switch (name) {
                       case 'shipments':
-                        return [value, t('dashboard.importer.responseTime.shipmentsCreated')]
+                        return [value, t('dashboard.customer.responseTime.shipmentsCreated')]
                       case 'offers':
-                        return [value, t('dashboard.importer.responseTime.offersReceived')]
+                        return [value, t('dashboard.customer.responseTime.offersReceived')]
                       case 'responseTime':
-                        return [`${value}h`, t('dashboard.importer.responseTime.avgResponseTime')]
+                        return [`${value}h`, t('dashboard.customer.responseTime.avgResponseTime')]
                       default:
                         return [value, name]
                     }
@@ -266,11 +266,11 @@ export function ResponseTimeMetrics({ filters }: ResponseTimeMetricsProps) {
                   formatter={(value) => {
                     switch (value) {
                       case 'shipments':
-                        return t('dashboard.importer.responseTime.shipmentsCreated')
+                        return t('dashboard.customer.responseTime.shipmentsCreated')
                       case 'offers':
-                        return t('dashboard.importer.responseTime.offersReceived')
+                        return t('dashboard.customer.responseTime.offersReceived')
                       case 'responseTime':
-                        return t('dashboard.importer.responseTime.avgResponseTime')
+                        return t('dashboard.customer.responseTime.avgResponseTime')
                       default:
                         return value
                     }
@@ -303,9 +303,9 @@ export function ResponseTimeMetrics({ filters }: ResponseTimeMetricsProps) {
             </ResponsiveContainer>
           </div>
           <div className="mt-4 text-sm text-muted-foreground">
-            <p>• <span className="text-blue-600">■</span> {t('dashboard.importer.responseTime.shipmentsCreated')}</p>
-            <p>• <span className="text-green-600">■</span> {t('dashboard.importer.responseTime.offersReceived')}</p>
-            <p>• <span className="text-yellow-600">—</span> {t('dashboard.importer.responseTime.avgResponseTime')} ({t('dashboard.importer.responseTime.hours')})</p>
+            <p>• <span className="text-blue-600">■</span> {t('dashboard.customer.responseTime.shipmentsCreated')}</p>
+            <p>• <span className="text-green-600">■</span> {t('dashboard.customer.responseTime.offersReceived')}</p>
+            <p>• <span className="text-yellow-600">—</span> {t('dashboard.customer.responseTime.avgResponseTime')} ({t('dashboard.customer.responseTime.hours')})</p>
           </div>
         </CardContent>
       </Card>
@@ -325,15 +325,15 @@ export function ResponseTimeMetrics({ filters }: ResponseTimeMetricsProps) {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className={`font-medium ${metrics.summary.fastResponse ? 'text-green-800' : 'text-yellow-800'}`}>
-                    {t('dashboard.importer.responseTime.fastResponse')}
+                    {t('dashboard.customer.responseTime.fastResponse')}
                   </h3>
                   <p className={`text-2xl font-bold ${metrics.summary.fastResponse ? 'text-green-600' : 'text-yellow-600'}`}>
                     {formatHours(metrics.averageFirstOfferHours)}
                   </p>
                   <p className={`text-xs ${metrics.summary.fastResponse ? 'text-green-700' : 'text-yellow-700'}`}>
                     {metrics.summary.fastResponse 
-                      ? t('dashboard.importer.responseTime.fastResponseTime')
-                      : t('dashboard.importer.responseTime.slowResponseTime')
+                      ? t('dashboard.customer.responseTime.fastResponseTime')
+                      : t('dashboard.customer.responseTime.slowResponseTime')
                     }
                   </p>
                 </div>
@@ -354,7 +354,7 @@ export function ResponseTimeMetrics({ filters }: ResponseTimeMetricsProps) {
                     metrics.marketResponseRate >= 80 ? 'text-green-800' : 
                     metrics.marketResponseRate >= 60 ? 'text-yellow-800' : 'text-red-800'
                   }`}>
-                    {t('dashboard.importer.responseTime.goodRate')}
+                    {t('dashboard.customer.responseTime.goodRate')}
                   </h3>
                   <p className={`text-2xl font-bold ${getResponseRateColor(metrics.marketResponseRate)}`}>
                     {metrics.marketResponseRate.toFixed(1)}%
@@ -364,10 +364,10 @@ export function ResponseTimeMetrics({ filters }: ResponseTimeMetricsProps) {
                     metrics.marketResponseRate >= 60 ? 'text-yellow-700' : 'text-red-700'
                   }`}>
                     {metrics.marketResponseRate >= 80 
-                      ? t('dashboard.importer.responseTime.responseRateExcellent')
+                      ? t('dashboard.customer.responseTime.responseRateExcellent')
                       : metrics.marketResponseRate >= 60 
-                        ? t('dashboard.importer.responseTime.responseRateGood')
-                        : t('dashboard.importer.responseTime.responseRatePoor')
+                        ? t('dashboard.customer.responseTime.responseRateGood')
+                        : t('dashboard.customer.responseTime.responseRatePoor')
                     }
                   </p>
                 </div>
@@ -382,7 +382,7 @@ export function ResponseTimeMetrics({ filters }: ResponseTimeMetricsProps) {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className={`font-medium ${metrics.summary.needsAttention ? 'text-red-800' : 'text-green-800'}`}>
-                    {t('dashboard.importer.responseTime.needsAttention')}
+                    {t('dashboard.customer.responseTime.needsAttention')}
                   </h3>
                   <p className={`text-2xl font-bold ${metrics.summary.needsAttention ? 'text-red-600' : 'text-green-600'}`}>
                     {metrics.shipmentsNoOffersAfterXDays}

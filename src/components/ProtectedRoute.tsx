@@ -32,8 +32,7 @@ export function ProtectedRoute({
       case 'agent':
         return 'agent'
       case 'customer':
-      case 'admin':
-        return 'importer'
+        return 'customer'
       default:
         return null
     }
@@ -68,7 +67,7 @@ export function ProtectedRoute({
       // Redirigir según el rol del usuario
       if (userRole === 'agent') {
         router.push('/graphics')
-      } else if (userRole === 'importer') {
+      } else if (userRole === 'customer') {
         router.push('/graphics')
       } else {
         router.push(fallbackRoute)
@@ -114,8 +113,7 @@ export function useCanAccessRoute(allowedRoles: UserRole[]): boolean {
       case 'agent':
         return 'agent'
       case 'customer':
-      case 'admin':
-        return 'importer'
+        return 'customer'
       default:
         return null
     }

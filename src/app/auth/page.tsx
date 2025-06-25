@@ -12,7 +12,7 @@ import { Ship, Package, ArrowRight, Shield, Globe, Users } from 'lucide-react'
 import { createSupabaseClient } from '@/src/utils/supabase/client'
 import { getUserProfileClient } from '@/src/utils/auth-client'
 
-const IMPORTER = 2
+  const CUSTOMER = 2
 const AGENT = 3
 
 export default function Auth() {
@@ -98,7 +98,7 @@ export default function Auth() {
   }
 
   const handleUserRole = (roleId: number, market_id: number) => {
-    if (roleId === IMPORTER) {
+    if (roleId === CUSTOMER) {
       router.push(`/?market=${market_id}&status=Active&shipping_type=Marítimo`)
     } else if (roleId === AGENT) {
       router.push(`/bid_list?market=${market_id}&status=Active&shipping_type=Marítimo`)
@@ -127,7 +127,7 @@ export default function Auth() {
               Connect your business with the world
             </h2>
             <p className="text-lg text-blue-100 mb-8">
-              Leading international logistics platform that connects importers and freight agents in real time.
+              Leading international logistics platform that connects customers and freight agents in real time.
             </p>
             
             {/* Features */}

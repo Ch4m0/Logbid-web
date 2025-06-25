@@ -48,7 +48,7 @@ const ImporterHelpModal = () => {
           <div className="bg-blue-50 p-4 rounded-lg">
             <h3 className="font-semibold text-blue-800 mb-2 flex items-center gap-2">
               <Package className="h-4 w-4" />
-              {t('dashboard.importer.totalShipments')}
+              {t('dashboard.customer.totalShipments')}
             </h3>
             <p className="text-blue-700 text-sm mb-2">
               Número total de shipments que has publicado en el período seleccionado.
@@ -66,7 +66,7 @@ const ImporterHelpModal = () => {
           <div className="bg-green-50 p-4 rounded-lg">
             <h3 className="font-semibold text-green-800 mb-2 flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
-              {t('dashboard.importer.totalSpent')}
+              {t('dashboard.customer.totalSpent')}
             </h3>
             <p className="text-green-700 text-sm mb-2">
               Suma total de dinero invertido en transporte durante el período.
@@ -84,7 +84,7 @@ const ImporterHelpModal = () => {
           <div className="bg-purple-50 p-4 rounded-lg">
             <h3 className="font-semibold text-purple-800 mb-2 flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
-              {t('dashboard.importer.averageCost')}
+              {t('dashboard.customer.averageCost')}
             </h3>
             <p className="text-purple-700 text-sm mb-2">
               Promedio de dinero gastado por cada shipment enviado.
@@ -102,7 +102,7 @@ const ImporterHelpModal = () => {
           <div className="bg-orange-50 p-4 rounded-lg">
             <h3 className="font-semibold text-orange-800 mb-2 flex items-center gap-2">
               <MessageCircle className="h-4 w-4" />
-              {t('dashboard.importer.offersPerShipment')}
+              {t('dashboard.customer.offersPerShipment')}
             </h3>
             <p className="text-orange-700 text-sm mb-2">
               Número promedio de ofertas que recibe cada uno de tus shipments.
@@ -138,7 +138,7 @@ const ImporterHelpModal = () => {
           <div className="bg-yellow-50 p-4 rounded-lg">
             <h3 className="font-semibold text-yellow-800 mb-2 flex items-center gap-2">
               <XCircle className="h-4 w-4" />
-              {t('dashboard.importer.conversionRate')}
+              {t('dashboard.customer.conversionRate')}
             </h3>
             <p className="text-yellow-700 text-sm mb-2">
               Porcentaje de shipments que logran recibir ofertas del total publicado.
@@ -200,7 +200,7 @@ export function ImporterKPICards({ data }: ImporterKPICardsProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">{t('dashboard.importer.totalShipments')}</h3>
+        <h3 className="text-lg font-semibold">{t('dashboard.customer.totalShipments')}</h3>
         <ImporterHelpModal />
       </div>
       
@@ -208,7 +208,7 @@ export function ImporterKPICards({ data }: ImporterKPICardsProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('dashboard.importer.totalShipments')}
+              {t('dashboard.customer.totalShipments')}
             </CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -223,7 +223,7 @@ export function ImporterKPICards({ data }: ImporterKPICardsProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('dashboard.importer.totalSpent')}
+              {t('dashboard.customer.totalSpent')}
             </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -238,7 +238,7 @@ export function ImporterKPICards({ data }: ImporterKPICardsProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('dashboard.importer.averageCost')}
+              {t('dashboard.customer.averageCost')}
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -268,7 +268,7 @@ export function ImporterKPICards({ data }: ImporterKPICardsProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('dashboard.importer.offersPerShipment')}
+              {t('dashboard.customer.offersPerShipment')}
             </CardTitle>
             <MessageCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -283,7 +283,7 @@ export function ImporterKPICards({ data }: ImporterKPICardsProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('dashboard.importer.conversionRate')}
+              {t('dashboard.customer.conversionRate')}
             </CardTitle>
             <CheckCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>

@@ -12,7 +12,7 @@ const LoadingFallback = () => (
 
 const GraphicsPage = () => {
   return (
-    <ProtectedRoute allowedRoles={['importer', 'agent']}>
+    <ProtectedRoute allowedRoles={['customer', 'agent']}>
       <Suspense fallback={<LoadingFallback />}>
         <GraphicsDashboard />
       </Suspense>

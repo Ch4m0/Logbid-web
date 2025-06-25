@@ -108,11 +108,7 @@ export default function NotificationsPage() {
       const userRole = profile?.role
 
       if (shipmentData?.shipment_uuid) {
-        if (userRole === 'admin') {
-          // Para customers: navegar a detalle con bidId y market
-          const market_id = shipmentData.market_id || profile?.all_markets?.[0]?.id || '4'
-          router.push(`/detalle?bidId=${shipmentData.shipment_uuid}&market=${market_id}`)
-        } else if (userRole === 'agent') {
+        if (userRole === 'agent') {
           // Para agentes: navegar a offers con offer_id
           const market_id = shipmentData.market_id || profile?.all_markets?.[0]?.id || '4'
           const shipping_type = shipmentData.shipping_type || 'Marítimo'
@@ -149,7 +145,7 @@ export default function NotificationsPage() {
 
   if (isLoading) {
     return (
-      <ProtectedRoute allowedRoles={['importer', 'agent']}>
+      <ProtectedRoute allowedRoles={['customer', 'agent']}>
         <div className="p-6">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-gray-200 rounded w-1/4"></div>
@@ -163,7 +159,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <ProtectedRoute allowedRoles={['importer', 'agent']}>
+    <ProtectedRoute allowedRoles={['customer', 'agent']}>
       <div className="container mx-auto p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

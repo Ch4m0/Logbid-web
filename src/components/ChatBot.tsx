@@ -65,6 +65,7 @@ export function ChatBot() {
           <div className="p-4 border-b bg-blue-600 text-white rounded-t-lg">
             <h2 className="text-lg font-semibold">Leo - LogBid Assistant</h2>
             <p className="text-sm text-blue-100">Your logistics expert, ready to help!</p>
+            <p className="text-xs text-blue-200 mt-1">Powered by DeepSeek AI</p>
           </div>
 
           {/* Messages */}
@@ -73,7 +74,7 @@ export function ChatBot() {
               <div className="text-center text-gray-500 mt-4">
                 <Bot className="h-8 w-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">
-                  Hi! I&apos;m Leo, your LogBid logistics expert. How can I assist you with your shipping needs today?
+                  Hi! I&apos;m Leo, your LogBid logistics expert powered by DeepSeek AI. How can I assist you with your shipping needs today?
                 </p>
               </div>
             ) : (

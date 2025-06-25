@@ -262,12 +262,59 @@ export default function Register() {
 
       console.log('✅ Markets assigned')
 
-      alert(`Usuario creado exitosamente. Se ha enviado un email de confirmación a ${formData.email}`)
-      router.push('/auth')
+              // Iniciar sesión automáticamente después del registro exitoso
+        try {
+          const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+            email: formData.email,
+            password: formData.password
+          })
 
-    } catch (err) {
-      console.error('💥 Unexpected error:', err)
-      setError('Error inesperado durante el registro')
+          if (loginError) {
+            console.error('❌ Auto-login error:', loginError)
+            alert(`Usuario creado exitosamente, pero hubo un error al iniciar sesión automáticamente: ${loginError.message}. Por favor inicia sesión manualmente.`)
+            router.push('/auth')
+            return
+          }
+
+          if (!loginData?.user) {
+            alert(`Usuario creado exitosamente, pero no se pudo obtener la información del usuario. Por favor inicia sesión manualmente.`)
+            router.push('/auth')
+            return
+          }
+
+        // Cargar el perfil en el store inmediatamente después del auto-login
+        try {
+          const { getUserProfileClient } = await import('@/src/utils/auth-client')
+          const authStoreModule = await import('@/src/store/authStore')
+          const authStore = authStoreModule.default
+          
+          const { profile: userProfile, error: profileError } = await getUserProfileClient(loginData.user.id)
+          
+          if (profileError) {
+            console.error('❌ Error loading profile after auto-login:', profileError)
+          } else if (userProfile) {
+            authStore.getState().setUser(loginData.user as any)
+            authStore.getState().setProfile(userProfile)
+          }
+        } catch (profileLoadError) {
+          console.error('💥 Error loading profile after auto-login:', profileLoadError)
+        }
+        
+        // Pequeña pausa para asegurar que todo se establezca
+        await new Promise(resolve => setTimeout(resolve, 500))
+        
+        alert(`¡Bienvenido! Tu cuenta ha sido creada exitosamente.`)
+        router.push('/graphics')
+      } catch (autoLoginError) {
+        console.error('💥 Auto-login catch error:', autoLoginError)
+        alert(`Usuario creado exitosamente, pero hubo un error inesperado al iniciar sesión automáticamente. Por favor inicia sesión manualmente.`)
+        router.push('/auth')
+        return
+      }
+
+          } catch (err) {
+        console.error('💥 Unexpected error:', err)
+        setError('Error inesperado durante el registro')
     } finally {
       setIsLoading(false)
     }
@@ -431,7 +478,6 @@ export default function Register() {
                     <SelectContent>
                       <SelectItem value="customer">Cliente/Importador</SelectItem>
                       <SelectItem value="agent">Agente de Carga</SelectItem>
-                      <SelectItem value="admin">Administrador</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

@@ -32,17 +32,17 @@ export async function middleware(request: NextRequest) {
       const { profile } = await getUserProfile(user.id)
       
       if (profile) {
-        // role: 'agent' = agente, 'customer'/'admin' = importer/exporter
+        // role: 'agent' = agente, 'customer' = importador
         const isAgent = profile.role === 'agent'
-        const isImporter = profile.role === 'customer' || profile.role === 'admin'
-        
-        // Si es agente intentando acceder a rutas de importers
-        if (isAgent && currentPath.includes('(importers)')) {
-          return NextResponse.redirect(new URL('/graphics', request.url))
-        }
-        
-        // Si es importer intentando acceder a rutas de agentes
-        if (isImporter && currentPath.includes('(agent)')) {
+            const isCustomer = profile.role === 'customer'
+    
+    // Si es agente intentando acceder a rutas de customers
+    if (isAgent && currentPath.includes('(importers)')) {
+      return NextResponse.redirect(new URL('/graphics', request.url))
+    }
+    
+    // Si es customer intentando acceder a rutas de agentes
+    if (isCustomer && currentPath.includes('(agent)')) {
           return NextResponse.redirect(new URL('/graphics', request.url))
         }
       }

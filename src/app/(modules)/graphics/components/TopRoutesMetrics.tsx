@@ -130,13 +130,13 @@ export function TopRoutesMetrics({ filters }: TopRoutesMetricsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Route className="h-5 w-5" />
-            🗺️ {t('dashboard.importer.topRoutes.title')}
+            🗺️ {t('dashboard.customer.topRoutes.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center p-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <span className="ml-2">{t('dashboard.importer.topRoutes.loading')}</span>
+            <span className="ml-2">{t('dashboard.customer.topRoutes.loading')}</span>
           </div>
         </CardContent>
       </Card>
@@ -149,12 +149,12 @@ export function TopRoutesMetrics({ filters }: TopRoutesMetricsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Route className="h-5 w-5" />
-            🗺️ {t('dashboard.importer.topRoutes.title')}
+            🗺️ {t('dashboard.customer.topRoutes.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center p-8">
-            <p className="text-red-500">{t('dashboard.importer.topRoutes.error')}</p>
+            <p className="text-red-500">{t('dashboard.customer.topRoutes.error')}</p>
           </div>
         </CardContent>
       </Card>
@@ -167,12 +167,12 @@ export function TopRoutesMetrics({ filters }: TopRoutesMetricsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Route className="h-5 w-5" />
-            🗺️ {t('dashboard.importer.topRoutes.title')}
+            🗺️ {t('dashboard.customer.topRoutes.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center p-8">
-            <p className="text-gray-500">{t('dashboard.importer.topRoutes.noRoutesData')}</p>
+            <p className="text-gray-500">{t('dashboard.customer.topRoutes.noRoutesData')}</p>
           </div>
         </CardContent>
       </Card>
@@ -187,7 +187,7 @@ export function TopRoutesMetrics({ filters }: TopRoutesMetricsProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('dashboard.importer.topRoutes.totalRoutes')}
+              {t('dashboard.customer.topRoutes.totalRoutes')}
             </CardTitle>
             <Globe className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -196,7 +196,7 @@ export function TopRoutesMetrics({ filters }: TopRoutesMetricsProps) {
               {metrics.totalRoutes}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {t('dashboard.importer.topRoutes.last90Days')}
+              {t('dashboard.customer.topRoutes.last90Days')}
             </p>
           </CardContent>
         </Card>
@@ -205,7 +205,7 @@ export function TopRoutesMetrics({ filters }: TopRoutesMetricsProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('dashboard.importer.topRoutes.totalShipments')}
+              {t('dashboard.customer.topRoutes.totalShipments')}
             </CardTitle>
             <MapPin className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -223,7 +223,7 @@ export function TopRoutesMetrics({ filters }: TopRoutesMetricsProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('dashboard.importer.topRoutes.avgCostPerRoute')}
+              {t('dashboard.customer.topRoutes.avgCostPerRoute')}
             </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -241,17 +241,17 @@ export function TopRoutesMetrics({ filters }: TopRoutesMetricsProps) {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('dashboard.importer.topRoutes.routeConcentration')}
+              {t('dashboard.customer.topRoutes.routeConcentration')}
             </CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className={`text-2xl font-bold ${getConcentrationColor(metrics.summary.routeConcentration)}`}>
-              {t(`dashboard.importer.topRoutes.concentration.${metrics.summary.routeConcentration}`)}
+              {t(`dashboard.customer.topRoutes.concentration.${metrics.summary.routeConcentration}`)}
             </div>
             <div className="flex items-center mt-2">
               <Badge variant={getConcentrationBadge(metrics.summary.routeConcentration) as any}>
-                {t(`dashboard.importer.topRoutes.concentrationDesc.${metrics.summary.routeConcentration}`)}
+                {t(`dashboard.customer.topRoutes.concentrationDesc.${metrics.summary.routeConcentration}`)}
               </Badge>
             </div>
           </CardContent>
@@ -265,7 +265,7 @@ export function TopRoutesMetrics({ filters }: TopRoutesMetricsProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5" />
-              {t('dashboard.importer.topRoutes.topRoutesChart')}
+              {t('dashboard.customer.topRoutes.topRoutesChart')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -292,7 +292,7 @@ export function TopRoutesMetrics({ filters }: TopRoutesMetricsProps) {
                     formatter={(value, name) => {
                       switch (name) {
                         case 'shipments':
-                          return [value, t('dashboard.importer.topRoutes.shipments')]
+                          return [value, t('dashboard.customer.topRoutes.shipments')]
                         default:
                           return [value, name]
                       }
@@ -321,7 +321,7 @@ export function TopRoutesMetrics({ filters }: TopRoutesMetricsProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <PieChart className="h-5 w-5" />
-              {t('dashboard.importer.topRoutes.transportDistribution')}
+              {t('dashboard.customer.topRoutes.transportDistribution')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -381,7 +381,7 @@ export function TopRoutesMetrics({ filters }: TopRoutesMetricsProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5" />
-              {t('dashboard.importer.topRoutes.costComparison')}
+              {t('dashboard.customer.topRoutes.costComparison')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -411,11 +411,11 @@ export function TopRoutesMetrics({ filters }: TopRoutesMetricsProps) {
                     formatter={(value, name) => {
                       switch (name) {
                         case 'avgCost':
-                          return [formatCurrency(Number(value)), t('dashboard.importer.topRoutes.avgCost')]
+                          return [formatCurrency(Number(value)), t('dashboard.customer.topRoutes.avgCost')]
                         case 'minCost':
-                          return [formatCurrency(Number(value)), t('dashboard.importer.topRoutes.minCost')]
+                          return [formatCurrency(Number(value)), t('dashboard.customer.topRoutes.minCost')]
                         case 'maxCost':
-                          return [formatCurrency(Number(value)), t('dashboard.importer.topRoutes.maxCost')]
+                          return [formatCurrency(Number(value)), t('dashboard.customer.topRoutes.maxCost')]
                         default:
                           return [value, name]
                       }
@@ -443,9 +443,9 @@ export function TopRoutesMetrics({ filters }: TopRoutesMetricsProps) {
               </ResponsiveContainer>
             </div>
             <div className="mt-4 text-sm text-muted-foreground">
-              <p>• <span className="text-green-600">■</span> {t('dashboard.importer.topRoutes.minCost')}</p>
-              <p>• <span className="text-blue-600">■</span> {t('dashboard.importer.topRoutes.avgCost')}</p>
-              <p>• <span className="text-red-600">■</span> {t('dashboard.importer.topRoutes.maxCost')}</p>
+              <p>• <span className="text-green-600">■</span> {t('dashboard.customer.topRoutes.minCost')}</p>
+              <p>• <span className="text-blue-600">■</span> {t('dashboard.customer.topRoutes.avgCost')}</p>
+              <p>• <span className="text-red-600">■</span> {t('dashboard.customer.topRoutes.maxCost')}</p>
             </div>
           </CardContent>
         </Card>
@@ -464,10 +464,10 @@ export function TopRoutesMetrics({ filters }: TopRoutesMetricsProps) {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left p-2">{t('dashboard.importer.topRoutes.route')}</th>
+                  <th className="text-left p-2">{t('dashboard.customer.topRoutes.route')}</th>
                   <th className="text-right p-2">Envíos</th>
                   <th className="text-right p-2">%</th>
-                  <th className="text-right p-2">{t('dashboard.importer.topRoutes.avgCost')}</th>
+                  <th className="text-right p-2">{t('dashboard.customer.topRoutes.avgCost')}</th>
                   <th className="text-right p-2">Rango</th>
                   <th className="text-right p-2">Ofertas</th>
                 </tr>

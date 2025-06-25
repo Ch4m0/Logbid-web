@@ -42,7 +42,7 @@ Se ha implementado una arquitectura de dashboard separada por roles para brindar
 ### ✅ Internacionalización Completa
 - Soporte para español e inglés
 - Traducciones específicas por rol:
-  - `dashboard.importer.*` - Para importadores
+  - `dashboard.customer.*` - Para customers (importadores/exportadores)
   - `dashboard.agent.*` - Para agentes
 
 ### ✅ Filtros Personalizados

@@ -6,7 +6,7 @@ export interface DashboardFilters {
   dateRange: '7d' | '30d' | '3m' | '6m' | '1y'
   transportType: 'all' | 'Aéreo' | 'Marítimo'
   userId: string
-  userRole: 'customer' | 'agent' | 'admin'
+  userRole: 'customer' | 'agent'
   enabled?: boolean
 }
 

@@ -22,7 +22,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   // Activar notificaciones para importadores Y agentes autenticados
   const shouldShowNotifications = isAuthenticated && 
     profile?.role && 
-    (profile.role === 'customer' || profile.role === 'admin' || profile.role === 'agent')
+    (profile.role === 'customer' || profile.role === 'agent')
 
   useEffect(() => {
     console.log('🔄 PROVIDER: Estado conexiones', {

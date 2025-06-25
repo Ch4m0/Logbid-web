@@ -5,7 +5,7 @@ import useAuthStore from '@/src/store/authStore'
 import { getUserProfileClient } from '@/src/utils/auth-client'
 import { useTranslation } from '@/src/hooks/useTranslation'
 
-export type UserRole = 'agent' | 'importer' | 'exporter'
+export type UserRole = 'agent' | 'customer'
 
 export const useAuth = () => {
   const router = useRouter()
@@ -23,7 +23,6 @@ export const useAuth = () => {
 
   // Función para cargar el perfil del usuario
   const loadUserProfile = async (userId: string) => {
-    console.log('👤 Loading user profile for:', userId)
     const { profile: userProfile, error } = await getUserProfileClient(userId)
     
     if (error) {
@@ -34,7 +33,6 @@ export const useAuth = () => {
     if (userProfile) {
       setProfile(userProfile)
       syncUserLanguage(userProfile)
-      console.log('✅ User profile loaded and language synchronized')
       return userProfile
     }
     
@@ -83,8 +81,6 @@ export const useAuth = () => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('🔄 Auth state changed:', event, session?.user?.id)
-        
         if (event === 'SIGNED_IN' && session?.user) {
           // Solo cargar perfil si no es el mismo usuario o no hay perfil
           if (!user || String(user.id) !== String(session.user.id) || !profile) {
@@ -172,8 +168,7 @@ export const useAuth = () => {
     
     // Mapeo de roles
     if (requiredRole === 'agent' && userRole === 'agent') return true
-    if ((requiredRole === 'importer' || requiredRole === 'exporter') && 
-        (userRole === 'customer' || userRole === 'admin')) return true
+    if (requiredRole === 'customer' && userRole === 'customer') return true
     
     return false
   }
@@ -186,8 +181,7 @@ export const useAuth = () => {
       case 'agent':
         return 'agent'
       case 'customer':
-      case 'admin':
-        return 'importer'
+        return 'customer'
       default:
         return null
     }

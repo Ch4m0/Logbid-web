@@ -72,11 +72,11 @@ export function CostMetricsCard({ filters }: CostMetricsCardProps) {
   const getTrendText = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
       case 'up':
-        return `📈 ${t('dashboard.importer.costMetrics.trends.up')}`
+        return `📈 ${t('dashboard.customer.costMetrics.trends.up')}`
       case 'down':
-        return `📉 ${t('dashboard.importer.costMetrics.trends.down')}`
+        return `📉 ${t('dashboard.customer.costMetrics.trends.down')}`
       case 'stable':
-        return `➖ ${t('dashboard.importer.costMetrics.trends.stable')}`
+        return `➖ ${t('dashboard.customer.costMetrics.trends.stable')}`
     }
   }
 
@@ -86,13 +86,13 @@ export function CostMetricsCard({ filters }: CostMetricsCardProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <DollarSign className="h-5 w-5" />
-            💰 {t('dashboard.importer.costMetrics.title')}
+            💰 {t('dashboard.customer.costMetrics.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center p-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <span className="ml-2">{t('dashboard.importer.costMetrics.loading')}</span>
+            <span className="ml-2">{t('dashboard.customer.costMetrics.loading')}</span>
           </div>
         </CardContent>
       </Card>
@@ -105,12 +105,12 @@ export function CostMetricsCard({ filters }: CostMetricsCardProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <DollarSign className="h-5 w-5" />
-            💰 {t('dashboard.importer.costMetrics.title')}
+            💰 {t('dashboard.customer.costMetrics.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center p-8">
-            <p className="text-red-500">{t('dashboard.importer.costMetrics.error')}</p>
+            <p className="text-red-500">{t('dashboard.customer.costMetrics.error')}</p>
           </div>
         </CardContent>
       </Card>
@@ -123,12 +123,12 @@ export function CostMetricsCard({ filters }: CostMetricsCardProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <DollarSign className="h-5 w-5" />
-            💰 {t('dashboard.importer.costMetrics.title')}
+            💰 {t('dashboard.customer.costMetrics.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center p-8">
-            <p className="text-gray-500">{t('dashboard.importer.costMetrics.noData')}</p>
+            <p className="text-gray-500">{t('dashboard.customer.costMetrics.noData')}</p>
           </div>
         </CardContent>
       </Card>
@@ -138,17 +138,17 @@ export function CostMetricsCard({ filters }: CostMetricsCardProps) {
   const getDateRangeText = (dateRange: string) => {
     switch (dateRange) {
       case '7d':
-        return t('dashboard.importer.dateRanges.7d')
+        return t('dashboard.customer.dateRanges.7d')
       case '30d':
-        return t('dashboard.importer.dateRanges.30d')
+        return t('dashboard.customer.dateRanges.30d')
       case '3m':
-        return t('dashboard.importer.dateRanges.3m')
+        return t('dashboard.customer.dateRanges.3m')
       case '6m':
-        return t('dashboard.importer.dateRanges.6m')
+        return t('dashboard.customer.dateRanges.6m')
       case '1y':
-        return t('dashboard.importer.dateRanges.1y')
+        return t('dashboard.customer.dateRanges.1y')
       default:
-        return t('dashboard.importer.dateRanges.30d')
+        return t('dashboard.customer.dateRanges.30d')
     }
   }
 
@@ -158,7 +158,7 @@ export function CostMetricsCard({ filters }: CostMetricsCardProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            {t('dashboard.importer.costMetrics.totalSpent')}
+            {t('dashboard.customer.costMetrics.totalSpent')}
           </CardTitle>
           <DollarSign className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -169,11 +169,11 @@ export function CostMetricsCard({ filters }: CostMetricsCardProps) {
           <div className="flex items-center mt-2">
             {getTrendIcon(metrics.costTrend)}
             <span className={`text-xs ml-1 ${getTrendColor(metrics.costTrend)}`}>
-              {formatPercentage(metrics.trendPercentage)} {t('dashboard.importer.costMetrics.vsPreviousPeriod')}
+              {formatPercentage(metrics.trendPercentage)} {t('dashboard.customer.costMetrics.vsPreviousPeriod')}
             </span>
           </div>
           <p className="text-xs text-muted-foreground mt-1">
-            {t('dashboard.importer.costMetrics.basedOn')} {metrics.acceptedOffersCount} {t('dashboard.importer.costMetrics.completedShipments')}
+            {t('dashboard.customer.costMetrics.basedOn')} {metrics.acceptedOffersCount} {t('dashboard.customer.costMetrics.completedShipments')}
           </p>
         </CardContent>
       </Card>
@@ -182,7 +182,7 @@ export function CostMetricsCard({ filters }: CostMetricsCardProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            {t('dashboard.importer.costMetrics.averagePrice')}
+            {t('dashboard.customer.costMetrics.averagePrice')}
           </CardTitle>
           <Calculator className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -193,11 +193,11 @@ export function CostMetricsCard({ filters }: CostMetricsCardProps) {
           <div className="flex items-center mt-2">
             <Package className="h-3 w-3 text-muted-foreground mr-1" />
             <span className="text-xs text-muted-foreground">
-              {t('dashboard.importer.costMetrics.perShipment')}
+              {t('dashboard.customer.costMetrics.perShipment')}
             </span>
           </div>
           <p className="text-xs text-muted-foreground mt-1">
-            {t('dashboard.importer.costMetrics.basedOn')} {metrics.acceptedOffersCount} {t('dashboard.importer.costMetrics.shipments')}
+            {t('dashboard.customer.costMetrics.basedOn')} {metrics.acceptedOffersCount} {t('dashboard.customer.costMetrics.shipments')}
           </p>
         </CardContent>
       </Card>
@@ -206,7 +206,7 @@ export function CostMetricsCard({ filters }: CostMetricsCardProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            {t('dashboard.importer.costMetrics.totalSavings')}
+            {t('dashboard.customer.costMetrics.totalSavings')}
           </CardTitle>
           <PiggyBank className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -217,7 +217,7 @@ export function CostMetricsCard({ filters }: CostMetricsCardProps) {
           <div className="flex items-center mt-2">
             <TrendingDown className="h-3 w-3 text-green-500 mr-1" />
             <span className="text-xs text-green-600">
-              {t('dashboard.importer.costMetrics.comparingOffers')}
+              {t('dashboard.customer.costMetrics.comparingOffers')}
             </span>
           </div>
           <p className="text-xs text-muted-foreground mt-1">
@@ -230,7 +230,7 @@ export function CostMetricsCard({ filters }: CostMetricsCardProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            {t('dashboard.importer.costMetrics.costTrends')}
+            {t('dashboard.customer.costMetrics.costTrends')}
           </CardTitle>
           <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
@@ -242,10 +242,10 @@ export function CostMetricsCard({ filters }: CostMetricsCardProps) {
           </div>
           <div className="mt-3">
             <div className="text-sm text-muted-foreground">
-              {t('dashboard.importer.costMetrics.previousPeriod')} {formatCurrency(metrics.periodComparison.previousPeriod)}
+              {t('dashboard.customer.costMetrics.previousPeriod')} {formatCurrency(metrics.periodComparison.previousPeriod)}
             </div>
             <div className="text-sm text-muted-foreground">
-              {t('dashboard.importer.costMetrics.difference')} 
+              {t('dashboard.customer.costMetrics.difference')} 
               <span className={`ml-1 font-medium ${
                 metrics.periodComparison.difference >= 0 ? 'text-red-500' : 'text-green-500'
               }`}>

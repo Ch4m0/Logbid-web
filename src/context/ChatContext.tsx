@@ -13,7 +13,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [input, setInput] = useState('')
 
   const openai = new OpenAI({
-    apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+    baseURL: 'https://api.deepseek.com',
+    apiKey: process.env.NEXT_PUBLIC_DEEPSEEK_API_KEY,
     dangerouslyAllowBrowser: true
   })
 
@@ -34,7 +35,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const response = await openai.chat.completions.create({
-        model: "gpt-4",
+        model: "deepseek-chat",
         messages: [
           {
             role: "system",

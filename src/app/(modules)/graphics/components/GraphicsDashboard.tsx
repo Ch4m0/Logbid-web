@@ -15,20 +15,20 @@ export function GraphicsDashboard() {
       <div className="p-8">
         <div className="flex items-center justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          <span className="ml-2">{t('dashboard.importer.loading')}</span>
+          <span className="ml-2">{t('dashboard.customer.loading')}</span>
         </div>
       </div>
     )
   }
 
   // Determinar el rol del usuario
-  const userRole = profile?.role || 'importer'
+  const userRole = profile?.role || 'customer'
 
   // Renderizar la vista específica para el rol
   if (userRole === 'agent') {
     return <AgentDashboardView profile={profile} />
   }
 
-  // Por defecto, mostrar vista de importador
+  // Por defecto, mostrar vista de customer
   return <ImporterDashboardView profile={profile} />
 } 

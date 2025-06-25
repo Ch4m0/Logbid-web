@@ -13,7 +13,7 @@ const LoadingFallback = () => (
 
 const page = () => {
   return (
-    <ProtectedRoute allowedRoles={['importer']}>
+    <ProtectedRoute allowedRoles={['customer']}>
       <section className="flex justify-between w-full gap-8">
         <Suspense fallback={<LoadingFallback />}>
           <CargoTransportTabs
