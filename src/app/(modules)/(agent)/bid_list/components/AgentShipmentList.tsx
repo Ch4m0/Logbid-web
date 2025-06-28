@@ -20,7 +20,7 @@ import { useTranslation } from '@/src/hooks/useTranslation'
 import { ShipmentFilters } from '@/src/app/(modules)/(importers)/(home)/components/ShipmentFilters'
 import { format } from 'date-fns'
 
-interface BidByMarket {
+interface ShipmentData {
   id: string
   inserted_at: string
   uuid: string
@@ -39,7 +39,7 @@ interface BidByMarket {
   status?: string
 }
 
-interface CargoTransporListProps {
+interface AgentShipmentListProps {
   status: 'Active' | 'Closed' | 'Offered' | 'WithoutOffers' | 'WithOffers'
 }
 
@@ -53,7 +53,7 @@ const normalizeShippingType = (shippingType: string) => {
   return typeMap[shippingType] || shippingType.toLowerCase()
 }
 
-export function AgentShipmentList({ status }: CargoTransporListProps) {
+export function AgentShipmentList({ status }: AgentShipmentListProps) {
   const { t } = useTranslation()
   const searchParams = useSearchParams()
   const user = useAuthStore((state) => state.user)
@@ -66,7 +66,7 @@ export function AgentShipmentList({ status }: CargoTransporListProps) {
 
   const shippingType = searchParams.get('shipping_type') || 'Marítimo'
 
-  const { data: bidList, refetch } = useGetBidListByMarket(
+  const { data: shipmentList, refetch } = useGetBidListByMarket(
     marketId,
     status,
     user?.id || null,
@@ -97,7 +97,7 @@ export function AgentShipmentList({ status }: CargoTransporListProps) {
     setFilters(prev => ({ ...prev, [mappedKey]: value }))
   }
 
-  const handleGetOffers = (uuid: string) => {
+  const handleViewShipment = (uuid: string) => {
     router.push(`/offers?offer_id=${uuid}&market_id=${marketId}&shipping_type=${shippingType}`)
   }
 
@@ -118,36 +118,36 @@ export function AgentShipmentList({ status }: CargoTransporListProps) {
     }
   }
 
-  const filteredList = bidList
-    ?.filter((bid: any) => {
-      if (status === 'WithoutOffers' && bid.offers_count > 0) {
+  const filteredList = shipmentList
+    ?.filter((shipment: ShipmentData) => {
+      if (status === 'WithoutOffers' && shipment.offers_count > 0) {
         return false
       }
-      if (status === 'WithOffers' && bid.offers_count === 0) {
+      if (status === 'WithOffers' && shipment.offers_count === 0) {
         return false
       }
       
       const filterChecks = {
         uuid: () => {
           if (!filters.uuid || filters.uuid === 'all') return true;
-          return bid.uuid.toLowerCase().includes(filters.uuid.toLowerCase());
+          return shipment.uuid.toLowerCase().includes(filters.uuid.toLowerCase());
         },
         origin_name: () => {
           if (!filters.origin_name || filters.origin_name === 'all') return true;
-          const fullOrigin = `${bid.origin_country} - ${bid.origin_name}`.toLowerCase();
+          const fullOrigin = `${shipment.origin_country} - ${shipment.origin_name}`.toLowerCase();
           return fullOrigin.includes(filters.origin_name.toLowerCase());
         },
         destination_name: () => {
           if (!filters.destination_name || filters.destination_name === 'all') return true;
-          const fullDestination = `${bid.destination_country} - ${bid.destination_name}`.toLowerCase();
+          const fullDestination = `${shipment.destination_country} - ${shipment.destination_name}`.toLowerCase();
           return fullDestination.includes(filters.destination_name.toLowerCase());
         },
         inserted_at: () => {
           if (!filters.inserted_at) return true;
           try {
             const filterDate = filters.inserted_at;
-            const bidDate = format(new Date(bid.inserted_at), 'yyyy-MM-dd');
-            return bidDate === filterDate;
+            const shipmentDate = format(new Date(shipment.inserted_at), 'yyyy-MM-dd');
+            return shipmentDate === filterDate;
           } catch (error) {
             console.error('Error comparing inserted_at dates:', error);
             return true;
@@ -157,8 +157,8 @@ export function AgentShipmentList({ status }: CargoTransporListProps) {
           if (!filters.expiration_date) return true;
           try {
             const filterDate = filters.expiration_date;
-            const bidDate = format(new Date(bid.expiration_date), 'yyyy-MM-dd');
-            return bidDate === filterDate;
+            const shipmentDate = format(new Date(shipment.expiration_date), 'yyyy-MM-dd');
+            return shipmentDate === filterDate;
           } catch (error) {
             console.error('Error comparing expiration dates:', error);
             return true;
@@ -166,19 +166,19 @@ export function AgentShipmentList({ status }: CargoTransporListProps) {
         },
         value: () => {
           if (!filters.value) return true;
-          return String(bid.value || '').includes(filters.value);
+          return String(shipment.value || '').includes(filters.value);
         },
         offers_count: () => {
           if (!filters.offers_count) return true;
-          return String(bid.offers_count).includes(filters.offers_count);
+          return String(shipment.offers_count).includes(filters.offers_count);
         }
       };
 
       return Object.keys(filterChecks).every(key => filterChecks[key as keyof typeof filterChecks]());
     })
-    .sort((a: any, b: any) => {
-      const aValue = a[sort.key as keyof BidByMarket]
-      const bValue = b[sort.key as keyof BidByMarket]
+    .sort((a: ShipmentData, b: ShipmentData) => {
+      const aValue = a[sort.key as keyof ShipmentData]
+      const bValue = b[sort.key as keyof ShipmentData]
 
       if (typeof aValue === 'string' && typeof bValue === 'string') {
         return sort.order === 'asc'
@@ -219,10 +219,10 @@ export function AgentShipmentList({ status }: CargoTransporListProps) {
       <CardContent>
         {showFilters && (
           <ShipmentFilters
-            shipmentList={bidList?.map(bid => ({
-              ...bid,
-              origin: `${bid.origin_country} - ${bid.origin_name}`,
-              destination: `${bid.destination_country} - ${bid.destination_name}`
+            shipmentList={shipmentList?.map(shipment => ({
+              ...shipment,
+              origin: `${shipment.origin_country} - ${shipment.origin_name}`,
+              destination: `${shipment.destination_country} - ${shipment.destination_name}`
             }))}
             filters={{
               uuid: filters.uuid,
@@ -240,38 +240,38 @@ export function AgentShipmentList({ status }: CargoTransporListProps) {
         )}
 
         <div className="space-y-4">
-          {paginatedList?.map((bid: BidByMarket) => (
+          {paginatedList?.map((shipment: ShipmentData) => (
             <Card
-              key={bid.uuid}
+              key={shipment.uuid}
               className="w-full cursor-pointer hover:shadow-md transition-shadow border-l-4 border-l-primary"
-              onClick={() => handleGetOffers(bid.uuid)}
+              onClick={() => handleViewShipment(shipment.uuid)}
             >
               <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
                 <div className="md:col-span-3 p-4 bg-muted/10">
                   <div className="space-y-2">
                     <Badge variant="outline" className="w-full justify-center">
-                      ID: {bid.uuid.substring(0, 20)}
+                      ID: {shipment.uuid.substring(0, 20)}
                     </Badge>
                     {STATUS.includes(status) && (
                       <Badge
                         className="w-full justify-center"
                         variant="secondary"
                       >
-                        {t('cargoList.agentCode')}: {bid.agent_code}
+                        {t('cargoList.agentCode')}: {shipment.agent_code}
                       </Badge>
                     )}
                     {STATUS.includes(status) && (
                       <div className="flex items-center justify-center space-x-2 mt-3 bg-primary/10 p-2 rounded-md">
                         <DollarSign className="h-4 w-4 text-primary" />
                         <span className="text-sm font-medium">
-                          USD {bid.last_price}
+                          USD {shipment.last_price}
                         </span>
                       </div>
                     )}
                     <div className="flex items-center justify-center space-x-2 mt-2 bg-blue-50 p-2 rounded-md">
                       <Users className="h-4 w-4 text-blue-600" />
                       <span className="text-sm font-medium text-blue-600">
-                        {bid.offers_count} {bid.offers_count === 1 ? t('cargoList.offer') : t('cargoList.offers')}
+                        {shipment.offers_count} {shipment.offers_count === 1 ? t('cargoList.offer') : t('cargoList.offers')}
                       </span>
                     </div>
                   </div>
@@ -286,7 +286,7 @@ export function AgentShipmentList({ status }: CargoTransporListProps) {
                           <span className="text-sm text-muted-foreground">
                             {t('cargoList.origin')}
                           </span>
-                          <span className="font-medium">{bid.origin_country} - {bid.origin_name}</span>
+                          <span className="font-medium">{shipment.origin_country} - {shipment.origin_name}</span>
                         </div>
                       </div>
                       <ArrowRight className="h-5 w-5 text-muted-foreground hidden md:block" />
@@ -297,7 +297,7 @@ export function AgentShipmentList({ status }: CargoTransporListProps) {
                             {t('cargoList.destination')}
                           </span>
                           <span className="font-medium">
-                            {bid.destination_country} - {bid.destination_name}
+                            {shipment.destination_country} - {shipment.destination_name}
                           </span>
                         </div>
                       </div>
@@ -312,7 +312,7 @@ export function AgentShipmentList({ status }: CargoTransporListProps) {
                           <span className="text-xs text-muted-foreground">
                             {t('cargoList.creation')}
                           </span>
-                          <span className="text-sm">{convertToColombiaTime(bid.inserted_at)}</span>
+                          <span className="text-sm">{convertToColombiaTime(shipment.inserted_at)}</span>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -321,7 +321,7 @@ export function AgentShipmentList({ status }: CargoTransporListProps) {
                           <span className="text-xs text-muted-foreground">
                             {t('cargoList.finalization')}
                           </span>
-                          <span className="text-sm">{convertToColombiaTime(bid.expiration_date)}</span>
+                          <span className="text-sm">{convertToColombiaTime(shipment.expiration_date)}</span>
                         </div>
                       </div>
                     </div>

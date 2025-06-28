@@ -1,6 +1,6 @@
 'use client'
 import React, { Suspense } from 'react'
-import { CargoTransporListAvaliable } from './components/CargoTransportListAvaliable'
+import { AgentShipmentList } from './components/AgentShipmentList'
 import CargoTransportTabs from './components/CargoTransportListAvaliableTabs/CargoTransportListAvaliableTabs'
 import { ProtectedRoute } from '@/src/components/ProtectedRoute'
 import { AgentOfferedShipments } from './components/AgentOfferedShipments'
@@ -17,15 +17,15 @@ const MyOffersWrapper = ({ status }: { status: string }) => (
   <AgentOfferedShipments status={status} />
 )
 
-const page = () => {
+const Page = () => {
   return (
     <ProtectedRoute allowedRoles={['agent']}>
       <div className="flex gap-4">
         <Suspense fallback={<LoadingFallback />}>
           <CargoTransportTabs
-            children1={<CargoTransporListAvaliable status={'WithoutOffers'} />}
-            children2={<CargoTransporListAvaliable status={'WithOffers'} />}
-            children3={<CargoTransporListAvaliable status={'Closed'} />}
+            children1={<AgentShipmentList status={'WithoutOffers'} />}
+            children2={<AgentShipmentList status={'WithOffers'} />}
+            children3={<AgentShipmentList status={'Closed'} />}
             children4={<MyOffersWrapper status={'MyOffers'} />}
           ></CargoTransportTabs>
         </Suspense>
@@ -34,4 +34,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page
