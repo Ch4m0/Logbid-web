@@ -28,7 +28,9 @@
     "back": "Volver",
     "yes": "Sí",
     "no": "No",
-    "newShipment": "Nuevo envío"
+    "newShipment": "Nuevo envío",
+    "all": "Todos",
+    "clearAll": "Limpiar todo"
   },
   "notifications": {
     "title": "Notificaciones",
@@ -520,7 +522,8 @@
     "noCargoTrips": "No hay shipments",
     "noCargoTripsMessage": "No se encontraron shipments con los filtros actuales.",
     "creationDate": "Fecha de creación",
-    "finalizationDate": "Fecha de Finalización",
+    "finalizationDate": "Fecha de finalización",
+    "expirationDate": "Fecha de expiración",
     "agentCode": "Código agente",
     "transactionId": "ID transacción",
     "origin": "Origen",
@@ -652,12 +655,14 @@
   "filters": {
     "filterCreationDate": "Filtrar fecha creación",
     "filterFinalizationDate": "Filtrar fecha finalización",
+    "filterExpirationDate": "Filtrar fecha expiración",
     "filterCode": "Filtrar código",
     "filterId": "Filtrar ID",
     "filterOrigin": "Filtrar origen",
     "filterDestination": "Filtrar destino",
     "filterPrice": "Filtrar precio",
-    "filterOffers": "Filtrar ofertas"
+    "filterOffers": "Filtrar ofertas",
+    "filterOffersCount": "Filtrar cantidad de ofertas"
   },
   "proposals": {
     "title": "Propuestas",

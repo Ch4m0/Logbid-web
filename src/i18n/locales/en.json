@@ -28,7 +28,9 @@
     "back": "Back",
     "yes": "Yes",
     "no": "No",
-    "newShipment": "New Shipment"
+    "newShipment": "New Shipment",
+    "all": "All",
+    "clearAll": "Clear all"
   },
   "notifications": {
     "title": "Notifications",
@@ -514,14 +516,15 @@
     "active": "Active",
     "closed": "Closed",
     "offering": "Offering",
-    "withOffers": "With Offers",
-    "withoutOffers": "Without Offers",
+    "withOffers": "With offers",
+    "withoutOffers": "Without offers",
     "history": "History",
     "noCargoTrips": "No shipments",
     "noCargoTripsMessage": "No shipments found with current filters.",
-    "creationDate": "Creation Date",
-    "finalizationDate": "Finalization Date",
-    "agentCode": "Agent Code",
+    "creationDate": "Creation date",
+    "finalizationDate": "Finalization date",
+    "expirationDate": "Expiration date",
+    "agentCode": "Agent code",
     "transactionId": "Transaction ID",
     "origin": "Origin",
     "destination": "Destination",
@@ -652,12 +655,14 @@
   "filters": {
     "filterCreationDate": "Filter creation date",
     "filterFinalizationDate": "Filter finalization date",
+    "filterExpirationDate": "Filter expiration date",
     "filterCode": "Filter code",
     "filterId": "Filter ID",
     "filterOrigin": "Filter origin",
     "filterDestination": "Filter destination",
     "filterPrice": "Filter price",
-    "filterOffers": "Filter offers"
+    "filterOffers": "Filter offers",
+    "filterOffersCount": "Filter offers count"
   },
   "proposals": {
     "title": "Proposals",

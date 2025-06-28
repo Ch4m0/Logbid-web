@@ -1,7 +1,7 @@
 'use client'
 import React, { Suspense } from 'react'
 import { CargoTransportTabs } from './components/CargoTransportTabs.tsx'
-import { CargoTransportListCards } from './components/CargoTransportListCards'
+import { ImporterShipmentCards } from './components/ImporterShipmentCards'
 import { ProtectedRoute } from '@/src/components/ProtectedRoute'
 
 const LoadingFallback = () => (
@@ -17,9 +17,9 @@ const page = () => {
       <section className="flex justify-between w-full gap-8">
         <Suspense fallback={<LoadingFallback />}>
           <CargoTransportTabs
-            children1={<CargoTransportListCards filterType={'withoutOffers'} />}
-            children2={<CargoTransportListCards filterType={'withOffers'} />}
-            children3={<CargoTransportListCards filterType={'closed'} />}
+            children1={<ImporterShipmentCards filterType={'withoutOffers'} />}
+            children2={<ImporterShipmentCards filterType={'withOffers'} />}
+            children3={<ImporterShipmentCards filterType={'closed'} />}
           ></CargoTransportTabs>
         </Suspense>
       </section>

@@ -12,6 +12,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
 import CreateShipment from './CreateShipment/CreateShipment'
 import { ExtendShipmentDeadline } from './ExtendShipmentDeadline'
+import { ShipmentFilters } from './ShipmentFilters'
 import { useBidStore } from '@/src/store/useBidStore'
 import { useGetShipments } from '@/src/app/hooks/useGetShipments'
 import Pagination from '../../../common/components/pagination/Pagination'
@@ -23,7 +24,6 @@ import {
   Package,
   Clock,
   DollarSign,
-  ArrowUpDown,
   ArrowRight,
   Users,
   Filter,
@@ -51,7 +51,6 @@ const normalizeShippingType = (shippingType: string) => {
 
 export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps) {
   const router = useRouter()
-  const user = useAuthStore((state) => state.user)
   const profile = useAuthStore((state) => state.profile)
   const { setMarketData } = useBidStore()
   const [itemsPerPage] = useState(8)
@@ -107,8 +106,6 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
     offers_count: '',
   })
 
-  const STATUS = ['Offering', 'Closed']
-  
   // Helper function to determine if we should show status-based elements
   const shouldShowStatusElements = () => {
     return filterType === 'withOffers' || filterType === 'closed'
@@ -170,8 +167,8 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
       // Then apply other filters
       return Object.keys(filters).every((key) => {
         const filterValue = filters[key as keyof typeof filters];
-        // If filter is empty, don't apply this filter
-        if (!filterValue || filterValue.trim() === '') {
+        // If filter is empty or set to 'all', don't apply this filter
+        if (!filterValue || filterValue.trim() === '' || filterValue === 'all') {
           return true;
         }
         
@@ -181,6 +178,13 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
           return false;
         }
         
+        // Special handling for date fields
+        if (key === 'inserted_at' || key === 'expiration_date') {
+          const shipmentDate = new Date(shipmentValue).toISOString().split('T')[0]; // Extract YYYY-MM-DD
+          return shipmentDate === filterValue;
+        }
+        
+        // Default string comparison for other fields
         return shipmentValue
           .toString()
           .toLowerCase()
@@ -235,168 +239,13 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
       </CardHeader>
       <CardContent>
         {showFilters && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            <div>
-              <label className="text-sm font-medium mb-1 block">
-                {t('cargoList.creationDate')}
-              </label>
-              <div className="flex items-center">
-                <Input
-                  placeholder={t('filters.filterCreationDate')}
-                  onChange={(e) =>
-                    handleFilterChange('inserted_at', e.target.value)
-                  }
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleSort('inserted_at')}
-                  className="ml-1"
-                >
-                  <ArrowUpDown className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-1 block">
-                {t('cargoList.finalizationDate')}
-              </label>
-              <div className="flex items-center">
-                <Input
-                  placeholder={t('filters.filterFinalizationDate')}
-                  onChange={(e) =>
-                    handleFilterChange('expiration_date', e.target.value)
-                  }
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleSort('expiration_date')}
-                  className="ml-1"
-                >
-                  <ArrowUpDown className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            {shouldShowStatusElements() && (
-              <div>
-                <label className="text-sm font-medium mb-1 block">
-                  {t('cargoList.agentCode')}
-                </label>
-                <div className="flex items-center">
-                  <Input
-                    placeholder={t('filters.filterCode')}
-                    onChange={(e) => handleFilterChange('uuid', e.target.value)}
-                  />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleSort('uuid')}
-                    className="ml-1"
-                  >
-                    <ArrowUpDown className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
-            <div>
-              <label className="text-sm font-medium mb-1 block">
-                {t('cargoList.transactionId')}
-              </label>
-              <div className="flex items-center">
-                <Input
-                  placeholder={t('filters.filterId')}
-                  onChange={(e) => handleFilterChange('uuid', e.target.value)}
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleSort('uuid')}
-                  className="ml-1"
-                >
-                  <ArrowUpDown className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-1 block">{t('cargoList.origin')}</label>
-              <div className="flex items-center">
-                <Input
-                  placeholder={t('filters.filterOrigin')}
-                  onChange={(e) =>
-                    handleFilterChange('origin_name', e.target.value)
-                  }
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleSort('origin_name')}
-                  className="ml-1"
-                >
-                  <ArrowUpDown className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-1 block">{t('cargoList.destination')}</label>
-              <div className="flex items-center">
-                <Input
-                  placeholder={t('filters.filterDestination')}
-                  onChange={(e) =>
-                    handleFilterChange('destination', e.target.value)
-                  }
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleSort('destination_name')}
-                  className="ml-1"
-                >
-                  <ArrowUpDown className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            {shouldShowStatusElements() && (
-              <div>
-                <label className="text-sm font-medium mb-1 block">
-                  {t('cargoList.lastPrice')}
-                </label>
-                <div className="flex items-center">
-                  <Input
-                    placeholder={t('filters.filterPrice')}
-                    onChange={(e) => handleFilterChange('value', e.target.value)}
-                  />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleSort('value')}
-                    className="ml-1"
-                  >
-                    <ArrowUpDown className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
-            <div>
-              <label className="text-sm font-medium mb-1 block">
-                {t('cargoList.offersCount')}
-              </label>
-              <div className="flex items-center">
-                <Input
-                  placeholder={t('filters.filterOffers')}
-                  onChange={(e) => handleFilterChange('offers_count', e.target.value)}
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleSort('offers_count')}
-                  className="ml-1"
-                >
-                  <ArrowUpDown className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
+          <ShipmentFilters
+            shipmentList={shipmentList}
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onSort={handleSort}
+            shouldShowStatusElements={shouldShowStatusElements()}
+          />
         )}
 
         <div className="space-y-4">
@@ -412,6 +261,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
                     <Badge variant="outline" className="w-full justify-center">
                       ID: {bid.uuid.substring(0, 20)}
                     </Badge>
+
                     {shouldShowStatusElements() && (
                       <Badge
                         className="w-full justify-center"
@@ -420,6 +270,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
                         {t('cargoList.agentCode')}: {bid.agent_code}
                       </Badge>
                     )}
+
                     {shouldShowStatusElements() && (
                       <div className="flex items-center justify-center space-x-2 mt-3 bg-primary/10 p-2 rounded-md">
                         <DollarSign className="h-4 w-4 text-primary" />
@@ -449,7 +300,9 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
                           <span className="font-medium">{bid.origin}</span>
                         </div>
                       </div>
+
                       <ArrowRight className="h-5 w-5 text-muted-foreground hidden md:block" />
+
                       <div className="flex items-center space-x-2 flex-1">
                         <MapPin className="h-5 w-5 text-destructive" />
                         <div className="flex flex-col">

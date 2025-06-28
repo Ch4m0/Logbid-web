@@ -15,6 +15,7 @@ import {
   TableRow,
 } from '@/src/components/ui/table'
 import { convertToColombiaTime } from '@/src/lib/utils'
+import { format, parse, isValid } from 'date-fns'
 
 import { useGetBidListByMarket } from '@/src/app/hooks/useGetBidListByMarket'
 import useAuthStore from '@/src/store/authStore'
@@ -28,6 +29,7 @@ import { ArrowRight, ArrowUpDown, Calendar, Clock, DollarSign, MapPin, Package, 
 import { Badge } from '@/src/components/ui/badge'
 import { Separator } from '@/src/components/ui/separator'
 import { useTranslation } from '@/src/hooks/useTranslation'
+import { ShipmentFilters } from '@/src/app/(modules)/(importers)/(home)/components/ShipmentFilters'
 
 interface BidByMarket {
   hasData: any
@@ -76,11 +78,10 @@ export function CargoTransporListAvaliable({ status }: CargoTransporListProps) {
     shippingType as ShippingType
   )
 
-
- const [filters, setFilters] = useState({
-    uuid: '',
-    origin_name: '',
-    destination_name: '',
+  const [filters, setFilters] = useState({
+    uuid: 'all',
+    origin_name: 'all',
+    destination_name: 'all',
     inserted_at: '',
     expiration_date: '',
     value: '',
@@ -88,13 +89,18 @@ export function CargoTransporListAvaliable({ status }: CargoTransporListProps) {
   })
 
   const currentPage = Number(searchParams.get('page')) || 1
-
   const [sort, setSort] = useState({ key: 'id', order: 'asc' })
   const [showFilters, setShowFilters] = useState(false)
   const [itemsPerPage] = useState(10)
 
   const handleFilterChange = (key: string, value: string) => {
-    setFilters((prev) => ({ ...prev, [key]: value }))
+    // Map the incoming filter keys to our internal keys
+    const keyMap: { [key: string]: string } = {
+      origin: 'origin_name',
+      destination: 'destination_name'
+    }
+    const mappedKey = keyMap[key] || key
+    setFilters(prev => ({ ...prev, [mappedKey]: value }))
   }
 
   const handleGetOffers = (uuid: string) => {
@@ -102,13 +108,20 @@ export function CargoTransporListAvaliable({ status }: CargoTransporListProps) {
   }
 
   const handleSort = (key: string) => {
-    if (sort.key === key) {
+    // Map the incoming sort keys to our internal keys
+    const keyMap: { [key: string]: string } = {
+      origin: 'origin_name',
+      destination: 'destination_name'
+    }
+    const mappedKey = keyMap[key] || key
+
+    if (sort.key === mappedKey) {
       setSort((prev) => ({
         ...prev,
         order: prev.order === 'asc' ? 'desc' : 'asc',
       }))
     } else {
-      setSort({ key, order: 'asc' })
+      setSort({ key: mappedKey, order: 'asc' })
     }
   }
 
@@ -123,15 +136,54 @@ export function CargoTransporListAvaliable({ status }: CargoTransporListProps) {
       }
       
       // Then apply the regular filters
-      return Object.keys(filters).every((key) => {
-        const filterValue = filters[key as keyof typeof filters]
-          .trim() // Eliminar espacios en blanco
-          .toLowerCase()
-        const bidValue = String(bid[key as keyof any] || '')
-          .trim() // Eliminar espacios en blanco en la data
-          .toLowerCase()
-        return bidValue.includes(filterValue)
-      })
+      const filterChecks = {
+        uuid: () => {
+          if (!filters.uuid || filters.uuid === 'all') return true;
+          return bid.uuid.toLowerCase().includes(filters.uuid.toLowerCase());
+        },
+        origin_name: () => {
+          if (!filters.origin_name || filters.origin_name === 'all') return true;
+          const fullOrigin = `${bid.origin_country} - ${bid.origin_name}`.toLowerCase();
+          return fullOrigin.includes(filters.origin_name.toLowerCase());
+        },
+        destination_name: () => {
+          if (!filters.destination_name || filters.destination_name === 'all') return true;
+          const fullDestination = `${bid.destination_country} - ${bid.destination_name}`.toLowerCase();
+          return fullDestination.includes(filters.destination_name.toLowerCase());
+        },
+        inserted_at: () => {
+          if (!filters.inserted_at) return true;
+          try {
+            const filterDate = filters.inserted_at;
+            const bidDate = format(new Date(bid.inserted_at), 'yyyy-MM-dd');
+            return bidDate === filterDate;
+          } catch (error) {
+            console.error('Error comparing inserted_at dates:', error);
+            return true;
+          }
+        },
+        expiration_date: () => {
+          if (!filters.expiration_date) return true;
+          try {
+            const filterDate = filters.expiration_date;
+            const bidDate = format(new Date(bid.expiration_date), 'yyyy-MM-dd');
+            return bidDate === filterDate;
+          } catch (error) {
+            console.error('Error comparing expiration dates:', error);
+            return true;
+          }
+        },
+        value: () => {
+          if (!filters.value) return true;
+          return String(bid.value).includes(filters.value);
+        },
+        offers_count: () => {
+          if (!filters.offers_count) return true;
+          return String(bid.offers_count).includes(filters.offers_count);
+        }
+      };
+
+      return Object.keys(filterChecks).every(key => filterChecks[key as keyof typeof filterChecks]());
     })
     .sort((a: any, b: any) => {
       const aValue = a[sort.key as keyof BidByMarket]
@@ -155,12 +207,9 @@ export function CargoTransporListAvaliable({ status }: CargoTransporListProps) {
 
   const STATUS = ['Offered', 'Closed']
 
-
-   useEffect(() => {
-      refetch()
+  useEffect(() => {
+    refetch()
   }, [shippingType, refetch])
-
-  console.log(paginatedList, "paginatedList")
 
   return (
     <Card className="w-full">
@@ -178,172 +227,29 @@ export function CargoTransporListAvaliable({ status }: CargoTransporListProps) {
       </CardHeader>
       <CardContent>
         {showFilters && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            <div>
-              <label className="text-sm font-medium mb-1 block">
-                {t('cargoList.creationDate')}
-              </label>
-              <div className="flex items-center">
-                <Input
-                  placeholder={t('filters.filterCreationDate')}
-                  onChange={(e) =>
-                    handleFilterChange('inserted_at', e.target.value)
-                  }
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleSort('inserted_at')}
-                  className="ml-1"
-                >
-                  <ArrowUpDown className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-1 block">
-                {t('cargoList.finalizationDate')}
-              </label>
-              <div className="flex items-center">
-                <Input
-                  placeholder={t('filters.filterFinalizationDate')}
-                  onChange={(e) =>
-                    handleFilterChange('expiration_date', e.target.value)
-                  }
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleSort('expiration_date')}
-                  className="ml-1"
-                >
-                  <ArrowUpDown className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            {STATUS.includes(status) && (
-              <div>
-                <label className="text-sm font-medium mb-1 block">
-                  {t('cargoList.agentCode')}
-                </label>
-                <div className="flex items-center">
-                  <Input
-                    placeholder={t('filters.filterCode')}
-                    onChange={(e) => handleFilterChange('uuid', e.target.value)}
-                  />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleSort('uuid')}
-                    className="ml-1"
-                  >
-                    <ArrowUpDown className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
-            <div>
-              <label className="text-sm font-medium mb-1 block">
-                {t('cargoList.transactionId')}
-              </label>
-              <div className="flex items-center">
-                <Input
-                  placeholder={t('filters.filterId')}
-                  onChange={(e) => handleFilterChange('uuid', e.target.value)}
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleSort('uuid')}
-                  className="ml-1"
-                >
-                  <ArrowUpDown className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-1 block">{t('cargoList.origin')}</label>
-              <div className="flex items-center">
-                <Input
-                  placeholder={t('filters.filterOrigin')}
-                  onChange={(e) =>
-                    handleFilterChange('origin_name', e.target.value)
-                  }
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleSort('origin_name')}
-                  className="ml-1"
-                >
-                  <ArrowUpDown className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium mb-1 block">{t('cargoList.destination')}</label>
-              <div className="flex items-center">
-                <Input
-                  placeholder={t('filters.filterDestination')}
-                  onChange={(e) =>
-                    handleFilterChange('destination_name', e.target.value)
-                  }
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleSort('destination_name')}
-                  className="ml-1"
-                >
-                  <ArrowUpDown className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            {STATUS.includes(status) && (
-              <div>
-                <label className="text-sm font-medium mb-1 block">
-                  {t('cargoList.lastPrice')}
-                </label>
-                <div className="flex items-center">
-                  <Input
-                    placeholder={t('filters.filterPrice')}
-                    onChange={(e) => handleFilterChange('value', e.target.value)}
-                  />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleSort('value')}
-                    className="ml-1"
-                  >
-                    <ArrowUpDown className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            )}
-            <div>
-              <label className="text-sm font-medium mb-1 block">
-                {t('cargoList.offersCount')}
-              </label>
-              <div className="flex items-center">
-                <Input
-                  placeholder={t('filters.filterOffers')}
-                  onChange={(e) => handleFilterChange('offers_count', e.target.value)}
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleSort('offers_count')}
-                  className="ml-1"
-                >
-                  <ArrowUpDown className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </div>
+          <ShipmentFilters
+            shipmentList={bidList?.map(bid => ({
+              ...bid,
+              origin: `${bid.origin_country} - ${bid.origin_name}`,
+              destination: `${bid.destination_country} - ${bid.destination_name}`
+            }))}
+            filters={{
+              uuid: filters.uuid,
+              origin: filters.origin_name,
+              destination: filters.destination_name,
+              inserted_at: filters.inserted_at,
+              expiration_date: filters.expiration_date,
+              value: filters.value,
+              offers_count: filters.offers_count
+            }}
+            onFilterChange={handleFilterChange}
+            onSort={handleSort}
+            shouldShowStatusElements={STATUS.includes(status)}
+          />
         )}
 
         <div className="space-y-4">
-          {paginatedList?.map((bid: any ) => (
+          {paginatedList?.map((bid: any) => (
             <Card
               key={bid.uuid}
               className="w-full cursor-pointer hover:shadow-md transition-shadow border-l-4 border-l-primary"
