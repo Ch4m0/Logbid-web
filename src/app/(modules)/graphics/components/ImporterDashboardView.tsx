@@ -19,9 +19,7 @@ import { ShipmentStatusFilters } from '@/src/app/hooks/useGetShipmentStatusMetri
 import { ResponseTimeFilters } from '@/src/app/hooks/useGetResponseTimeMetrics'
 import { SuccessRateFilters } from '@/src/app/hooks/useGetSuccessRateMetrics'
 import { useTranslation } from '@/src/hooks/useTranslation'
-import { Calendar, Filter, BarChart3, Package, TrendingUp, Bell } from 'lucide-react'
-import { createTestNotifications, clearTestNotifications } from '@/src/utils/testNotifications'
-import { toast } from '@/src/components/ui/use-toast'
+import { Calendar, Filter, BarChart3, Package, TrendingUp } from 'lucide-react'
 
 interface ImporterDashboardViewProps {
   profile: any
@@ -71,41 +69,6 @@ export function ImporterDashboardView({ profile }: ImporterDashboardViewProps) {
     setFilters(prev => ({ ...prev, [key]: value }))
   }
 
-  // Función para probar notificaciones
-  const handleTestNotifications = async () => {
-    try {
-      await createTestNotifications(profile.id)
-      toast({
-        title: '✅ Notificaciones de prueba creadas',
-        description: 'Se crearon 6 notificaciones de prueba. Revisa la campana 🔔',
-        duration: 3000
-      })
-    } catch (error) {
-      toast({
-        title: '❌ Error',
-        description: 'No se pudieron crear las notificaciones de prueba',
-        variant: 'destructive'
-      })
-    }
-  }
-
-  const handleClearNotifications = async () => {
-    try {
-      await clearTestNotifications(profile.id)
-      toast({
-        title: '🧹 Notificaciones eliminadas',
-        description: 'Se eliminaron las notificaciones de prueba',
-        duration: 3000
-      })
-    } catch (error) {
-      toast({
-        title: '❌ Error',
-        description: 'No se pudieron eliminar las notificaciones',
-        variant: 'destructive'
-      })
-    }
-  }
-
   const dateRangeOptions = [
     { value: '7d', label: t('dashboard.customer.dateRanges.7d') },
     { value: '30d', label: t('dashboard.customer.dateRanges.30d') },
@@ -122,28 +85,6 @@ export function ImporterDashboardView({ profile }: ImporterDashboardViewProps) {
 
   return (
     <div className="p-8 space-y-6">
-      {/* Botones de prueba de notificaciones */}
-      <Card className="p-4 bg-yellow-50 border-yellow-200">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Bell className="h-5 w-5 text-yellow-600" />
-            <div>
-              <h3 className="font-semibold text-yellow-800">🧪 Prueba del Sistema de Notificaciones</h3>
-              <p className="text-sm text-yellow-700">Prueba las notificaciones en tiempo real</p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button onClick={handleTestNotifications} variant="outline" size="sm">
-              <Bell className="h-4 w-4 mr-2" />
-              Crear Notificaciones
-            </Button>
-            <Button onClick={handleClearNotifications} variant="outline" size="sm">
-              🧹 Limpiar
-            </Button>
-          </div>
-        </div>
-      </Card>
-
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
