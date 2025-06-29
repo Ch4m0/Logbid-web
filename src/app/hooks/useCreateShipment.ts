@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createSupabaseClient } from '@/src/utils/supabase/client'
 import useAuthStore from '@/src/store/authStore'
-import { notifyAgentsAboutNewShipment } from '@/src/utils/notificationHelpers'
 
 interface CreateShipmentData {
   tipoTransporte: string  // shipping_type: 'Marítimo' | 'Aéreo'
@@ -25,23 +24,6 @@ interface CreateShipmentData {
   incoterm?: string     // incoterms_id
   cargaClasificacion?: string // dangerous_merch classification
   partidaArancelaria?: string // tariff_item
-}
-
-interface ShipmentInsert {
-  status: string
-  profile_id: string
-  market_id: number
-  origin_name: string
-  origin_country: string
-  destination_name: string
-  destination_country: string
-  transportation: string
-  comex_type: string
-  shipping_type: string
-  value: number
-  currency: string
-  expiration_date: string
-  additional_info: string
 }
 
 interface ShipmentDetailsInsert {
@@ -138,8 +120,8 @@ export const useCreateShipment = () => {
         throw new Error('No se pudieron obtener los datos de origen y destino')
       }
 
-      // Preparar datos para insertar el shipment principal (sin detalles por ahora)
-      const shipmentData: ShipmentInsert = {
+      // Preparar datos para la función de base de datos
+      const shipmentData = {
         status: 'Active',
         profile_id: profile.id,
         market_id: data.market_id,
@@ -156,43 +138,23 @@ export const useCreateShipment = () => {
         additional_info: data.informacionAdicional || data.tipoMercancia || '',
       }
 
-      // Insertar en Supabase
+      // 🚀 Crear shipment y notificar agentes automáticamente con función de BD
       const { data: result, error } = await supabase
-        .from('shipments')
-        .insert(shipmentData)
-        .select()
-        .single()
+        .rpc('create_shipment_and_notify', {
+          shipment_data: shipmentData
+        })
 
       if (error) {
         throw new Error(`Error al crear el shipment: ${error.message}`)
       }
 
-      // 🔔 Notificar a todos los agentes del mercado sobre el nuevo shipment
-      try {
-        
-        if (!result.uuid) {
-          throw new Error('UUID no disponible')
-        }
-        
-        await notifyAgentsAboutNewShipment(
-          data.market_id,
-          {
-            uuid: result.uuid,
-            origin: `${originData.country} - ${originData.name}`,
-            destination: `${destinationData.country} - ${destinationData.name}`,
-            shipping_type: data.tipoTransporte,
-            value: parseFloat(data.valor),
-            currency: data.moneda,
-            expiration_date: new Date(data.fechaExpiracion).toISOString()
-          }
-        )
-      } catch (notificationError) {
-        if (notificationError instanceof Error) {
-        }
-        // No fallar la operación principal por error de notificación
+      if (!result.success) {
+        throw new Error(`Error en la función: ${result.error}`)
       }
 
-      return result
+      console.log(`✅ Shipment creado y ${result.agents_notified} agentes notificados en ${result.market_name}`)
+
+      return result.shipment
     },
     onSuccess: (data) => {
       console.log('✅ SHIPMENT: Creado exitosamente, invalidando queries...')
