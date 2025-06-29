@@ -9,7 +9,7 @@ import { useTranslation } from '@/src/hooks/useTranslation'
 export interface Notification {
   id: number
   user_id: string
-  type: 'new_offer' | 'offer_accepted' | 'offer_rejected' | 'shipment_expiring' | 'shipment_status_changed' | 'deadline_extended' | 'new_shipment'
+  type: 'new_offer' | 'offer_accepted' | 'offer_rejected' | 'shipment_expiring' | 'shipment_status_changed' | 'deadline_extended' | 'deadline_extended_for_agents' | 'new_shipment'
   title: string
   message: string
   data?: any
@@ -55,7 +55,12 @@ export const useNotifications = () => {
   } = useQuery({
     queryKey: ['notifications', profile?.id],
     queryFn: async (): Promise<Notification[]> => {
-      if (!profile?.id) return []
+      if (!profile?.id) {
+        console.log('❌ QUERY: No hay profile.id para obtener notificaciones')
+        return []
+      }
+      
+      console.log('🔍 QUERY: Obteniendo notificaciones para:', profile.id)
       
       const { data, error } = await supabase
         .from('notifications')
@@ -64,16 +69,34 @@ export const useNotifications = () => {
         .order('created_at', { ascending: false })
         .limit(50)
 
-      if (error) throw error
+      if (error) {
+        console.error('❌ QUERY: Error obteniendo notificaciones:', error)
+        throw error
+      }
+      
+      console.log('✅ QUERY: Notificaciones obtenidas:', data?.length || 0)
       return data || []
     },
     enabled: !!profile?.id,
-    refetchOnWindowFocus: false,
-    staleTime: 30 * 1000, // 30 segundos
+    refetchOnWindowFocus: true, // Refetch cuando vuelve el foco
+    staleTime: 5 * 1000, // 5 segundos (más frecuente)
+    refetchInterval: 10 * 1000, // Refetch cada 10 segundos como respaldo
   })
 
   // Contar notificaciones no leídas
   const unreadCount = notifications.filter(n => !n.read).length
+  
+  // Log para debugging
+  useEffect(() => {
+    console.log('📊 COUNTER: Notificaciones totales:', notifications.length)
+    console.log('📊 COUNTER: Notificaciones no leídas:', unreadCount)
+    console.log('📊 COUNTER: Últimas 3 notificaciones:', notifications.slice(0, 3).map(n => ({
+      id: n.id,
+      type: n.type,
+      read: n.read,
+      created_at: n.created_at
+    })))
+  }, [notifications.length, unreadCount])
 
   // Marcar notificación como leída
   const markAsReadMutation = useMutation({
@@ -140,6 +163,8 @@ export const useNotifications = () => {
         return `🔄 ${t('notifications.toasts.statusUpdated')}`;
       case 'deadline_extended':
         return `📅 ${t('notifications.toasts.deadlineExtended')}`;
+      case 'deadline_extended_for_agents':
+        return `⏰ ${t('notifications.toasts.deadlineExtendedForAgents')}`;
       case 'new_shipment':
         return `🚢 ${t('notifications.toasts.newShipmentAvailable')}`;
       default:
@@ -249,6 +274,14 @@ export const useNotifications = () => {
             destination
           });
 
+        case 'deadline_extended_for_agents':
+          return interpolateTemplate(t('notifications.messages.deadlineExtendedForAgents'), {
+            origin: data?.origin || '',
+            destination: data?.destination || '',
+            value: data?.value ? Number(data.value).toLocaleString() : '0',
+            currency: data?.currency || 'USD'
+          });
+
         case 'new_shipment':
           return interpolateTemplate(t('notifications.messages.newShipmentAvailable'), {
             shippingType: data?.shipping_type?.toLowerCase() || '',
@@ -316,6 +349,13 @@ export const useNotifications = () => {
             variant: 'default' as const,
             duration: 4000
           }
+        case 'deadline_extended_for_agents':
+          return {
+            title: interpolateNotificationTitle(notification),
+            description: interpolatedMessage,
+            variant: 'default' as const,
+            duration: 5000
+          }
         case 'new_shipment':
           return {
             title: interpolateNotificationTitle(notification),
@@ -363,13 +403,16 @@ export const useRealtimeNotifications = () => {
   const [isConnected, setIsConnected] = useState(false)
 
   useEffect(() => {
-    if (!profile?.id) return
+    if (!profile?.id) {
+      console.log('❌ REALTIME: No hay profile.id, no se puede suscribir')
+      return
+    }
 
-    console.log('🔔 Suscribiéndose a notificaciones en tiempo real para:', profile.id)
+    console.log('🔔 REALTIME: Suscribiéndose a notificaciones para:', profile.id)
 
     // Crear canal de Supabase Realtime
     const channel = supabase
-      .channel('notifications')
+      .channel(`notifications-${profile.id}`) // Canal único por usuario
       .on(
         'postgres_changes',
         {
@@ -379,34 +422,63 @@ export const useRealtimeNotifications = () => {
           filter: `user_id=eq.${profile.id}`
         },
         (payload) => {
-          console.log('🎉 Nueva notificación recibida:', payload)
+          console.log('🎉 REALTIME: Nueva notificación recibida:', payload)
           
           const newNotification = payload.new as Notification
+          console.log('🔍 REALTIME: Datos de la notificación:', {
+            id: newNotification.id,
+            type: newNotification.type,
+            title: newNotification.title,
+            user_id: newNotification.user_id
+          })
           
           // Mostrar toast inmediatamente
-          showNotificationToast(newNotification)
+          try {
+            showNotificationToast(newNotification)
+            console.log('✅ REALTIME: Toast mostrado')
+          } catch (error) {
+            console.error('❌ REALTIME: Error mostrando toast:', error)
+          }
           
-          // Actualizar la cache de React Query
+          // Actualizar la cache de React Query INMEDIATAMENTE
           queryClient.setQueryData(
             ['notifications', profile.id],
             (oldData: Notification[] | undefined) => {
+              console.log('🔄 REALTIME: Actualizando cache. Datos anteriores:', oldData?.length || 0)
               if (!oldData) return [newNotification]
-              return [newNotification, ...oldData]
+              const newData = [newNotification, ...oldData]
+              console.log('✅ REALTIME: Cache actualizada. Nuevos datos:', newData.length)
+              return newData
             }
           )
           
-          // Invalidar queries para asegurar sincronización
+          // FORZAR invalidación para actualizar contador
+          console.log('🔄 REALTIME: Invalidando queries de notificaciones')
           queryClient.invalidateQueries({ queryKey: ['notifications'] })
+          
+          // Refetch inmediato para asegurar sincronización
+          setTimeout(() => {
+            console.log('🔄 REALTIME: Refetch adicional después de 100ms')
+            queryClient.refetchQueries({ queryKey: ['notifications', profile.id] })
+          }, 100)
         }
       )
       .subscribe((status) => {
-        console.log('📡 Estado de suscripción:', status)
+        console.log('📡 REALTIME: Estado de suscripción:', status)
         setIsConnected(status === 'SUBSCRIBED')
+        
+        if (status === 'SUBSCRIBED') {
+          console.log('✅ REALTIME: Conectado exitosamente')
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('❌ REALTIME: Error en el canal')
+        } else if (status === 'TIMED_OUT') {
+          console.error('⏰ REALTIME: Timeout de conexión')
+        }
       })
 
     // Cleanup al desmontar
     return () => {
-      console.log('🔌 Desconectando de notificaciones en tiempo real')
+      console.log('🔌 REALTIME: Desconectando de notificaciones en tiempo real')
       supabase.removeChannel(channel)
       setIsConnected(false)
     }

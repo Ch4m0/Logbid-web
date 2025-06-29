@@ -54,6 +54,7 @@
     "expiringSoon": "Próximos a expirar",
     "statusChanged": "Cambios de estado",
     "deadlineExtended": "Fechas extendidas",
+    "deadlineExtendedForAgents": "Fecha límite extendida",
     "newShipments": "Nuevos shipments",
     "notificationsCount": "notificaciones",
     "of": "de",
@@ -67,6 +68,7 @@
       "shipmentExpiring": "Shipment próximo a expirar",
       "statusUpdated": "Estado actualizado",
       "deadlineExtended": "Fecha extendida",
+      "deadlineExtendedForAgents": "¡Fecha límite extendida!",
       "newShipmentAvailable": "¡Nuevo shipment disponible!"
     },
     "messages": {
@@ -76,6 +78,7 @@
       "shipmentExpiring": "Tu envío {{origin}} → {{destination}} expira en {{hours}} horas. Considera extender la fecha límite.",
       "statusUpdated": "Tu envío {{origin}} → {{destination}} cambió de {{oldStatus}} a {{statusEmoji}} {{newStatus}}",
       "deadlineExtended": "La fecha límite de tu envío {{origin}} → {{destination}} se extendió exitosamente",
+      "deadlineExtendedForAgents": "El shipment {{origin}} → {{destination}} (${{value}} {{currency}}) extendió su fecha límite. ¡Tienes más tiempo para ofertar!",
       "newShipmentAvailable": "Nuevo {{shippingType}} disponible en {{marketName}}: {{origin}} → {{destination}} (${{value}} {{currency}})"
     }
   },

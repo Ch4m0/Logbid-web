@@ -29,6 +29,7 @@ import { cn } from '@/src/lib/utils'
 import { useRouter } from 'next/navigation'
 import { ProtectedRoute } from '@/src/components/ProtectedRoute'
 import useAuthStore from '@/src/store/authStore'
+import { RealtimeDebugger } from '@/src/components/RealtimeDebugger'
 
 export default function NotificationsPage() {
   const { 
@@ -65,6 +66,7 @@ export default function NotificationsPage() {
       case 'shipment_status_changed':
         return <RotateCcw className="h-5 w-5 text-blue-600" />
       case 'deadline_extended':
+      case 'deadline_extended_for_agents':
         return <Calendar className="h-5 w-5 text-blue-600" />
       case 'new_shipment':
         return <Package className="h-5 w-5 text-purple-600" />
@@ -85,6 +87,7 @@ export default function NotificationsPage() {
         return 'bg-yellow-100 text-yellow-800'
       case 'shipment_status_changed':
       case 'deadline_extended':
+      case 'deadline_extended_for_agents':
         return 'bg-blue-100 text-blue-800'
       case 'new_shipment':
         return 'bg-purple-100 text-purple-800'
@@ -160,6 +163,7 @@ export default function NotificationsPage() {
 
   return (
     <ProtectedRoute allowedRoles={['customer', 'agent']}>
+      <RealtimeDebugger />
       <div className="container mx-auto p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

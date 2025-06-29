@@ -2,6 +2,7 @@
 import { Input } from '@/src/components/ui/input'
 import { Label } from '@/src/components/ui/label'
 import { useTranslation } from '@/src/hooks/useTranslation'
+import { useSendWelcomeEmail } from '@/src/hooks/useSendWelcomeEmail'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
@@ -31,6 +32,7 @@ interface Company {
 export default function Register() {
   const { t } = useTranslation()
   const router = useRouter()
+  const { sendWelcomeEmail } = useSendWelcomeEmail()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -303,7 +305,36 @@ export default function Register() {
         // Pequeña pausa para asegurar que todo se establezca
         await new Promise(resolve => setTimeout(resolve, 500))
         
-        alert(`¡Bienvenido! Tu cuenta ha sido creada exitosamente.`)
+        // Enviar email de bienvenida
+        console.log('🎯 Iniciando proceso de envío de email de bienvenida...')
+        try {
+          const companyName = isCreatingNewCompany 
+            ? formData.companyName 
+            : companies.find(c => c.id.toString() === formData.companyId)?.name
+
+          console.log('📤 Llamando a sendWelcomeEmail con datos:', {
+            email: formData.email,
+            full_name: formData.fullName,
+            role: formData.role,
+            language: formData.language,
+            company_name: companyName
+          })
+
+          const emailResult = await sendWelcomeEmail({
+            email: formData.email,
+            full_name: formData.fullName,
+            role: formData.role,
+            language: formData.language,
+            company_name: companyName
+          })
+
+          console.log('✅ Email result:', emailResult)
+        } catch (emailError) {
+          // El error ya se maneja en el hook, solo logueamos aquí
+          console.error('⚠️ Welcome email error (registration still successful):', emailError)
+        }
+        
+        alert(`¡Bienvenido! Tu cuenta ha sido creada exitosamente. ${formData.email ? 'Revisa tu email para más información.' : ''}`)
         router.push('/graphics')
       } catch (autoLoginError) {
         console.error('💥 Auto-login catch error:', autoLoginError)

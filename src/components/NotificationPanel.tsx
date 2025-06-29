@@ -56,6 +56,7 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
         return 'bg-yellow-100 text-yellow-800'
       case 'shipment_status_changed':
       case 'deadline_extended':
+      case 'deadline_extended_for_agents':
         return 'bg-blue-100 text-blue-800'
       default:
         return 'bg-gray-100 text-gray-800'

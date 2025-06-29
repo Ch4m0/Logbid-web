@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/src/utils/supabase/client'
-import { createDeadlineExtendedNotification } from '@/src/utils/notificationHelpers'
 
 interface ExtendExpirationDateParams {
   bidListItemId: string
@@ -13,52 +12,25 @@ const extendExpirationDateSupabase = async ({
 }: ExtendExpirationDateParams) => {
   console.log('🔄 Extending expiration date:', { bidListItemId, newExpirationDate })
   
+  // Usar función de BD que maneja todo internamente (actualización + notificaciones)
   const { data, error } = await supabase
-    .from('shipments')
-    .update({ 
-      expiration_date: newExpirationDate,
-      updated_at: new Date().toISOString()
+    .rpc('extend_shipment_deadline_and_notify', {
+      shipment_id_param: parseInt(bidListItemId),
+      new_expiration_date_param: newExpirationDate
     })
-    .eq('id', parseInt(bidListItemId))
-    .select()
 
   if (error) {
     console.error('❌ Error extending expiration date:', error)
     throw new Error(`Error al extender fecha: ${error.message}`)
   }
 
-  console.log('✅ Expiration date extended successfully:', data)
-
-  // 🔔 Crear notificación de deadline extendido
-  try {
-    const updatedShipment = data[0] // Supabase devuelve array con el shipment actualizado
-    if (updatedShipment) {
-      // Obtener información completa del shipment para la notificación
-      const { data: shipmentData, error: shipmentError } = await supabase
-        .from('shipments')
-        .select('uuid, origin_name, origin_country, destination_name, destination_country, profile_id')
-        .eq('id', parseInt(bidListItemId))
-        .single()
-
-      if (shipmentError) {
-        console.error('Error obteniendo datos del shipment para notificación:', shipmentError)
-      } else if (shipmentData) {
-        await createDeadlineExtendedNotification(
-          shipmentData.profile_id,
-          {
-            uuid: shipmentData.uuid,
-            origin: `${shipmentData.origin_country} - ${shipmentData.origin_name}`,
-            destination: `${shipmentData.destination_country} - ${shipmentData.destination_name}`
-          },
-          newExpirationDate
-        )
-        console.log('✅ Notificación de deadline extendido enviada')
-      }
-    }
-  } catch (notificationError) {
-    console.error('❌ Error enviando notificación de deadline extendido:', notificationError)
-    // No fallar la operación principal por error de notificación
+  if (!data?.success) {
+    console.error('❌ Function returned error:', data?.error)
+    throw new Error(`Error al extender fecha: ${data?.error || 'Unknown error'}`)
   }
+
+  console.log('✅ Expiration date extended successfully:', data)
+  console.log(`📤 Notified ${data.agents_notified} agents in market "${data.market_name}"`)
 
   return data
 }

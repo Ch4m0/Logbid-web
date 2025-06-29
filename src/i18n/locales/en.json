@@ -54,6 +54,7 @@
     "expiringSoon": "Expiring soon",
     "statusChanged": "Status changes",
     "deadlineExtended": "Deadlines extended",
+    "deadlineExtendedForAgents": "Deadline extended",
     "newShipments": "New shipments",
     "notificationsCount": "notifications",
     "of": "of",
@@ -67,6 +68,7 @@
       "shipmentExpiring": "Shipment expiring soon",
       "statusUpdated": "Status updated",
       "deadlineExtended": "Deadline extended",
+      "deadlineExtendedForAgents": "Deadline extended!",
       "newShipmentAvailable": "New shipment available!"
     },
     "messages": {
@@ -76,6 +78,7 @@
       "shipmentExpiring": "Your shipment {{origin}} → {{destination}} expires in {{hours}} hours. Consider extending the deadline.",
       "statusUpdated": "Your shipment {{origin}} → {{destination}} changed from {{oldStatus}} to {{statusEmoji}} {{newStatus}}",
       "deadlineExtended": "The deadline for your shipment {{origin}} → {{destination}} was successfully extended",
+      "deadlineExtendedForAgents": "Shipment {{origin}} → {{destination}} (${{value}} {{currency}}) extended its deadline. You have more time to bid!",
       "newShipmentAvailable": "New {{shippingType}} available in {{marketName}}: {{origin}} → {{destination}} (${{value}} {{currency}})"
     }
   },

@@ -3,7 +3,7 @@ import { NotificationData } from '@/src/hooks/useNotifications'
 
 export interface CreateNotificationParams {
   user_id: string
-  type: 'new_offer' | 'offer_accepted' | 'offer_rejected' | 'shipment_expiring' | 'shipment_status_changed' | 'deadline_extended' | 'new_shipment'
+  type: 'new_offer' | 'offer_accepted' | 'offer_rejected' | 'shipment_expiring' | 'shipment_status_changed' | 'deadline_extended' | 'deadline_extended_for_agents' | 'new_shipment'
   title: string
   message: string
   data?: NotificationData
@@ -209,7 +209,7 @@ export async function createShipmentStatusChangedNotification(
   })
 }
 
-// Función específica: Fecha límite extendida
+// Función específica: Fecha límite extendida (para IMPORTADOR)
 export async function createDeadlineExtendedNotification(
   importerUserId: string,
   shipmentData: {
@@ -229,6 +229,51 @@ export async function createDeadlineExtendedNotification(
       expiration_date: newExpirationDate,
       origin: shipmentData.origin,
       destination: shipmentData.destination
+    },
+    shipment_id: parseInt(shipmentData.uuid.split('-')[0]) || undefined
+  })
+}
+
+// Función específica: Notificar a AGENTES sobre deadline extendido
+export async function createDeadlineExtendedForAgentsNotification(
+  agentUserId: string,
+  shipmentData: {
+    uuid: string
+    origin: string
+    destination: string
+    shipping_type: string
+    value: number
+    currency: string
+  },
+  newExpirationDate: string,
+  marketData: {
+    name: string
+  }
+) {
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
+  return createNotification({
+    user_id: agentUserId,
+    type: 'deadline_extended_for_agents',
+    title: '⏰ Fecha límite extendida',
+    message: `El shipment ${shipmentData.origin} → ${shipmentData.destination} ($${shipmentData.value.toLocaleString()} ${shipmentData.currency}) extendió su fecha límite hasta ${formatDate(newExpirationDate)}. ¡Tienes más tiempo para ofertar!`,
+    data: {
+      shipment_uuid: shipmentData.uuid,
+      market_name: marketData.name,
+      value: shipmentData.value.toString(),
+      currency: shipmentData.currency,
+      shipping_type: shipmentData.shipping_type,
+      origin: shipmentData.origin,
+      destination: shipmentData.destination,
+      expiration_date: newExpirationDate
     },
     shipment_id: parseInt(shipmentData.uuid.split('-')[0]) || undefined
   })
@@ -448,5 +493,71 @@ export async function notifyAgentsAboutNewShipment(
 
     await Promise.all(notificationPromises)
   } catch (error) {
+  }
+}
+
+// Función para notificar a todos los agentes de un mercado sobre deadline extendido
+export async function notifyAgentsAboutDeadlineExtended(
+  marketId: number,
+  shipmentData: {
+    uuid: string
+    origin: string
+    destination: string
+    shipping_type: string
+    value: number
+    currency: string
+  },
+  newExpirationDate: string
+) {
+  try {
+    console.log('🔔 Notificando a agentes del mercado sobre deadline extendido:', marketId)
+
+    // Obtener información del mercado
+    const { data: marketInfo, error: marketError } = await supabase
+      .from('markets')
+      .select('name')
+      .eq('id', marketId)
+      .single()
+
+    if (marketError) {
+      console.error('❌ Error obteniendo información del mercado:', marketError)
+      return
+    }
+
+    // Usar función de BD que bypass RLS para obtener agentes del mercado
+    const { data: agents, error: agentsError } = await supabase
+      .rpc('get_market_agents', { market_id_param: marketId })
+
+    if (agentsError) {
+      console.error('❌ Error obteniendo agentes del mercado:', agentsError)
+      return
+    }
+
+    if (!agents || agents.length === 0) {
+      console.log('ℹ️ No se encontraron agentes en el mercado:', marketId)
+      return
+    }
+
+    console.log(`📤 Enviando notificaciones a ${agents.length} agentes`)
+
+    // Enviar notificación a cada agente
+    const notificationPromises = agents.map(async (agent: any) => {
+      try {
+        await createDeadlineExtendedForAgentsNotification(
+          agent.user_id,
+          shipmentData,
+          newExpirationDate,
+          { name: marketInfo.name }
+        )
+        console.log(`✅ Notificación enviada al agente: ${agent.user_id}`)
+      } catch (error) {
+        console.error(`❌ Error enviando notificación al agente ${agent.user_id}:`, error)
+      }
+    })
+
+    await Promise.all(notificationPromises)
+    console.log('🎯 Todas las notificaciones de deadline extendido enviadas')
+  } catch (error) {
+    console.error('💥 Error en notifyAgentsAboutDeadlineExtended:', error)
   }
 } 
