@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/src/utils/supabase/client'
-import { createNewOfferNotification, getShipmentOwnerId } from '@/src/utils/notificationHelpers'
 
 interface CreateOfferData {
   bid_id: number
@@ -46,72 +45,45 @@ export const useCreateOffer = () => {
         ...(details || {}), // Si ya hay details, los mantenemos
         ...formDetails      // Agregamos todos los datos del formulario
       }
-      
+
+      // 🚀 Crear oferta y notificar al customer usando la función de base de datos
       const offerData = {
         shipment_id: bid_id,
         agent_id: agent_id,
-        agent_code: agentCode || 'AGENT001',
         price: parseFloat(price.toString()),
+        currency: 'USD', // Por ahora hardcodeado a USD
         shipping_type: shipping_type,
-        details: detailsObject,
-        status: 'pending'
+        agent_code: agentCode || 'AGENT001',
+        additional_info: JSON.stringify({
+          details: detailsObject
+        })
       }
 
+      console.log('📦 Datos de la oferta a enviar:', offerData)
+
       const { data: result, error } = await supabase
-        .from('offers')
-        .insert(offerData)
-        .select()
-        .single()
+        .rpc('create_offer_and_notify', {
+          offer_data: offerData
+        })
 
       if (error) {
         console.error('Error creating offer:', error)
         throw new Error(`Error al crear la oferta: ${error.message}`)
       }
 
-      // 🔔 Crear notificación para el importador
-      try {
-        // Obtener información del shipment
-        const { data: shipmentData, error: shipmentError } = await supabase
-          .from('shipments')
-          .select('uuid, origin_name, origin_country, destination_name, destination_country, shipping_type, profile_id')
-          .eq('id', bid_id)
-          .single()
-
-        if (shipmentError) {
-          console.error('Error obteniendo datos del shipment para notificación:', shipmentError)
-        } else if (shipmentData) {
-          console.log('🔍 Datos del shipment para notificación:', shipmentData)
-          console.log('🔍 Profile ID del importador:', shipmentData.profile_id)
-          
-          // Crear notificación de nueva oferta
-          await createNewOfferNotification(
-            shipmentData.profile_id,
-            {
-              uuid: shipmentData.uuid,
-              origin: `${shipmentData.origin_country} - ${shipmentData.origin_name}`,
-              destination: `${shipmentData.destination_country} - ${shipmentData.destination_name}`,
-              shipping_type: shipmentData.shipping_type
-            },
-            {
-              id: result.id,
-              price: result.price.toString(),
-              currency: 'USD', // Asumir USD por defecto
-              agent_code: result.agent_code
-            }
-          )
-          console.log('✅ Notificación de nueva oferta enviada al importador')
-        }
-      } catch (notificationError) {
-        console.error('❌ Error enviando notificación de nueva oferta:', notificationError)
-        // No fallar la operación principal por error de notificación
+      if (!result.success) {
+        throw new Error(`Error en la función: ${result.error}`)
       }
 
-      return result
+      console.log(`✅ Oferta creada y notificación enviada al customer ${result.customer_id}`)
+
+      return result.offer
     },
     onSuccess: (data) => {
       // Invalidar queries relacionadas para refrescar los datos
       queryClient.invalidateQueries({ queryKey: ['shipment'] })
       queryClient.invalidateQueries({ queryKey: ['bidListByMarket'] })
+      queryClient.invalidateQueries({ queryKey: ['notifications'] }) // Asegurar que se actualiza el contador
       return data
     },
     onError: (error: Error) => {

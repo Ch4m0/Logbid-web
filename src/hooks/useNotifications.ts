@@ -78,9 +78,9 @@ export const useNotifications = () => {
       return data || []
     },
     enabled: !!profile?.id,
-    refetchOnWindowFocus: true, // Refetch cuando vuelve el foco
-    staleTime: 5 * 1000, // 5 segundos (más frecuente)
-    refetchInterval: 10 * 1000, // Refetch cada 10 segundos como respaldo
+    refetchOnWindowFocus: true,
+    staleTime: 5 * 1000, // Reducido a 5 segundos
+    refetchInterval: 15 * 1000, // Reducido a 15 segundos como respaldo
   })
 
   // Contar notificaciones no leídas
@@ -401,6 +401,8 @@ export const useRealtimeNotifications = () => {
   const queryClient = useQueryClient()
   const { showNotificationToast } = useNotifications()
   const [isConnected, setIsConnected] = useState(false)
+  const [retryCount, setRetryCount] = useState(0)
+  const maxRetries = 3
 
   useEffect(() => {
     if (!profile?.id) {
@@ -410,79 +412,99 @@ export const useRealtimeNotifications = () => {
 
     console.log('🔔 REALTIME: Suscribiéndose a notificaciones para:', profile.id)
 
-    // Crear canal de Supabase Realtime
-    const channel = supabase
-      .channel(`notifications-${profile.id}`) // Canal único por usuario
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${profile.id}`
-        },
-        (payload) => {
-          console.log('🎉 REALTIME: Nueva notificación recibida:', payload)
-          
-          const newNotification = payload.new as Notification
-          console.log('🔍 REALTIME: Datos de la notificación:', {
-            id: newNotification.id,
-            type: newNotification.type,
-            title: newNotification.title,
-            user_id: newNotification.user_id
-          })
-          
-          // Mostrar toast inmediatamente
-          try {
-            showNotificationToast(newNotification)
-            console.log('✅ REALTIME: Toast mostrado')
-          } catch (error) {
-            console.error('❌ REALTIME: Error mostrando toast:', error)
-          }
-          
-          // Actualizar la cache de React Query INMEDIATAMENTE
-          queryClient.setQueryData(
-            ['notifications', profile.id],
-            (oldData: Notification[] | undefined) => {
-              console.log('🔄 REALTIME: Actualizando cache. Datos anteriores:', oldData?.length || 0)
-              if (!oldData) return [newNotification]
-              const newData = [newNotification, ...oldData]
-              console.log('✅ REALTIME: Cache actualizada. Nuevos datos:', newData.length)
-              return newData
+    const setupChannel = () => {
+      const channel = supabase
+        .channel(`notifications-${profile.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${profile.id}`
+          },
+          async (payload) => {
+            console.log('🎉 REALTIME: Nueva notificación recibida:', payload)
+            
+            const newNotification = payload.new as Notification
+            console.log('🔍 REALTIME: Datos de la notificación:', {
+              id: newNotification.id,
+              type: newNotification.type,
+              title: newNotification.title,
+              user_id: newNotification.user_id
+            })
+            
+            // Mostrar toast inmediatamente
+            try {
+              showNotificationToast(newNotification)
+              console.log('✅ REALTIME: Toast mostrado')
+            } catch (error) {
+              console.error('❌ REALTIME: Error mostrando toast:', error)
             }
-          )
+            
+            // Actualizar la cache de React Query INMEDIATAMENTE
+            queryClient.setQueryData(
+              ['notifications', profile.id],
+              (oldData: Notification[] | undefined) => {
+                console.log('🔄 REALTIME: Actualizando cache. Datos anteriores:', oldData?.length || 0)
+                if (!oldData) return [newNotification]
+                // Verificar si la notificación ya existe para evitar duplicados
+                const exists = oldData.some(n => n.id === newNotification.id)
+                if (exists) return oldData
+                const newData = [newNotification, ...oldData]
+                console.log('✅ REALTIME: Cache actualizada. Nuevos datos:', newData.length)
+                return newData
+              }
+            )
+            
+            // Forzar refetch inmediato
+            await queryClient.refetchQueries({ queryKey: ['notifications', profile.id] })
+            console.log('🔄 REALTIME: Refetch completo')
+          }
+        )
+        .subscribe((status) => {
+          console.log('📡 REALTIME: Estado de suscripción:', status)
           
-          // FORZAR invalidación para actualizar contador
-          console.log('🔄 REALTIME: Invalidando queries de notificaciones')
-          queryClient.invalidateQueries({ queryKey: ['notifications'] })
-          
-          // Refetch inmediato para asegurar sincronización
-          setTimeout(() => {
-            console.log('🔄 REALTIME: Refetch adicional después de 100ms')
-            queryClient.refetchQueries({ queryKey: ['notifications', profile.id] })
-          }, 100)
-        }
-      )
-      .subscribe((status) => {
-        console.log('📡 REALTIME: Estado de suscripción:', status)
-        setIsConnected(status === 'SUBSCRIBED')
-        
-        if (status === 'SUBSCRIBED') {
-          console.log('✅ REALTIME: Conectado exitosamente')
-        } else if (status === 'CHANNEL_ERROR') {
-          console.error('❌ REALTIME: Error en el canal')
-        } else if (status === 'TIMED_OUT') {
-          console.error('⏰ REALTIME: Timeout de conexión')
-        }
-      })
+          if (status === 'SUBSCRIBED') {
+            console.log('✅ REALTIME: Conectado exitosamente')
+            setIsConnected(true)
+            setRetryCount(0)
+          } else if (status === 'CHANNEL_ERROR') {
+            console.error('❌ REALTIME: Error en el canal')
+            handleReconnect()
+          } else if (status === 'TIMED_OUT') {
+            console.error('⏰ REALTIME: Timeout de conexión')
+            handleReconnect()
+          }
+        })
 
-    // Cleanup al desmontar
+      return channel
+    }
+
+    const handleReconnect = () => {
+      if (retryCount < maxRetries) {
+        console.log(`🔄 REALTIME: Intento de reconexión ${retryCount + 1}/${maxRetries}`)
+        setRetryCount(prev => prev + 1)
+        const timeoutId = setTimeout(() => {
+          channel = setupChannel()
+        }, 2000 * Math.pow(2, retryCount)) // Backoff exponencial
+        return () => clearTimeout(timeoutId)
+      } else {
+        console.error('❌ REALTIME: Máximo de intentos de reconexión alcanzado')
+        setIsConnected(false)
+      }
+    }
+
+    let channel = setupChannel()
+
+    // Cleanup
     return () => {
       console.log('🔌 REALTIME: Desconectando de notificaciones en tiempo real')
       supabase.removeChannel(channel)
       setIsConnected(false)
+      setRetryCount(0)
     }
-  }, [profile?.id, queryClient, showNotificationToast])
+  }, [profile?.id, queryClient, showNotificationToast, retryCount])
 
   return { isConnected }
 }
