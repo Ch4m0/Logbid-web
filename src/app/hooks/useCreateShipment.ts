@@ -49,20 +49,14 @@ export const useCreateShipment = () => {
     mutationFn: async (data: CreateShipmentData): Promise<any> => {
 
       
-      if (!profile?.id) {
+      if (!profile?.auth_id) {
         throw new Error('Usuario no autenticado')
       }
-
-
 
       // Obtener información de origen y destino según el tipo de transporte
       let originData, destinationData
 
-
-
       if (data.tipoTransporte === 'Marítimo') {
-
-        
         // Obtener puertos marítimos
         const { data: originPort, error: originError } = await supabase
           .from('maritime_ports')
@@ -87,8 +81,6 @@ export const useCreateShipment = () => {
         originData = { name: originPort.port_name, country: originPort.country }
         destinationData = { name: destinationPort.port_name, country: destinationPort.country }
       } else {
-
-        
         // Obtener aeropuertos
         const { data: originAirport, error: originError } = await supabase
           .from('airports')
@@ -114,8 +106,6 @@ export const useCreateShipment = () => {
         destinationData = { name: destinationAirport.airport_name, country: destinationAirport.country }
       }
 
-
-
       if (!originData || !destinationData) {
         throw new Error('No se pudieron obtener los datos de origen y destino')
       }
@@ -123,7 +113,7 @@ export const useCreateShipment = () => {
       // Preparar datos para la función de base de datos
       const shipmentData = {
         status: 'Active',
-        profile_id: profile.id,
+        profile_id: profile.auth_id,
         market_id: data.market_id,
         origin_name: originData.name,
         origin_country: originData.country,
@@ -138,6 +128,8 @@ export const useCreateShipment = () => {
         additional_info: data.informacionAdicional || data.tipoMercancia || '',
       }
 
+      console.log('🚀 Enviando datos a función RPC:', shipmentData)
+
       // 🚀 Crear shipment y notificar agentes automáticamente con función de BD
       const { data: result, error } = await supabase
         .rpc('create_shipment_and_notify', {
@@ -145,11 +137,13 @@ export const useCreateShipment = () => {
         })
 
       if (error) {
+        console.error('❌ Error en RPC:', error)
         throw new Error(`Error al crear el shipment: ${error.message}`)
       }
 
-      if (!result.success) {
-        throw new Error(`Error en la función: ${result.error}`)
+      if (!result?.success) {
+        console.error('❌ Función RPC falló:', result)
+        throw new Error(`Error en la función: ${result?.error || 'Error desconocido'}`)
       }
 
       console.log(`✅ Shipment creado y ${result.agents_notified} agentes notificados en ${result.market_name}`)

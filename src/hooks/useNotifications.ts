@@ -53,19 +53,19 @@ export const useNotifications = () => {
     error,
     refetch
   } = useQuery({
-    queryKey: ['notifications', profile?.id],
+    queryKey: ['notifications', profile?.auth_id],
     queryFn: async (): Promise<Notification[]> => {
-      if (!profile?.id) {
-        console.log('❌ QUERY: No hay profile.id para obtener notificaciones')
+      if (!profile?.auth_id) {
+        console.log('❌ QUERY: No hay profile.auth_id para obtener notificaciones')
         return []
       }
       
-      console.log('🔍 QUERY: Obteniendo notificaciones para:', profile.id)
+      console.log('🔍 QUERY: Obteniendo notificaciones para:', profile.auth_id)
       
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
-        .eq('user_id', profile.id)
+        .eq('user_id', profile.auth_id)
         .order('created_at', { ascending: false })
         .limit(50)
 
@@ -77,10 +77,10 @@ export const useNotifications = () => {
       console.log('✅ QUERY: Notificaciones obtenidas:', data?.length || 0)
       return data || []
     },
-    enabled: !!profile?.id,
+    enabled: !!profile?.auth_id,
     refetchOnWindowFocus: true,
     staleTime: 5 * 1000, // Reducido a 5 segundos
-    refetchInterval: 30 * 1000, // Reducido a 15 segundos como respaldo
+    refetchInterval: 30 * 1000, // Reducido a 15 segundos como respaldo,
   })
 
   // Contar notificaciones no leídas
@@ -116,18 +116,18 @@ export const useNotifications = () => {
   // Marcar todas como leídas
   const markAllAsReadMutation = useMutation({
     mutationFn: async () => {
-      if (!profile?.id) return
+      if (!profile?.auth_id) return
       
       const { error } = await supabase
         .from('notifications')
         .update({ read: true })
-        .eq('user_id', profile.id)
+        .eq('user_id', profile.auth_id)
         .eq('read', false)
 
       if (error) throw error
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] })
+      queryClient.invalidateQueries({ queryKey: ['notifications', profile?.auth_id] })
     }
   })
 
@@ -142,7 +142,7 @@ export const useNotifications = () => {
       if (error) throw error
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] })
+      queryClient.invalidateQueries({ queryKey: ['notifications', profile?.auth_id] })
     }
   })
 
@@ -405,23 +405,23 @@ export const useRealtimeNotifications = () => {
   const maxRetries = 3
 
   useEffect(() => {
-    if (!profile?.id) {
-      console.log('❌ REALTIME: No hay profile.id, no se puede suscribir')
+    if (!profile?.auth_id) {
+      console.log('❌ REALTIME: No hay profile.auth_id, no se puede suscribir')
       return
     }
 
-    console.log('🔔 REALTIME: Suscribiéndose a notificaciones para:', profile.id)
+    console.log('🔔 REALTIME: Suscribiéndose a notificaciones para:', profile.auth_id)
 
     const setupChannel = () => {
       const channel = supabase
-        .channel(`notifications-${profile.id}`)
+        .channel(`notifications-${profile.auth_id}`)
         .on(
           'postgres_changes',
           {
             event: 'INSERT',
             schema: 'public',
             table: 'notifications',
-            filter: `user_id=eq.${profile.id}`
+            filter: `user_id=eq.${profile.auth_id}`
           },
           async (payload) => {
             console.log('🎉 REALTIME: Nueva notificación recibida:', payload)
@@ -444,7 +444,7 @@ export const useRealtimeNotifications = () => {
             
             // Actualizar la cache de React Query INMEDIATAMENTE
             queryClient.setQueryData(
-              ['notifications', profile.id],
+              ['notifications', profile.auth_id],
               (oldData: Notification[] | undefined) => {
                 console.log('🔄 REALTIME: Actualizando cache. Datos anteriores:', oldData?.length || 0)
                 if (!oldData) return [newNotification]
@@ -458,7 +458,7 @@ export const useRealtimeNotifications = () => {
             )
             
             // Forzar refetch inmediato
-            await queryClient.refetchQueries({ queryKey: ['notifications', profile.id] })
+            await queryClient.refetchQueries({ queryKey: ['notifications', profile.auth_id] })
             console.log('🔄 REALTIME: Refetch completo')
           }
         )
@@ -504,7 +504,7 @@ export const useRealtimeNotifications = () => {
       setIsConnected(false)
       setRetryCount(0)
     }
-  }, [profile?.id, queryClient, showNotificationToast, retryCount])
+  }, [profile?.auth_id, queryClient, showNotificationToast, retryCount])
 
   return { isConnected }
 }
