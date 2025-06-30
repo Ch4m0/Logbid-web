@@ -27,7 +27,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
           variant="ghost"
           size="sm"
           className={cn(
-            "relative p-2 hover:bg-gray-100 rounded-full transition-all duration-200",
+            "relative p-2 hover:bg-gray-100 rounded-full transition-all",
             className
           )}
         >
@@ -37,7 +37,7 @@ export function NotificationBell({ className }: NotificationBellProps) {
               variant="destructive"
               className={cn(
                 "absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs font-bold",
-                "animate-pulse border-2 border-white",
+                "border-2 border-white",
                 unreadCount > 99 ? "text-[10px]" : "text-xs"
               )}
             >

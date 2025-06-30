@@ -80,7 +80,7 @@ export const useNotifications = () => {
     enabled: !!profile?.id,
     refetchOnWindowFocus: true,
     staleTime: 5 * 1000, // Reducido a 5 segundos
-    refetchInterval: 15 * 1000, // Reducido a 15 segundos como respaldo
+    refetchInterval: 30 * 1000, // Reducido a 15 segundos como respaldo
   })
 
   // Contar notificaciones no leídas
