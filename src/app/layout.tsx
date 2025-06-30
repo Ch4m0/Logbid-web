@@ -19,6 +19,9 @@ const fontSans = FontSans({
 export const metadata: Metadata = {
   title: 'LogBid',
   description: 'International logistics platform',
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
 export default function RootLayout({
