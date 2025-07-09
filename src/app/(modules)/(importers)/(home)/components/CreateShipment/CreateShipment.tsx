@@ -28,13 +28,14 @@ import useAuthStore from '@/src/store/authStore'
 import { useSearchParams } from 'next/navigation'
 import { toast } from '@/src/components/ui/use-toast'
 import { drawerService } from '@/src/service/drawerService'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useGetIncotermList } from '@/src/app/hooks/useGetIncotermList'
 import { useGetListContainer } from '@/src/app/hooks/useGetContainerList'
 import { useCreateShipment } from '@/src/app/hooks/useCreateShipment'
 import FilterableSelectMaritimePort from '@/src/app/(modules)/common/components/FilterableSelectMaritimePort'
 import { useTranslation } from '@/src/hooks/useTranslation'
 import { Plus } from 'lucide-react'
+import { DatePicker } from '@/src/components/ui/date-picker'
 
 // Definir el tipo para los valores del formulario
 interface FormValues {
@@ -44,7 +45,6 @@ interface FormValues {
   tipoComex: string
   tipoEnvio: string
   contenedor: string
-  empaque: string
   pesoTotal: number | ''
   tipoMedida: string
   cbm: number | ''
@@ -56,7 +56,12 @@ interface FormValues {
   valor: number | ''
   moneda: string
   fechaExpiracion: string
+  fechaEmbarque: string
   informacionAdicional?: string
+}
+
+interface CreateShipmentProps {
+  onRefetch?: () => void
 }
 
 const ErrorMessage = styled.span`
@@ -64,7 +69,7 @@ const ErrorMessage = styled.span`
   color: red;
 `
 
-export default function CreateShipment() {
+export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) {
   const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [shippingType, setShippingType] = useState('Marítimo')
@@ -96,7 +101,63 @@ export default function CreateShipment() {
         }
       ),
     moneda: Yup.string().required(t('createCargo.validation.currencyRequired')),
-    fechaExpiracion: Yup.string().required(t('createCargo.validation.shipmentDateRequired')),
+    fechaExpiracion: Yup.string()
+      .required(t('createCargo.validation.shipmentDateRequired'))
+      .test(
+        'is-valid-date',
+        t('createCargo.validation.dateInvalid'),
+        (value) => {
+          if (!value) return false
+          const date = new Date(value)
+          return !isNaN(date.getTime())
+        }
+      )
+      .test(
+        'is-future-date',
+        t('createCargo.validation.dateMustBeFuture'),
+        (value) => {
+          if (!value) return false
+          const date = new Date(value)
+          const today = new Date()
+          today.setHours(0, 0, 0, 0)
+          return date >= today
+        }
+      )
+      .test(
+        'is-reasonable-date',
+        t('createCargo.validation.dateNotMoreThanYear'),
+        (value) => {
+          if (!value) return false
+          const date = new Date(value)
+          const maxDate = new Date()
+          maxDate.setFullYear(maxDate.getFullYear() + 1)
+          return date <= maxDate
+        }
+      ),
+    fechaEmbarque: Yup.string()
+      .test(
+        'is-valid-date',
+        t('createCargo.validation.dateInvalid'),
+        function(value) {
+          const { tipoTransporte } = this.parent
+          if (tipoTransporte !== 'Marítimo' || !value) return true // Solo validar para marítimo
+          const date = new Date(value)
+          return !isNaN(date.getTime())
+        }
+      )
+      .test(
+        'is-after-closing-date',
+        t('createCargo.validation.shippingDateMustBeAfterClosing'),
+        function(value) {
+          const { tipoTransporte, fechaExpiracion } = this.parent
+          if (tipoTransporte !== 'Marítimo' || !value) return true // Solo validar para marítimo
+          if (!fechaExpiracion) return true
+          
+          const shippingDate = new Date(value)
+          const closingDate = new Date(fechaExpiracion)
+          return shippingDate >= closingDate
+        }
+      ),
     tipoMercancia: Yup.string().required(t('createCargo.validation.merchandiseTypeRequired')),
   })
 
@@ -108,7 +169,6 @@ export default function CreateShipment() {
       tipoComex: '',
       tipoEnvio: '',
       contenedor: '',
-      empaque: '',
       pesoTotal: '',
       tipoMedida: '',
       cbm: '',
@@ -120,6 +180,7 @@ export default function CreateShipment() {
       valor: '',
       moneda: 'USD',
       fechaExpiracion: '',
+      fechaEmbarque: '',
       informacionAdicional: '',
     },
     validationSchema,
@@ -153,12 +214,12 @@ export default function CreateShipment() {
           valor: values.valor.toString(),
           moneda: values.moneda,
           fechaExpiracion: values.fechaExpiracion,
+          fechaEmbarque: values.fechaEmbarque,
           informacionAdicional: values.informacionAdicional,
           tipoMercancia: values.tipoMercancia,
           market_id: parseInt(marketId),
           // Campos adicionales del formulario
           contenedor: values.contenedor,
-          empaque: values.empaque,
           pesoTotal: typeof values.pesoTotal === 'number' ? values.pesoTotal : undefined,
           tipoMedida: values.tipoMedida,
           cbm: typeof values.cbm === 'number' ? values.cbm : undefined,
@@ -178,8 +239,14 @@ export default function CreateShipment() {
             setIsOpen(false)
             formik.resetForm()
             
-            // 🔄 Invalidar queries para refrescar los datos sin recargar la página
-            // Esto actualizará la lista de shipments automáticamente
+            // 🔄 Refrescar la lista manualmente
+            console.log('🔄 Ejecutando refetch manual...')
+            if (onRefetch) {
+              onRefetch()
+              console.log('✅ Refetch ejecutado - la lista se actualizará automáticamente')
+            } else {
+              console.log('⚠️ No se proporcionó función onRefetch')
+            }
           },
           onError: (error) => {
             console.error('Error creating shipment:', error)
@@ -196,6 +263,26 @@ export default function CreateShipment() {
 
   const { data: listIncoterm } = useGetIncotermList()
   const { mutate: createShipment, isPending } = useCreateShipment()
+
+  // Efecto para limpiar fecha de embarque si es anterior a la nueva fecha de cierre
+  useEffect(() => {
+    const { fechaExpiracion, fechaEmbarque } = formik.values
+    if (fechaExpiracion && fechaEmbarque) {
+      const closingDate = new Date(fechaExpiracion)
+      const shippingDate = new Date(fechaEmbarque)
+      
+      if (shippingDate < closingDate) {
+        formik.setFieldValue('fechaEmbarque', '')
+      }
+    }
+  }, [formik.values.fechaExpiracion])
+
+  // Efecto para limpiar fecha de embarque cuando se cambia a transporte aéreo
+  useEffect(() => {
+    if (formik.values.tipoTransporte === 'Aéreo' && formik.values.fechaEmbarque) {
+      formik.setFieldValue('fechaEmbarque', '')
+    }
+  }, [formik.values.tipoTransporte])
   
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault()
@@ -410,7 +497,12 @@ export default function CreateShipment() {
                   </div>
 
                   <div className="grid gap-1">
-                    <Label htmlFor="contenedor" className="text-sm font-semibold text-gray-700">{t('createCargo.labels.containerType')}</Label>
+                    <Label htmlFor="contenedor" className="text-sm font-semibold text-gray-700">
+                      {formik.values.tipoTransporte === 'Marítimo' 
+                        ? t('createCargo.labels.containerType') 
+                        : t('createCargo.labels.packagingType')
+                      }
+                    </Label>
                     <Select
                       value={formik.values.contenedor}
                       onValueChange={(value) =>
@@ -418,7 +510,11 @@ export default function CreateShipment() {
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder={t('createCargo.placeholders.selectContainer')} />
+                        <SelectValue placeholder={
+                          formik.values.tipoTransporte === 'Marítimo' 
+                            ? t('createCargo.placeholders.selectContainer')
+                            : t('createCargo.placeholders.selectPackaging')
+                        } />
                       </SelectTrigger>
                       <SelectContent>
                         {containerList?.map((container: any) => (
@@ -430,17 +526,7 @@ export default function CreateShipment() {
                     </Select>
                   </div>
 
-                  <div className="grid gap-1">
-                    <Label htmlFor="empaque" className="text-sm font-semibold text-gray-700">{t('createCargo.labels.packagingType')}</Label>
-                    <Input
-                      id="empaque"
-                      name="empaque"
-                      placeholder={t('createCargo.placeholders.packagingExample')}
-                      value={formik.values.empaque}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                    />
-                  </div>
+
                 </div>
               </div>
 
@@ -521,7 +607,7 @@ export default function CreateShipment() {
                       <SelectContent>
                         {listIncoterm?.map((incoterm: any) => (
                           <SelectItem key={incoterm.id} value={incoterm.id.toString()}>
-                            {incoterm.name} - {incoterm.spanish_name}
+                            {incoterm.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -552,7 +638,7 @@ export default function CreateShipment() {
               {/* Sección 5: Información Comercial */}
               <div className="space-y-4 bg-orange-50 p-4 rounded-lg">
                 <h3 className="text-xl font-bold text-gray-800 border-b-2 border-orange-500 pb-2">💰 {t('createCargo.sections.commercialInfo')}</h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className={`grid gap-4 ${formik.values.tipoTransporte === 'Marítimo' ? 'grid-cols-3' : 'grid-cols-2'}`}>
                   <div className="grid gap-1">
                     <Label htmlFor="valor" className="text-sm font-semibold text-gray-700">{t('createCargo.value')}</Label>
                     <Input
@@ -598,13 +684,12 @@ export default function CreateShipment() {
 
                   <div className="grid gap-1">
                     <Label htmlFor="fechaExpiracion" className="text-sm font-semibold text-gray-700">{t('createCargo.shipmentDate')}</Label>
-                    <Input
-                      id="fechaExpiracion"
-                      type="date"
-                      name="fechaExpiracion"
+                    <DatePicker
                       value={formik.values.fechaExpiracion}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
+                      onChange={(date) => formik.setFieldValue('fechaExpiracion', date)}
+                      placeholder={t('extendCargo.selectDate')}
+                      minDate={new Date()} // No permitir fechas pasadas
+                      maxDate={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)} // Máximo 1 año en el futuro
                     />
                     <div className="text-red-500 min-h-[20px]">
                       {formik.errors.fechaExpiracion &&
@@ -626,7 +711,36 @@ export default function CreateShipment() {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                     />
+                    <div className="text-red-500 min-h-[20px]">
+                      {formik.errors.partidaArancelaria &&
+                        formik.touched.partidaArancelaria && (
+                          <ErrorMessage>
+                            {formik.errors.partidaArancelaria}
+                          </ErrorMessage>
+                        )}
+                    </div>
                   </div>
+
+                  {formik.values.tipoTransporte === 'Marítimo' && (
+                    <div className="grid gap-1">
+                      <Label htmlFor="fechaEmbarque" className="text-sm font-semibold text-gray-700">{t('createCargo.shippingDate')}</Label>
+                      <DatePicker
+                        value={formik.values.fechaEmbarque}
+                        onChange={(date) => formik.setFieldValue('fechaEmbarque', date)}
+                        placeholder={t('extendCargo.selectDate')}
+                        minDate={formik.values.fechaExpiracion ? new Date(formik.values.fechaExpiracion) : new Date()} // Usar fecha de cierre como mínimo
+                        maxDate={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)} // Máximo 1 año en el futuro
+                      />
+                      <div className="text-red-500 min-h-[20px]">
+                        {formik.errors.fechaEmbarque &&
+                          formik.touched.fechaEmbarque && (
+                            <ErrorMessage>
+                              {formik.errors.fechaEmbarque}
+                            </ErrorMessage>
+                          )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 

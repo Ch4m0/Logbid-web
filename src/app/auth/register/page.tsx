@@ -507,7 +507,7 @@ export default function Register() {
                       <SelectValue placeholder="Selecciona tu rol" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="customer">Cliente/Importador</SelectItem>
+                      <SelectItem value="customer">Cliente</SelectItem>
                       <SelectItem value="agent">Agente de Carga</SelectItem>
                     </SelectContent>
                   </Select>

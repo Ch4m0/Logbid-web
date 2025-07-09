@@ -13,6 +13,7 @@ import {
   Activity
 } from 'lucide-react'
 import { useTranslation } from '@/src/hooks/useTranslation'
+import { useRouter } from 'next/navigation'
 
 interface ShipmentStatusMetricsProps {
   filters: ShipmentStatusFilters
@@ -20,6 +21,7 @@ interface ShipmentStatusMetricsProps {
 
 export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
   const { t } = useTranslation()
+  const router = useRouter()
   const { data: metrics, isLoading, error } = useGetShipmentStatusMetrics(filters)
 
   const formatPercentage = (percentage: number) => {
@@ -50,6 +52,45 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
       default:
         return 'text-blue-600'
     }
+  }
+
+  // Funciones de navegación para las tarjetas
+  const navigateToShipments = (filterType: string) => {
+    const basePath = '/'
+    let searchParams = new URLSearchParams()
+    
+    // Agregar filtros existentes si están disponibles
+    if (filters.marketId) {
+      searchParams.set('market_id', filters.marketId)
+    }
+    if (filters.transportType) {
+      searchParams.set('shipping_type', filters.transportType)
+    }
+    
+    // Usar el filterType directamente como parámetro filter
+    let filterParam = ''
+    switch (filterType) {
+      case 'withoutOffers':
+        filterParam = 'withoutOffers'
+        break
+      case 'withOffers':
+        filterParam = 'withOffers' 
+        break
+      case 'closed':
+        filterParam = 'closed'
+        break
+      case 'active':
+        // Para envíos activos, mostrar sin ofertas por defecto ya que es más urgente
+        filterParam = 'withoutOffers'
+        break
+      default:
+        filterParam = 'withoutOffers'
+    }
+    
+    searchParams.set('filter', filterParam)
+    
+    const url = `${basePath}?${searchParams.toString()}`
+    router.push(url)
   }
 
   if (isLoading) {
@@ -110,7 +151,10 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {/* Envíos Activos vs Cerrados */}
-      <Card>
+      <Card 
+        className="cursor-pointer hover:shadow-lg transition-shadow"
+        onClick={() => navigateToShipments('active')}
+      >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
             {t('dashboard.customer.shipmentStatus.activeShipments')}
@@ -133,7 +177,10 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
       </Card>
 
       {/* Envíos Cerrados */}
-      <Card>
+      <Card 
+        className="cursor-pointer hover:shadow-lg transition-shadow"
+        onClick={() => navigateToShipments('closed')}
+      >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
             {t('dashboard.customer.shipmentStatus.closedShipments')}
@@ -157,7 +204,10 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
       </Card>
 
       {/* Envíos Sin Ofertas */}
-      <Card>
+      <Card 
+        className="cursor-pointer hover:shadow-lg transition-shadow"
+        onClick={() => navigateToShipments('withoutOffers')}
+      >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
             {t('dashboard.customer.shipmentStatus.withoutOffers')}
@@ -181,7 +231,10 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
       </Card>
 
       {/* Envíos Próximos a Vencer */}
-      <Card>
+      <Card 
+        className="cursor-pointer hover:shadow-lg transition-shadow"
+        onClick={() => navigateToShipments('withoutOffers')}
+      >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
             {t('dashboard.customer.shipmentStatus.expiringSoon')}

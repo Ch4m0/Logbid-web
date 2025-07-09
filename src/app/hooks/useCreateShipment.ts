@@ -11,6 +11,7 @@ interface CreateShipmentData {
   valor: string          // value
   moneda: string         // currency
   fechaExpiracion: string // expiration_date
+  fechaEmbarque?: string  // shipping_date
   informacionAdicional?: string // additional_info
   tipoMercancia: string   // Used for additional_info
   market_id: number
@@ -125,6 +126,11 @@ export const useCreateShipment = () => {
         value: parseFloat(data.valor),
         currency: data.moneda,
         expiration_date: new Date(data.fechaExpiracion).toISOString(),
+        shipping_date: data.fechaEmbarque && 
+          typeof data.fechaEmbarque === 'string' && 
+          data.fechaEmbarque.trim() !== '' 
+          ? new Date(data.fechaEmbarque).toISOString() 
+          : null,
         additional_info: data.informacionAdicional || data.tipoMercancia || '',
       }
 
@@ -147,6 +153,67 @@ export const useCreateShipment = () => {
       }
 
       console.log(`✅ Shipment creado y ${result.agents_notified} agentes notificados en ${result.market_name}`)
+
+      // 🛒 Crear detalles de mercancía si hay datos disponibles
+      const hasDetails = data.pesoTotal || data.tipoMedida || data.cbm || data.unidades || 
+                        data.tipoMercancia || data.cargaClasificacion || data.partidaArancelaria ||
+                        data.contenedor || data.incoterm
+
+      if (hasDetails && result.shipment?.id) {
+        console.log('📦 Creando detalles de mercancía...')
+        
+        // Preparar datos para shipment_details
+        const shipmentDetailsData: ShipmentDetailsInsert = {
+          total_weight: data.pesoTotal,
+          measure_type: data.tipoMedida || undefined,
+          volume: data.cbm,
+          units: data.unidades,
+          merchandise_type: data.tipoMercancia || undefined,
+          dangerous_merch: data.cargaClasificacion ? data.cargaClasificacion.toLowerCase() === 'peligrosa' : false,
+          tariff_item: data.partidaArancelaria || undefined,
+          container_id: data.contenedor ? parseInt(data.contenedor) : undefined,
+          incoterms_id: data.incoterm ? parseInt(data.incoterm) : undefined,
+          special_requirements: data.informacionAdicional || undefined
+        }
+
+        // Filtrar campos undefined/null
+        const cleanedDetailsData = Object.fromEntries(
+          Object.entries(shipmentDetailsData).filter(([_, value]) => value !== undefined && value !== '' && value !== null)
+        )
+
+        if (Object.keys(cleanedDetailsData).length > 0) {
+          console.log('📦 Datos de detalles a insertar:', cleanedDetailsData)
+
+          // Insertar en shipment_details
+          const { data: detailsResult, error: detailsError } = await supabase
+            .from('shipment_details')
+            .insert(cleanedDetailsData)
+            .select('id')
+            .single()
+
+          if (detailsError) {
+            console.error('❌ Error al crear detalles de mercancía:', detailsError)
+            throw new Error(`Error al crear detalles de mercancía: ${detailsError.message}`)
+          }
+
+          if (detailsResult?.id) {
+            console.log(`📦 Detalles de mercancía creados con ID: ${detailsResult.id}`)
+
+            // Actualizar el shipment con el shipment_details_id
+            const { error: updateError } = await supabase
+              .from('shipments')
+              .update({ shipment_details_id: detailsResult.id })
+              .eq('id', result.shipment.id)
+
+            if (updateError) {
+              console.error('❌ Error al vincular detalles con shipment:', updateError)
+              throw new Error(`Error al vincular detalles: ${updateError.message}`)
+            }
+
+            console.log('✅ Detalles de mercancía vinculados correctamente al shipment')
+          }
+        }
+      }
 
       return result.shipment
     },

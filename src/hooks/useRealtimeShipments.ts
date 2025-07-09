@@ -13,9 +13,6 @@ export const useRealtimeShipments = () => {
   useEffect(() => {
     if (!profile?.id) return
     
-    console.log('🚢 REALTIME: Conectando shipments para user:', profile.id)
-
-
     // Crear canal de Supabase Realtime
     const channel = supabase
       .channel('shipments')
@@ -27,14 +24,12 @@ export const useRealtimeShipments = () => {
           table: 'shipments'
         },
                  (payload) => {
-           console.log('🎉 REALTIME: Nuevo shipment detectado', payload.new?.uuid)
            
            // Invalidar queries para que se refresquen automáticamente
            queryClient.invalidateQueries({ queryKey: ['shipments'] })
            queryClient.invalidateQueries({ queryKey: ['bidListByMarket'] })
            queryClient.invalidateQueries({ queryKey: ['bidList'] })
            
-           console.log('✅ REALTIME: Queries invalidadas')
          }
       )
       .on(
@@ -54,7 +49,6 @@ export const useRealtimeShipments = () => {
         }
       )
       .subscribe((status) => {
-        console.log('📡 REALTIME: Estado conexión shipments:', status)
         setIsConnected(status === 'SUBSCRIBED')
       })
 

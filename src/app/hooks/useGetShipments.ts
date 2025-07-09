@@ -79,6 +79,7 @@ export const useGetShipments = ({
         comex_type: shipment.comex_type,
         expiration_date: shipment.expiration_date,
         shipping_type: shipment.shipping_type,
+        shipping_date: shipment.shipping_date,
         value: shipment.value,
         currency: shipment.currency,
         additional_info: shipment.additional_info,

@@ -230,7 +230,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
             <Filter className="h-4 w-4" />
             <span>{showFilters ? t('common.hideFilters') : t('common.showFilters')}</span>
           </Button>
-                     <CreateShipment />
+                     <CreateShipment onRefetch={refetch} />
         </div>
       </CardHeader>
       <CardContent>

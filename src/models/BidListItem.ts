@@ -16,6 +16,7 @@ export class BidListItem {
     public comex_type: string,
     public expiration_date: string,
     public shipping_type: string,
+    public shipping_date: string | null,
     public value: string,
     public currency: string,
     public additional_info: string,

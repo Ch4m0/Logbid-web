@@ -533,8 +533,9 @@
     "destination": "Destination",
     "lastPrice": "Last Price",
     "offersCount": "Offers Count",
-    "creation": "Creation",
-    "finalization": "Finalization",
+    "creation": "Creation date",
+    "finalization": "Finalization date",
+    "shipping": "Shipping date",
     "offers": "Offers",
     "offer": "Offer"
   },
@@ -557,7 +558,8 @@
     "tariffItem": "Tariff Item",
     "value": "Value",
     "currency": "Currency",
-    "shipmentDate": "Shipment Date",
+          "shipmentDate": "Shipment Date",
+      "shippingDate": "Shipping Date",
     "additionalInfo": "Additional Information",
     "select": "Select",
     "enterWeight": "Enter total weight",
@@ -591,7 +593,11 @@
       "valueRequired": "Value is required",
       "onlyNumbers": "Only numbers are allowed in the value field",
       "currencyRequired": "Currency is required",
-      "shipmentDateRequired": "Shipment date is required"
+      "shipmentDateRequired": "Shipment date is required",
+      "dateInvalid": "Invalid date",
+      "dateMustBeFuture": "Date must be after today",
+      "dateNotMoreThanYear": "Date cannot be more than 1 year in the future",
+      "shippingDateMustBeAfterClosing": "Shipping date must be after the closing date"
     },
     "shipmentTypes": {
       "looseCargo": "Loose Cargo",
@@ -615,6 +621,7 @@
     },
     "placeholders": {
       "selectContainer": "Select container",
+      "selectPackaging": "Select packaging",
       "selectMeasure": "Select measure",
       "selectIncoterm": "Select incoterm",
       "selectClassification": "Select classification",

@@ -533,8 +533,9 @@
     "destination": "Destino",
     "lastPrice": "Último Precio",
     "offersCount": "Cantidad de Ofertas",
-    "creation": "Creación",
-    "finalization": "Finalización",
+    "creation": "Fecha de inicio",
+    "finalization": "Fecha de cierre",
+    "shipping": "Fecha de embarque",
     "offers": "Ofertas",
     "offer": "Oferta"
   },
@@ -557,7 +558,8 @@
     "tariffItem": "Partida Arancelaria",
     "value": "Valor",
     "currency": "Moneda",
-    "shipmentDate": "Fecha despacho",
+          "shipmentDate": "Fecha cierre",
+      "shippingDate": "Fecha de Embarque",
     "additionalInfo": "Información adicional",
     "select": "Seleccionar",
     "enterWeight": "Ingrese el peso total",
@@ -591,7 +593,11 @@
       "valueRequired": "El valor es requerido",
       "onlyNumbers": "Solo se permiten números en el campo valor",
       "currencyRequired": "La moneda es requerida",
-      "shipmentDateRequired": "La fecha de despacho es requerida"
+      "shipmentDateRequired": "La fecha de despacho es requerida",
+      "dateInvalid": "Fecha inválida",
+      "dateMustBeFuture": "La fecha debe ser posterior a hoy",
+      "dateNotMoreThanYear": "La fecha no puede ser más de 1 año en el futuro",
+      "shippingDateMustBeAfterClosing": "La fecha de embarque debe ser posterior a la fecha de cierre"
     },
     "shipmentTypes": {
       "looseCargo": "Carga suelta",
@@ -615,6 +621,7 @@
     },
     "placeholders": {
       "selectContainer": "Selecciona contenedor",
+      "selectPackaging": "Selecciona empaque",
       "selectMeasure": "Selecciona medida",
       "selectIncoterm": "Selecciona incoterm",
       "selectClassification": "Selecciona clasificación",

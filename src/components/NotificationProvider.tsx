@@ -24,16 +24,6 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     profile?.role && 
     (profile.role === 'customer' || profile.role === 'agent')
 
-  useEffect(() => {
-    console.log('🔄 PROVIDER: Estado conexiones', {
-      shouldShow: shouldShowNotifications,
-      notifications: isConnected,
-      shipments: shipmentsConnected,
-      user: profile?.email,
-      role: profile?.role
-    })
-  }, [shouldShowNotifications, isConnected, shipmentsConnected, profile?.email, profile?.role])
-
   return (
     <NotificationContext.Provider value={{ isConnected, shipmentsConnected }}>
       {children}
