@@ -44,7 +44,10 @@ export function AgentDashboardView({ profile }: AgentDashboardViewProps) {
   const [languageKey, setLanguageKey] = useState(0)
   
   // Obtener el primer mercado del usuario como default
-  const defaultMarketId = profile?.all_markets?.[0]?.id?.toString() || 'all'
+  const hasMultipleMarkets = profile?.all_markets?.length > 1
+  const defaultMarketId = hasMultipleMarkets 
+    ? 'all' 
+    : (profile?.all_markets?.[0]?.id?.toString() || '')
   
   const [filters, setFilters] = useState({
     marketId: defaultMarketId,
@@ -147,7 +150,9 @@ export function AgentDashboardView({ profile }: AgentDashboardViewProps) {
                   <SelectValue placeholder={t('dashboard.agent.selectMarket')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t('dashboard.agent.allMarkets')}</SelectItem>
+                  {hasMultipleMarkets && (
+                    <SelectItem value="all">{t('dashboard.agent.allMarkets')}</SelectItem>
+                  )}
                   {profile?.all_markets?.map((market: any) => (
                     <SelectItem key={market.id} value={market.id.toString()}>
                       {market.name}

@@ -73,6 +73,8 @@ export function AgentShipmentList({ status }: AgentShipmentListProps) {
     shippingType as ShippingType
   )
 
+  console.log({ shipmentList })
+
   const [filters, setFilters] = useState({
     uuid: 'all',
     origin_name: 'all',

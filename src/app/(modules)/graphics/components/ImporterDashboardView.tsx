@@ -29,7 +29,10 @@ export function ImporterDashboardView({ profile }: ImporterDashboardViewProps) {
   const { t } = useTranslation()
   
   // Obtener el primer mercado del usuario como default
-  const defaultMarketId = profile?.all_markets?.[0]?.id?.toString() || 'all'
+  const hasMultipleMarkets = profile?.all_markets?.length > 1
+  const defaultMarketId = hasMultipleMarkets 
+    ? 'all' 
+    : (profile?.all_markets?.[0]?.id?.toString() || '')
   
   const [filters, setFilters] = useState<CostFilters>({
     marketId: defaultMarketId,
@@ -122,7 +125,9 @@ export function ImporterDashboardView({ profile }: ImporterDashboardViewProps) {
                   <SelectValue placeholder={t('dashboard.customer.selectMarket')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">{t('dashboard.customer.allMarkets')}</SelectItem>
+                  {hasMultipleMarkets && (
+                    <SelectItem value="all">{t('dashboard.customer.allMarkets')}</SelectItem>
+                  )}
                   {profile?.all_markets?.map((market: any) => (
                     <SelectItem key={market.id} value={market.id.toString()}>
                       {market.name}

@@ -838,8 +838,8 @@
     "containerRequired": "Contenedor requerido",
     "securityManifestRequired": "Security manifest requerido",
     "handlingRequired": "Handling requerido",
-    "blEmissionRequired": "BL emission requerido",
-    "agencyFeeRequired": "Agency fee requerido",
+    "blEmissionRequired": "Emission BL requerido",
+    "agencyFeeRequired": "Agenciamiento requerido",
     "collectFeeRequired": "Collect fee requerido",
     "preShipmentInspectionRequired": "Pre shipment inspection requerido",
     "carbonFeeRequired": "Carbon fee requerido",
@@ -864,8 +864,8 @@
     "handling": "Handling",
     "originSubtotal": "Subtotal Origen:",
     "destinationCharges": "Cargos de Destino",
-    "blEmission": "BL Emission",
-    "agency": "Agency",
+    "blEmission": "Emission BL",
+    "agency": "Agenciamiento",
     "collectFee": "Collect Fee",
     "selectCollectFee": "Seleccionar porcentaje de collect fee",
     "customPercentage": "Porcentaje personalizado",
@@ -879,7 +879,7 @@
     "others": "Otros",
     "otherSubtotal": "Subtotal Otros:",
     "totalCost": "Costo Total",
-    "saveQuote": "Guardar Cotización"
+    "saveQuote": "Cotizar"
   },
   "proposalFormAir": {
     "cargoQuote": "Cotización de Carga Aérea",
