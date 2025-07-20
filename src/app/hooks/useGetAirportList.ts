@@ -47,6 +47,7 @@ export const useGetAirportList = (searchQuery = '', enabled = true) => {
         airport_name: airport.airport_name,
         name: airport.airport_name,
         country: airport.country,
+        country_code: airport.country_code,
         code: airport.airport_code,
         iata: airport.airport_code,
         icao: airport.un_code,

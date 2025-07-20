@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react'
 interface Option {
   airport_name: string
   country: string
+  country_code?: string
   iata?: string
   icao?: string
   id: number
@@ -71,15 +72,26 @@ export default function FilterableSelectAirport({
 
   // Sincronizar el valor seleccionado con la opción actual
   useEffect(() => {
-    if (value) {
+    // Solo intentar sincronizar si hay un valor y hay opciones disponibles
+    if (value && allOptions.length > 0) {
       const selected = allOptions.find(
         (option) => option.id.toString() === value
       )
-      if (selected) {
+      if (selected && (!selectedOption || selectedOption.id.toString() !== value)) {
         setSelectedOption(selected)
       }
+    } else if (!value && selectedOption) {
+      // Si no hay valor pero hay una opción seleccionada, limpiarla
+      setSelectedOption(undefined)
     }
-  }, [value, allOptions])
+  }, [value, allOptions, selectedOption])
+
+  // Limpiar la selección cuando se cambia el prop value a undefined o empty
+  useEffect(() => {
+    if (!value) {
+      setSelectedOption(undefined)
+    }
+  }, [value])
 
   return (
     <div className="grid gap-2">
@@ -94,8 +106,13 @@ export default function FilterableSelectAirport({
           className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           onClick={() => setIsDropdownOpen((prev) => !prev)}
         >
-          {selectedOption ? selectedOption.airport_name : 'Seleccionar'}
-          <span className="h-4 w-4 opacity-50">
+          <span className="truncate">
+            {selectedOption 
+              ? `${selectedOption.country} ${selectedOption.country_code ? `(${selectedOption.country_code})` : ''}`
+              : 'Seleccionar'
+            }
+          </span>
+          <span className="h-4 w-4 opacity-50 flex-shrink-0">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -137,13 +154,22 @@ export default function FilterableSelectAirport({
                   onClick={() => handleOptionClick(option)}
                   className={`relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground ${
                     isSearching ? 'opacity-50 pointer-events-none' : ''
-                  }`}
+                  } ${selectedOption?.id === option.id ? 'bg-accent text-accent-foreground' : ''}`}
                 >
-                  {option.country} - {option.airport_name} {option.iata ? `(${option.iata})` : ''}
+                  <div className="truncate">
+                    <div className="font-medium">
+                      {option.country} {option.country_code ? `(${option.country_code})` : ''}
+                    </div>
+                  </div>
                 </div>
               ))}
               {isFetchingNextPage && (
                 <div className="p-2 text-center">Cargando más...</div>
+              )}
+              {allOptions.length === 0 && !isFetchingNextPage && search && (
+                <div className="p-2 text-center text-muted-foreground">
+                  No se encontraron aeropuertos
+                </div>
               )}
             </div>
           </div>
