@@ -209,8 +209,7 @@ export default function Auth() {
                 </div>
 
                 <Button
-                  type="button"
-                  onClick={handleLogin}
+                  type="submit"
                   className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-base rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
                   disabled={isLoading}
                 >
