@@ -84,7 +84,7 @@ export function AgentShipmentList({ status }: AgentShipmentListProps) {
   })
 
   const currentPage = Number(searchParams.get('page')) || 1
-  const [sort, setSort] = useState({ key: 'id', order: 'asc' })
+  const [sort, setSort] = useState({ key: '', order: '' })
   const [showFilters, setShowFilters] = useState(false)
   const [itemsPerPage] = useState(10)
 
@@ -176,22 +176,26 @@ export function AgentShipmentList({ status }: AgentShipmentListProps) {
 
       return Object.keys(filterChecks).every(key => filterChecks[key as keyof typeof filterChecks]());
     })
-    .sort((a: ShipmentData, b: ShipmentData) => {
-      const aValue = a[sort.key as keyof ShipmentData]
-      const bValue = b[sort.key as keyof ShipmentData]
 
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
+  // Solo aplicar ordenamiento si el usuario ha seleccionado una columna específica
+  const sortedList = sort.key && sort.order 
+    ? filteredList?.sort((a: ShipmentData, b: ShipmentData) => {
+        const aValue = a[sort.key as keyof ShipmentData]
+        const bValue = b[sort.key as keyof ShipmentData]
+
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          return sort.order === 'asc'
+            ? aValue.localeCompare(bValue)
+            : bValue.localeCompare(aValue)
+        }
+
         return sort.order === 'asc'
-          ? aValue.localeCompare(bValue)
-          : bValue.localeCompare(aValue)
-      }
+          ? Number(aValue || 0) - Number(bValue || 0)
+          : Number(bValue || 0) - Number(aValue || 0)
+      })
+    : filteredList
 
-      return sort.order === 'asc'
-        ? Number(aValue || 0) - Number(bValue || 0)
-        : Number(bValue || 0) - Number(aValue || 0)
-    })
-
-  const paginatedList = filteredList?.slice(
+  const paginatedList = sortedList?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   )
@@ -331,7 +335,7 @@ export function AgentShipmentList({ status }: AgentShipmentListProps) {
             </Card>
           ))}
 
-          {(filteredList?.length || 0) === 0 && (
+          {(sortedList?.length || 0) === 0 && (
             <div className="text-center py-8">
               <Package className="h-12 w-12 mx-auto text-muted-foreground" />
               <h3 className="mt-2 text-lg font-medium">
@@ -347,7 +351,7 @@ export function AgentShipmentList({ status }: AgentShipmentListProps) {
         <div className="w-full flex justify-end mt-6">
           <Suspense fallback={<div>Loading...</div>}>
             <Pagination
-              totalPages={Math.ceil((filteredList?.length || 0) / itemsPerPage)}
+              totalPages={Math.ceil((sortedList?.length || 0) / itemsPerPage)}
             />
           </Suspense>
         </div>

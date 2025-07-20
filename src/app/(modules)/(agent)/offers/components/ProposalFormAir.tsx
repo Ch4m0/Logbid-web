@@ -1,15 +1,8 @@
 'use client'
 
 import { Button } from '@/src/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/src/components/ui/card'
 import { Input } from '@/src/components/ui/input'
 import { Label } from '@/src/components/ui/label'
-import { Separator } from '@/src/components/ui/separator'
 import {
   Select,
   SelectContent,
@@ -17,14 +10,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/components/ui/select'
-import { useFormik } from 'formik'
-import { useEffect, useState, memo } from 'react'
-import * as Yup from 'yup'
+import { Separator } from '@/src/components/ui/separator'
 import { useTranslation } from '@/src/hooks/useTranslation'
+import { useFormik } from 'formik'
+import { memo, useEffect, useState } from 'react'
+import * as Yup from 'yup'
 
 interface ProposalFormProps {
   initialData?: CargoQuote
   onSubmit?: (values: CargoQuote) => void
+  bidDataForAgent?: any
 }
 
 interface CargoQuote {
@@ -157,6 +152,7 @@ SelectField.displayName = 'SelectField'
 export default function ProposalFormAir({
   initialData,
   onSubmit,
+  bidDataForAgent,
 }: ProposalFormProps) {
   const { t } = useTranslation()
   const [hasErrors, setHasErrors] = useState(false)

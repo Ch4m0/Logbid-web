@@ -49,18 +49,21 @@ export const useGetShipment = ({ shipment_id }: Args) => {
       let incotermInfo = null
 
       if (shipmentDetails?.container_id) {
-        const { data: container } = await supabase
+        const { data: container, error: containerError } = await supabase
           .from('containers')
-          .select('name, description')
+          .select('name, type, shipping_type')
           .eq('id', shipmentDetails.container_id)
           .single()
-        containerInfo = container
+        
+        if (!containerError) {
+          containerInfo = container
+        }
       }
 
       if (shipmentDetails?.incoterms_id) {
         const { data: incoterm } = await supabase
           .from('incoterms')
-          .select('name, description')
+          .select('name, english_name')
           .eq('id', shipmentDetails.incoterms_id)
           .single()
         incotermInfo = incoterm

@@ -1,15 +1,8 @@
 'use client'
 
 import { Button } from '@/src/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/src/components/ui/card'
 import { Input } from '@/src/components/ui/input'
 import { Label } from '@/src/components/ui/label'
-import { Separator } from '@/src/components/ui/separator'
 import {
   Select,
   SelectContent,
@@ -17,14 +10,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/components/ui/select'
-import { useFormik } from 'formik'
-import { useEffect, useState, memo } from 'react'
-import * as Yup from 'yup'
+import { Separator } from '@/src/components/ui/separator'
 import { useTranslation } from '@/src/hooks/useTranslation'
+import { useFormik } from 'formik'
+import { memo, useEffect, useState } from 'react'
+import * as Yup from 'yup'
 
 interface ProposalFormProps {
   initialData?: CargoQuote
   onSubmit?: (values: CargoQuote) => void
+  bidDataForAgent?: any
 }
 
 export interface CargoQuote {
@@ -33,10 +28,6 @@ export interface CargoQuote {
   price: number
   shipping_type: string
   basic_service: {
-    validity: {
-      time: number
-      unit: string
-    }
     cancellation_fee: number
     free_days: number
   }
@@ -128,6 +119,7 @@ export const SelectField = ({
   touched,
   options,
   placeholder,
+  disabled,
 }: {
   label: string
   id: string
@@ -136,6 +128,7 @@ export const SelectField = ({
   touched?: boolean
   options: { value: string; label: string }[]
   placeholder?: string
+  disabled?: boolean
 }) => {
   const { value } = formik.getFieldProps(id)
   
@@ -145,8 +138,9 @@ export const SelectField = ({
       <Select 
         value={value} 
         onValueChange={(newValue) => formik.setFieldValue(id, newValue)}
+        disabled={disabled}
       >
-        <SelectTrigger className={touched && error ? 'border-red-500' : ''}>
+        <SelectTrigger className={`${touched && error ? 'border-red-500' : ''} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
@@ -168,6 +162,7 @@ export const SelectField = ({
 export default function ProposalFormSea({
   initialData,
   onSubmit,
+  bidDataForAgent,
 }: ProposalFormProps) {
   const { t } = useTranslation()
   const [subtotals, setSubtotals] = useState({
@@ -177,14 +172,9 @@ export default function ProposalFormSea({
     other: 0,
     total: 0,
   })
+  console.log({ bidDataForAgent })
 
   // Opciones para los campos Select
-  const timeUnits = [
-    { value: 'days', label: t('proposalForm.days') || 'Days' },
-    { value: 'hours', label: t('proposalForm.hours') || 'Hours' },
-    { value: 'minutes', label: t('proposalForm.minutes') || 'Minutes' },
-  ]
-
   const containerTypes = [
     { value: '20GP', label: '20\' General Purpose (20GP)' },
     { value: '40GP', label: '40\' General Purpose (40GP)' },
@@ -210,12 +200,6 @@ export default function ProposalFormSea({
 
   const validationSchema = Yup.object().shape({
     shipping_type: Yup.string().required(t('proposalForm.shippingTypeRequired')),
-    basic_service: Yup.object().shape({
-      validity: Yup.object().shape({
-        time: Yup.number().required(t('proposalForm.timeRequired')).min(0),
-        unit: Yup.string().required(t('proposalForm.unitRequired')),
-      }),
-    }),
     freight_fees: Yup.object().shape({
       value: Yup.number().required(t('proposalForm.valueRequired')).min(0),
       container: Yup.string().required(t('proposalForm.containerRequired')),
@@ -254,16 +238,12 @@ export default function ProposalFormSea({
       shipping_type: 'Marítimo',
       price: 0,
       basic_service: {
-        validity: {
-          time: 30,
-          unit: '',
-        },
         cancellation_fee: 100,
         free_days: 30,
       },
       freight_fees: {
         value: 5000,
-        container: '',
+        container: bidDataForAgent?.container_name,
       },
       origin_fees: {
         security_manifest: 100,
@@ -340,39 +320,6 @@ export default function ProposalFormSea({
   return (
     <div className="space-y-6">
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Sección 1: Servicio Básico */}
-        <div className="space-y-4 bg-gray-50 p-6 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800 border-b border-gray-300 pb-3">
-            🚢 {t('proposalForm.basicService')}
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              label={t('proposalForm.validityTime')}
-              id="basic_service.validity.time"
-              type="number"
-              placeholder="30"
-              formik={formik}
-              error={formik.errors.basic_service?.validity?.time as string}
-              touched={
-                formik.touched.basic_service?.validity?.time as boolean
-              }
-            />
-            <SelectField
-              label={t('proposalForm.unit')}
-              id="basic_service.validity.unit"
-              formik={formik}
-              options={timeUnits}
-              placeholder={t('proposalForm.selectTimeUnit') || 'Días'}
-              error={formik.errors.basic_service?.validity?.unit as string}
-              touched={
-                formik.touched.basic_service?.validity?.unit as boolean
-              }
-            />
-          </div>
-        </div>
-
-        <Separator className="my-6" />
-
         {/* Sección 2: Cargos de Flete */}
         <div className="space-y-4 bg-gray-50 p-6 rounded-lg border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-800 border-b border-gray-300 pb-3">
@@ -388,15 +335,13 @@ export default function ProposalFormSea({
               error={formik.errors.freight_fees?.value as string}
               touched={formik.touched.freight_fees?.value as boolean}
             />
-            <SelectField
-              label={t('proposalForm.container')}
-              id="freight_fees.container"
-              formik={formik}
-              options={containerTypes}
-              placeholder={t('proposalForm.selectContainer') || '40HC'}
-              error={formik.errors.freight_fees?.container as string}
-              touched={formik.touched.freight_fees?.container as boolean}
-            />
+            
+              <div>
+                <Label>{t('proposalForm.container')}</Label>
+                <div className="mt-1  rounded-md">
+                  <span className="text-sm text-gray-500 ml-2">{bidDataForAgent?.container_name}</span>
+                </div>
+              </div>
           </div>
           <SubtotalDisplay label={t('proposalForm.freightSubtotal')} amount={subtotals.freight} />
         </div>

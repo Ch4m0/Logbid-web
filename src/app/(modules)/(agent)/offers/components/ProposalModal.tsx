@@ -16,12 +16,14 @@ import { useTranslation } from '@/src/hooks/useTranslation'
 interface ProposalModalProps {
   shippingType: string
   bidDataShippingType: string
+  bidDataForAgent?: any
   onSubmit: (value: any) => void
 }
 
 export default function ProposalModal({ 
   shippingType, 
   bidDataShippingType, 
+  bidDataForAgent,
   onSubmit 
 }: ProposalModalProps) {
   const { t } = useTranslation()
@@ -58,9 +60,9 @@ export default function ProposalModal({
         {/* Contenido con scroll */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {isMaritimo ? (
-            <ProposalFormSea onSubmit={handleSubmit} />
+            <ProposalFormSea onSubmit={handleSubmit} bidDataForAgent={bidDataForAgent} />
           ) : (
-            <ProposalFormAir onSubmit={handleSubmit} />
+            <ProposalFormAir onSubmit={handleSubmit} bidDataForAgent={bidDataForAgent} />
           )}
         </div>
       </DialogContent>

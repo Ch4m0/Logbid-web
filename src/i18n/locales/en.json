@@ -698,6 +698,8 @@
     "units": "Units",
     "totalWeight": "Total Weight",
     "volume": "Volume",
+    "containerType": "Container Type",
+    "tariffItem": "Tariff Item",
     "priceInformation": "Price Information",
     "lowestPrice": "Lowest Price",
     "lastPrice": "Last Price",

@@ -91,6 +91,14 @@ const BidInfo = ({ bidDataForAgent }: any) => {
               <span className="font-bold">{t('bidInfo.volume')}:</span>
               <span>{getMerchandiseValue('volume')}</span>
             </div>
+            <div className="flex items-center gap-2">
+              <span className="font-bold">{t('bidInfo.containerType')}:</span>
+              <span>{bidDataForAgent.container_name || t('common.notSpecified')}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-bold">{t('bidInfo.tariffItem')}:</span>
+              <span>{getMerchandiseValue('tariff_item')}</span>
+            </div>
           </div>
         </div>
 

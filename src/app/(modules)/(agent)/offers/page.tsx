@@ -1,21 +1,19 @@
 "use client"
 import { useCreateOffer } from "@/src/app/hooks/useCreateOffer"
 import { useGetShipment } from "@/src/app/hooks/useGetShipment"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/src/components/ui/accordion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { toast } from "@/src/components/ui/use-toast"
+import { useTranslation } from "@/src/hooks/useTranslation"
 import { modalService } from "@/src/service/modalService"
 import useAuthStore from "@/src/store/authStore"
 import { ArrowLeft, DollarSign } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react"
+import { Suspense, useCallback, useMemo, useState } from "react"
 import Pagination from "../../common/components/pagination/Pagination"
 import AdvancedFilters from "./components/AdvancedFilters"
 import BidInfo from "./components/BidInfo"
 import OfferCard from "./components/OfferCard"
 import ProposalModal from "./components/ProposalModal"
-import { FiltersOffer } from '@/src/models/FiltersOffer'
-import { useTranslation } from "@/src/hooks/useTranslation"
 
 const OffersPageContent = () => {
   const { t } = useTranslation()
@@ -250,6 +248,7 @@ const OffersPageContent = () => {
               <ProposalModal 
                 shippingType={shippingType}
                 bidDataShippingType={bidDataForAgent?.shipping_type || shippingType}
+                bidDataForAgent={bidDataForAgent}
                 onSubmit={handleCreateOffer}
               />
             )}
