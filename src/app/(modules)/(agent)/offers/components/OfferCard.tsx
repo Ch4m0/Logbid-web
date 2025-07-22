@@ -168,15 +168,15 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
         {expandedOffers[offer.id] && offer.details && (
           <div className="border-t border-border p-4">
             <Tabs defaultValue="freight">
-              <TabsList className="grid grid-cols-5 mb-4">
-                <TabsTrigger value="freight">{t('offerCard.freight')}</TabsTrigger>
+              <TabsList className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 mb-4 h-auto">
+                <TabsTrigger value="freight" className="text-xs sm:text-sm">{t('offerCard.freight')}</TabsTrigger>
                 {offer.shipping_type === "Aéreo" && offer.details.additional_fees && (
-                  <TabsTrigger value="additional">{t('offerCard.additionalCharges')}</TabsTrigger>
+                  <TabsTrigger value="additional" className="text-xs sm:text-sm">{t('offerCard.additionalCharges')}</TabsTrigger>
                 )}
-                {offer.details.origin_fees && <TabsTrigger value="origin">{t('offerCard.origin')}</TabsTrigger>}
-                {offer.details.destination_fees && <TabsTrigger value="destination">{t('offerCard.destination')}</TabsTrigger>}
-                {offer.details.basic_service && <TabsTrigger value="basic">{t('offerCard.basicService')}</TabsTrigger>}
-                <TabsTrigger value="other">{t('offerCard.otherCharges')}</TabsTrigger>
+                {offer.details.origin_fees && <TabsTrigger value="origin" className="text-xs sm:text-sm">{t('offerCard.origin')}</TabsTrigger>}
+                {offer.details.destination_fees && <TabsTrigger value="destination" className="text-xs sm:text-sm">{t('offerCard.destination')}</TabsTrigger>}
+                {offer.details.basic_service && <TabsTrigger value="basic" className="text-xs sm:text-sm">{t('offerCard.basicService')}</TabsTrigger>}
+                <TabsTrigger value="other" className="text-xs sm:text-sm">{t('offerCard.otherCharges')}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="freight" className="space-y-2">

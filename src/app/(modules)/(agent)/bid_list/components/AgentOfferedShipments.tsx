@@ -110,82 +110,174 @@ export function AgentOfferedShipments({ status }: AgentOfferedShipmentsProps) {
             </p>
           </div>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="font-bold text-black">
-                  {t('cargoList.transactionId')}
-                </TableHead>
-                <TableHead className="font-bold text-black">
-                  {t('cargoList.origin')}
-                </TableHead>
-                <TableHead className="font-bold text-black">
-                  {t('cargoList.destination')}
-                </TableHead>
-                <TableHead className="font-bold text-black">
-                  {t('cargoList.creationDate')}
-                </TableHead>
-                <TableHead className="font-bold text-black">
-                  {t('cargoList.lastPrice')}
-                </TableHead>
-                <TableHead className="font-bold text-black">
-                  {t('cargoList.offersCount')}
-                </TableHead>
-                <TableHead className="font-bold text-black">
-                  {t('agentOffers.myOffers')}
-                </TableHead>
-                <TableHead className="font-bold text-black">
-                  {t('cargoList.offers')}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="font-bold text-black">
+                      {t('cargoList.transactionId')}
+                    </TableHead>
+                    <TableHead className="font-bold text-black">
+                      {t('cargoList.origin')}
+                    </TableHead>
+                    <TableHead className="font-bold text-black">
+                      {t('cargoList.destination')}
+                    </TableHead>
+                    <TableHead className="font-bold text-black">
+                      {t('cargoList.creationDate')}
+                    </TableHead>
+                    <TableHead className="font-bold text-black">
+                      {t('cargoList.lastPrice')}
+                    </TableHead>
+                    <TableHead className="font-bold text-black">
+                      {t('cargoList.offersCount')}
+                    </TableHead>
+                    <TableHead className="font-bold text-black">
+                      {t('agentOffers.myOffers')}
+                    </TableHead>
+                    <TableHead className="font-bold text-black">
+                      {t('cargoList.offers')}
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedShipments.map((shipment: any) => {
+                    const myOffers = shipment.offers?.filter((offer: any) => 
+                      offer.agent_id === user?.id
+                    ) || []
+                    
+                    return (
+                      <TableRow key={shipment.id}>
+                        <TableCell className="font-medium">
+                          {shipment.uuid}
+                        </TableCell>
+                        <TableCell>{shipment.origin}</TableCell>
+                        <TableCell>{shipment.destination}</TableCell>
+                        <TableCell>
+                          {format(new Date(shipment.inserted_at), 'dd/MM/yyyy HH:mm', {
+                            locale: dateLocale,
+                          })}
+                        </TableCell>
+                        <TableCell>
+                          {shipment.last_price ? `$${shipment.last_price}` : 'N/A'}
+                        </TableCell>
+                        <TableCell>
+                          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">
+                            {shipment.offers_count}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
+                            {myOffers.length}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <Link href={`/offers?offer_id=${shipment.uuid}&market_id=${marketId}&shipping_type=${shippingType}`}>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="hover:bg-blue-50"
+                            >
+                              {t('cargoList.offers')}
+                            </Button>
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Mobile Cards View */}
+            <div className="md:hidden space-y-4">
               {paginatedShipments.map((shipment: any) => {
                 const myOffers = shipment.offers?.filter((offer: any) => 
                   offer.agent_id === user?.id
                 ) || []
                 
                 return (
-                  <TableRow key={shipment.id}>
-                    <TableCell className="font-medium">
-                      {shipment.uuid}
-                    </TableCell>
-                    <TableCell>{shipment.origin}</TableCell>
-                    <TableCell>{shipment.destination}</TableCell>
-                    <TableCell>
-                      {format(new Date(shipment.inserted_at), 'dd/MM/yyyy HH:mm', {
-                        locale: dateLocale,
-                      })}
-                    </TableCell>
-                    <TableCell>
-                      {shipment.last_price ? `$${shipment.last_price}` : 'N/A'}
-                    </TableCell>
-                    <TableCell>
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm">
-                        {shipment.offers_count}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm">
-                        {myOffers.length}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <Link href={`/offers?offer_id=${shipment.uuid}&market_id=${marketId}&shipping_type=${shippingType}`}>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="hover:bg-blue-50"
-                        >
-                          {t('cargoList.offers')}
-                        </Button>
-                      </Link>
-                    </TableCell>
-                  </TableRow>
+                  <Card key={shipment.id} className="border border-gray-200">
+                    <CardContent className="p-4">
+                      {/* Header with ID and badges */}
+                      <div className="flex flex-col gap-2 mb-3">
+                        <div className="flex justify-between items-start">
+                          <div className="text-sm font-medium text-gray-600">
+                            {t('cargoList.transactionId')}
+                          </div>
+                          <div className="flex gap-2">
+                            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
+                              {shipment.offers_count} ofertas
+                            </span>
+                            <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                              {myOffers.length} mías
+                            </span>
+                          </div>
+                        </div>
+                        <div className="font-mono text-sm text-gray-900 break-all">
+                          {shipment.uuid}
+                        </div>
+                      </div>
+
+                      {/* Route */}
+                      <div className="mb-3">
+                        <div className="text-sm font-medium text-gray-600 mb-1">
+                          Ruta
+                        </div>
+                        <div className="text-sm text-gray-900">
+                          <span className="font-medium">{shipment.origin}</span>
+                          <span className="mx-2 text-gray-400">→</span>
+                          <span className="font-medium">{shipment.destination}</span>
+                        </div>
+                      </div>
+
+                      {/* Date and Price */}
+                      <div className="grid grid-cols-2 gap-4 mb-3">
+                        <div>
+                          <div className="text-sm font-medium text-gray-600 mb-1">
+                            {t('cargoList.creationDate')}
+                          </div>
+                          <div className="text-sm text-gray-900">
+                            {format(new Date(shipment.inserted_at), 'dd/MM/yyyy', {
+                              locale: dateLocale,
+                            })}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {format(new Date(shipment.inserted_at), 'HH:mm', {
+                              locale: dateLocale,
+                            })}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-gray-600 mb-1">
+                            {t('cargoList.lastPrice')}
+                          </div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {shipment.last_price ? `$${shipment.last_price}` : 'N/A'}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Action Button */}
+                      <div className="pt-3 border-t border-gray-100">
+                        <Link href={`/offers?offer_id=${shipment.uuid}&market_id=${marketId}&shipping_type=${shippingType}`}>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="w-full hover:bg-blue-50"
+                          >
+                            {t('cargoList.offers')}
+                          </Button>
+                        </Link>
+                      </div>
+                    </CardContent>
+                  </Card>
                 )
               })}
-            </TableBody>
-          </Table>
+            </div>
+          </>
         )}
         
         {/* Paginación */}

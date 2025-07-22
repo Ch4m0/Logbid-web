@@ -128,19 +128,17 @@ const MenuHeaderContent: React.FC = () => {
       <div className="w-px h-4 sm:h-5 md:h-6 bg-gray-300"></div>
 
       <div
-        className="flex flex-col items-center cursor-pointer transition-colors duration-200 min-w-[40px] sm:min-w-[48px]"
-        onClick={() => handleSelect('land')}
+        className="flex flex-col items-center cursor-not-allowed transition-colors duration-200 min-w-[40px] sm:min-w-[48px] opacity-50"
       >
-        <Truck className={`h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 ${getColorClass('land')}`} />
+        <Truck className={`h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-gray-400`} />
       </div>
 
       <div className="w-px h-4 sm:h-5 md:h-6 bg-gray-300"></div>
 
       <div
-        className="flex flex-col items-center cursor-pointer transition-colors duration-200 min-w-[40px] sm:min-w-[48px]"
-        onClick={() => handleSelect('warehouse')}
+        className="flex flex-col items-center cursor-not-allowed transition-colors duration-200 min-w-[40px] sm:min-w-[48px] opacity-50"
       >
-        <Warehouse className={`h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 ${getColorClass('warehouse')}`} />
+        <Warehouse className={`h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-gray-400`} />
       </div>
     </div>
   )
