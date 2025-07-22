@@ -8,7 +8,8 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '@/src/components/ui/button'
 import { Card, CardContent } from '@/src/components/ui/card'
-import { Ship, Package, ArrowRight, Shield, Globe, Users } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/src/components/ui/dialog'
+import { Ship, Package, ArrowRight, Shield, Globe, Users, Mail, ArrowLeft } from 'lucide-react'
 import { createSupabaseClient } from '@/src/utils/supabase/client'
 import { getUserProfileClient } from '@/src/utils/auth-client'
 
@@ -22,6 +23,13 @@ export default function Auth() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  
+  // Estados para reset de contraseña
+  const [resetEmail, setResetEmail] = useState('')
+  const [resetError, setResetError] = useState<string | null>(null)
+  const [resetSuccess, setResetSuccess] = useState(false)
+  const [isResetLoading, setIsResetLoading] = useState(false)
+  const [showResetDialog, setShowResetDialog] = useState(false)
 
   const { setUser, setProfile } = useAuthStore()
 
@@ -95,6 +103,48 @@ export default function Auth() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    try {
+      setIsResetLoading(true)
+      setResetError(null)
+
+      const supabase = createSupabaseClient()
+      
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
+      })
+
+      if (error) {
+        // Manejar diferentes tipos de errores
+        if (error.message.includes('over_email_send_rate_limit') || error.message.includes('email rate limit exceeded')) {
+          setResetError('Has alcanzado el límite de emails. Por favor espera 1 hora antes de intentar nuevamente.')
+        } else if (error.message.includes('User not found') || error.message.includes('Invalid email')) {
+          setResetError('No se encontró una cuenta con este email.')
+        } else {
+          setResetError(error.message)
+        }
+        return
+      }
+
+      setResetSuccess(true)
+    } catch (err) {
+      console.error('Error during password reset:', err)
+      setResetError('Error inesperado al enviar el email de recuperación')
+    } finally {
+      setIsResetLoading(false)
+    }
+  }
+
+  const handleResetDialogClose = () => {
+    setShowResetDialog(false)
+    setResetEmail('')
+    setResetError(null)
+    setResetSuccess(false)
+    setIsResetLoading(false)
   }
 
   const handleUserRole = (roleId: number, market_id: number) => {
@@ -235,13 +285,98 @@ export default function Auth() {
                 )}
 
                 <div className="text-center pt-2 space-y-2">
-                  <Link
-                    href="#"
-                    className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors block"
-                    prefetch={false}
-                  >
-                    {t('auth.forgotPassword')}
-                  </Link>
+                  <Dialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+                    <DialogTrigger asChild>
+                      <button
+                        type="button"
+                        className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors block w-full cursor-pointer"
+                      >
+                        {t('auth.forgotPassword')}
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                      <DialogHeader>
+                        <DialogTitle className="text-xl font-semibold text-gray-900">
+                          Recuperar contraseña
+                        </DialogTitle>
+                      </DialogHeader>
+                      
+                      {!resetSuccess ? (
+                        <form onSubmit={handlePasswordReset} className="space-y-4">
+                          <div className="text-sm text-gray-600 mb-4">
+                            Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.
+                          </div>
+                          
+                          <div>
+                            <Label htmlFor="reset-email" className="text-sm font-medium text-gray-700">
+                              Correo electrónico
+                            </Label>
+                            <Input
+                              id="reset-email"
+                              type="email"
+                              placeholder="tu@email.com"
+                              value={resetEmail}
+                              onChange={(e) => setResetEmail(e.target.value)}
+                              required
+                              className="mt-1"
+                              disabled={isResetLoading}
+                            />
+                          </div>
+
+                          {resetError && (
+                            <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                              <p className="text-red-700 text-sm">{resetError}</p>
+                            </div>
+                          )}
+
+                          <div className="flex space-x-3 pt-4">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={handleResetDialogClose}
+                              className="flex-1"
+                              disabled={isResetLoading}
+                            >
+                              <ArrowLeft className="w-4 h-4 mr-2" />
+                              Cancelar
+                            </Button>
+                            <Button
+                              type="submit"
+                              className="flex-1 bg-blue-600 hover:bg-blue-700"
+                              disabled={isResetLoading || !resetEmail}
+                            >
+                              {isResetLoading ? (
+                                <Package className="w-4 h-4 animate-spin mr-2" />
+                              ) : (
+                                <Mail className="w-4 h-4 mr-2" />
+                              )}
+                              {isResetLoading ? 'Enviando...' : 'Enviar enlace'}
+                            </Button>
+                          </div>
+                        </form>
+                      ) : (
+                        <div className="text-center py-6">
+                          <div className="mx-auto flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+                            <Mail className="w-8 h-8 text-green-600" />
+                          </div>
+                          <h3 className="text-lg font-medium text-gray-900 mb-2">
+                            ¡Email enviado!
+                          </h3>
+                          <p className="text-sm text-gray-600 mb-6">
+                            Te hemos enviado un enlace para restablecer tu contraseña a <strong>{resetEmail}</strong>.
+                            Revisa tu bandeja de entrada y sigue las instrucciones.
+                          </p>
+                          <Button 
+                            onClick={handleResetDialogClose}
+                            className="w-full bg-blue-600 hover:bg-blue-700"
+                          >
+                            Entendido
+                          </Button>
+                        </div>
+                      )}
+                    </DialogContent>
+                  </Dialog>
+                  
                   <Link
                     href="/auth/register"
                     className="text-sm text-green-600 hover:text-green-800 font-medium transition-colors block"
