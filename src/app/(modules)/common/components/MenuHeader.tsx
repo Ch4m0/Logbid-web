@@ -108,39 +108,39 @@ const MenuHeaderContent: React.FC = () => {
   }
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-2 sm:gap-3 md:gap-4 overflow-x-auto pb-2">
       <div
-        className="flex flex-col items-center cursor-pointer transition-colors duration-200"
+        className="flex flex-col items-center cursor-pointer transition-colors duration-200 min-w-[40px] sm:min-w-[48px]"
         onClick={() => handleSelect('sea')}
       >
-        <Ship className={`h-8 w-8 ${getColorClass('sea')}`} />
+        <Ship className={`h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 ${getColorClass('sea')}`} />
       </div>
 
-      <div className="w-px" style={{ height: '1.5rem', backgroundColor: '#ccc' }}></div>
+      <div className="w-px h-4 sm:h-5 md:h-6 bg-gray-300"></div>
 
       <div
-        className="flex flex-col items-center cursor-pointer transition-colors duration-200"
+        className="flex flex-col items-center cursor-pointer transition-colors duration-200 min-w-[40px] sm:min-w-[48px]"
         onClick={() => handleSelect('air')}
       >
-        <Plane className={`h-8 w-8 ${getColorClass('air')}`} />
+        <Plane className={`h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 ${getColorClass('air')}`} />
       </div>
 
-      <div className="w-px" style={{ height: '1.5rem', backgroundColor: '#ccc' }}></div>
+      <div className="w-px h-4 sm:h-5 md:h-6 bg-gray-300"></div>
 
       <div
-        className="flex flex-col items-center cursor-pointer transition-colors duration-200"
+        className="flex flex-col items-center cursor-pointer transition-colors duration-200 min-w-[40px] sm:min-w-[48px]"
         onClick={() => handleSelect('land')}
       >
-        <Truck className={`h-8 w-8 ${getColorClass('land')}`} />
+        <Truck className={`h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 ${getColorClass('land')}`} />
       </div>
 
-      <div className="w-px" style={{ height: '1.5rem', backgroundColor: '#ccc' }}></div>
+      <div className="w-px h-4 sm:h-5 md:h-6 bg-gray-300"></div>
 
       <div
-        className="flex flex-col items-center cursor-pointer transition-colors duration-200"
+        className="flex flex-col items-center cursor-pointer transition-colors duration-200 min-w-[40px] sm:min-w-[48px]"
         onClick={() => handleSelect('warehouse')}
       >
-        <Warehouse className={`h-8 w-8 ${getColorClass('warehouse')}`} />
+        <Warehouse className={`h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 ${getColorClass('warehouse')}`} />
       </div>
     </div>
   )
@@ -149,14 +149,14 @@ const MenuHeaderContent: React.FC = () => {
 const MenuHeader: React.FC = () => {
   return (
     <Suspense fallback={
-      <div className="flex items-center gap-4">
-        <div className="h-8 w-8 bg-gray-200 rounded animate-pulse"></div>
-        <div className="w-px h-6 bg-gray-200"></div>
-        <div className="h-8 w-8 bg-gray-200 rounded animate-pulse"></div>
-        <div className="w-px h-6 bg-gray-200"></div>
-        <div className="h-8 w-8 bg-gray-200 rounded animate-pulse"></div>
-        <div className="w-px h-6 bg-gray-200"></div>
-        <div className="h-8 w-8 bg-gray-200 rounded animate-pulse"></div>
+      <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
+        <div className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 bg-gray-200 rounded animate-pulse"></div>
+        <div className="w-px h-4 sm:h-5 md:h-6 bg-gray-200"></div>
+        <div className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 bg-gray-200 rounded animate-pulse"></div>
+        <div className="w-px h-4 sm:h-5 md:h-6 bg-gray-200"></div>
+        <div className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 bg-gray-200 rounded animate-pulse"></div>
+        <div className="w-px h-4 sm:h-5 md:h-6 bg-gray-200"></div>
+        <div className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 bg-gray-200 rounded animate-pulse"></div>
       </div>
     }>
       <MenuHeaderContent />

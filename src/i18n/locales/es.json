@@ -120,7 +120,7 @@
   },
   "dashboard": {
     "customer": {
-      "title": "Dashboard de Importador",
+      "title": "Dashboard",
       "subtitle": "Análisis de costos y performance logística",
       "loading": "Cargando dashboard...",
       "filtersTitle": "Filtros de Análisis",
