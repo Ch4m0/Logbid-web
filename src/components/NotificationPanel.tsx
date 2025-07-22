@@ -103,7 +103,7 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
 
   if (isLoading) {
     return (
-      <div className="p-6">
+      <div className="p-3 sm:p-6">
         <div className="animate-pulse space-y-4">
           <div className="h-4 bg-gray-200 rounded w-3/4"></div>
           <div className="h-4 bg-gray-200 rounded w-1/2"></div>
@@ -114,38 +114,37 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
-        <div className="flex items-center gap-2">
-          <h3 className="font-semibold text-lg">🔔 {t('notifications.title')}</h3>
+      <div className="flex items-center justify-between p-3 sm:p-4 border-b">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <h3 className="font-semibold text-base sm:text-lg truncate">🔔 {t('notifications.title')}</h3>
           {unreadCount > 0 && (
-            <Badge variant="secondary" className="text-xs">
-              {unreadCount} {t('notifications.newNotifications')}
+            <Badge variant="secondary" className="text-xs shrink-0">
+              {unreadCount} <span className="hidden sm:inline">{t('notifications.newNotifications')}</span>
             </Badge>
           )}
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 shrink-0">
           {unreadCount > 0 && (
             <Button
               variant="ghost"
               size="sm"
               onClick={() => markAllAsRead()}
-              className="text-xs"
+              className="text-xs p-1 sm:p-2"
             >
-              <CheckCheck className="h-4 w-4 mr-1" />
-              {t('notifications.markAll')}
+              <CheckCheck className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-1" />
+              <span className="hidden sm:inline">{t('notifications.markAll')}</span>
             </Button>
           )}
-
         </div>
       </div>
 
       {/* Lista de notificaciones */}
-      <div className="h-96 overflow-y-auto">
+      <div className="h-64 sm:h-80 md:h-96 overflow-y-auto">
         {notifications.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            <Package className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+          <div className="p-6 sm:p-8 text-center text-gray-500">
+            <Package className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-4 text-gray-300" />
             <p className="text-sm">{t('notifications.noNotifications')}</p>
           </div>
         ) : (
@@ -154,19 +153,19 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
               <div key={notification.id}>
                 <div
                   className={cn(
-                    "p-4 hover:bg-gray-50 cursor-pointer transition-colors",
+                    "p-3 sm:p-4 hover:bg-gray-50 cursor-pointer transition-colors",
                     !notification.read && "bg-blue-50 border-l-4 border-l-blue-500"
                   )}
                   onClick={() => handleNotificationClick(notification)}
                 >
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-start gap-2 sm:gap-3">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="text-sm font-medium text-gray-900 truncate">
+                      <div className="flex items-start justify-between mb-1 gap-2">
+                        <p className="text-sm font-medium text-gray-900 line-clamp-2 sm:truncate flex-1">
                           {interpolateNotificationTitle(notification)}
                         </p>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500">
+                        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-1 sm:gap-2 shrink-0">
+                          <span className="text-xs text-gray-500 whitespace-nowrap">
                             {formatRelativeTime(notification.created_at)}
                           </span>
                           {!notification.read && (
@@ -175,23 +174,24 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
                         </div>
                       </div>
                       
-                      <p className="text-xs text-gray-600 mb-2">
+                      <p className="text-xs text-gray-600 mb-2 line-clamp-2">
                         {interpolateNotificationMessage(notification)}
                       </p>
                       
                       {/* Datos adicionales según el tipo */}
                       {notification.data && (
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
                           {notification.data.shipment_uuid && (
                             <Badge 
                               variant="outline" 
-                              className={cn("text-xs", getNotificationBadgeColor(notification.type))}
+                              className={cn("text-xs truncate max-w-[120px] sm:max-w-none", getNotificationBadgeColor(notification.type))}
+                              title={notification.data.shipment_uuid}
                             >
                               {notification.data.shipment_uuid}
                             </Badge>
                           )}
                           {notification.data.price && (
-                            <Badge variant="outline" className="text-xs">
+                            <Badge variant="outline" className="text-xs whitespace-nowrap">
                               💰 {notification.data.price} {notification.data.currency || 'USD'}
                             </Badge>
                           )}
@@ -199,7 +199,7 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
                       )}
                     </div>
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex flex-col sm:flex-row items-center gap-1 shrink-0">
                       {!notification.read && (
                         <Button
                           variant="ghost"
@@ -209,6 +209,7 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
                             markAsRead(notification.id)
                           }}
                           className="h-6 w-6 p-0"
+                          title={t('notifications.markAsRead')}
                         >
                           <Eye className="h-3 w-3" />
                         </Button>
@@ -221,6 +222,7 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
                           deleteNotification(notification.id)
                         }}
                         className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                        title={t('notifications.delete')}
                       >
                         <Trash2 className="h-3 w-3" />
                       </Button>
@@ -236,11 +238,11 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
 
       {/* Footer */}
       {notifications.length > 0 && (
-        <div className="border-t p-3 text-center">
+        <div className="border-t p-2 sm:p-3 text-center">
           <Button 
             variant="ghost" 
             size="sm" 
-            className="text-blue-600 hover:text-blue-800"
+            className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm w-full sm:w-auto"
             onClick={() => {
               onClose()
               router.push('/notifications') // Página completa de notificaciones
