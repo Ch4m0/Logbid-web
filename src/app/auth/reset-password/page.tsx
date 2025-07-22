@@ -8,6 +8,9 @@ import { Card, CardContent } from '@/src/components/ui/card'
 import { Ship, Lock, Eye, EyeOff, CheckCircle, XCircle } from 'lucide-react'
 import { createSupabaseClient } from '@/src/utils/supabase/client'
 
+// Force this page to be dynamically rendered (not statically generated)
+export const dynamic = 'force-dynamic'
+
 export default function ResetPassword() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -18,14 +21,19 @@ export default function ResetPassword() {
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [isInitialized, setIsInitialized] = useState(false)
   
   // Verificar si tenemos los parámetros necesarios para el reset
   useEffect(() => {
+    // Ensure searchParams is available (client-side hydration)
+    if (!searchParams) return
+    
     const accessToken = searchParams.get('access_token')
     const refreshToken = searchParams.get('refresh_token')
     
     if (!accessToken || !refreshToken) {
       setError('Enlace de restablecimiento inválido o expirado')
+      setIsInitialized(true)
       return
     }
 
@@ -35,6 +43,8 @@ export default function ResetPassword() {
       access_token: accessToken,
       refresh_token: refreshToken
     })
+    
+    setIsInitialized(true)
   }, [searchParams])
 
   const validatePassword = (password: string) => {
@@ -87,6 +97,27 @@ export default function ResetPassword() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  // Show loading while initializing
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="w-full max-w-md border-0 shadow-xl bg-white">
+          <CardContent className="p-8 text-center">
+            <div className="mx-auto flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-6">
+              <Lock className="w-8 h-8 text-blue-600 animate-spin" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Verificando enlace...
+            </h2>
+            <p className="text-gray-600">
+              Por favor espera mientras verificamos tu enlace de restablecimiento.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   if (success) {

@@ -1,28 +1,21 @@
 'use client'
-import React from 'react'
+import { Badge } from '@/src/components/ui/badge'
+import { Button } from '@/src/components/ui/button'
 import { formatDistanceToNow } from 'date-fns'
-import { es, enUS } from 'date-fns/locale'
-import { 
-  Check, 
-  CheckCheck, 
-  Trash2, 
+import { enUS, es } from 'date-fns/locale'
+import {
+  CheckCheck,
   Eye,
   Package,
-  DollarSign,
-  Clock,
-  RotateCcw,
-  Calendar,
-  X
+  Trash2
 } from 'lucide-react'
-import { Button } from '@/src/components/ui/button'
-import { Badge } from '@/src/components/ui/badge'
 // import { ScrollArea } from '@/src/components/ui/scroll-area'
 import { Separator } from '@/src/components/ui/separator'
-import { useNotifications, Notification } from '@/src/hooks/useNotifications'
+import { Notification, useNotifications } from '@/src/hooks/useNotifications'
 import { useTranslation } from '@/src/hooks/useTranslation'
 import { cn } from '@/src/lib/utils'
-import { useRouter } from 'next/navigation'
 import useAuthStore from '@/src/store/authStore'
+import { useRouter } from 'next/navigation'
 
 interface NotificationPanelProps {
   onClose: () => void
