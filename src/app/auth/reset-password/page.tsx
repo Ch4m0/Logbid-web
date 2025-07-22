@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/src/components/ui/button'
 import { Input } from '@/src/components/ui/input'
@@ -11,7 +11,7 @@ import { createSupabaseClient } from '@/src/utils/supabase/client'
 // Force this page to be dynamically rendered (not statically generated)
 export const dynamic = 'force-dynamic'
 
-export default function ResetPassword() {
+function ResetPasswordContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [password, setPassword] = useState('')
@@ -268,4 +268,33 @@ export default function ResetPassword() {
       </div>
     </div>
   )
-} 
+}
+
+// Loading component for Suspense fallback
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <Card className="w-full max-w-md border-0 shadow-xl bg-white">
+        <CardContent className="p-8 text-center">
+          <div className="mx-auto flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-6">
+            <Lock className="w-8 h-8 text-blue-600 animate-spin" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            Cargando...
+          </h2>
+          <p className="text-gray-600">
+            Preparando el formulario de restablecimiento.
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+export default function ResetPassword() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <ResetPasswordContent />
+    </Suspense>
+  )
+}
