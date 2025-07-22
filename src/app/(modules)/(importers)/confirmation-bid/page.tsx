@@ -27,6 +27,7 @@ const ConfirmationPage = () => {
     bidId: (bidStoreData as any).bidId || null,
     id: (bidStoreData as any).id || null,
     agent_id: (bidStoreData as any).agent_id || null,
+    agent_code: (bidStoreData as any).agent_code || null,
     price: (bidStoreData as any).price || "USD 0",
     uuid: (bidStoreData as any).uuid || t('common.notSpecified'),
     status: (bidStoreData as any).status || "Active",
@@ -119,6 +120,8 @@ ${t('confirmationBid.date')}: ${formatDate(offerData.inserted_at)}
   const handlePrint = () => {
     window.print()
   }
+
+  console.log(offerData, 'OfferData')
 
   // Format date
   const formatDate = (dateString: string) => {
@@ -420,7 +423,7 @@ ${t('confirmationBid.date')}: ${formatDate(offerData.inserted_at)}
                 <div>
                   <p className="text-sm text-muted-foreground">{t('confirmationBid.agentInformation')}</p>
                   <p className="font-medium">{t('confirmationBid.agent')}</p>
-                  <p className="text-sm">{t('confirmationBid.code')}: {offerData.agent_id || t('common.notSpecified')}</p>
+                  <p className="text-sm">{t('confirmationBid.code')}: {offerData.agent_code || t('common.notSpecified')}</p>
                   <p className="text-sm">{t('confirmationBid.creationDate')}: {formatDate(offerData.inserted_at)}</p>
                 </div>
               </div>

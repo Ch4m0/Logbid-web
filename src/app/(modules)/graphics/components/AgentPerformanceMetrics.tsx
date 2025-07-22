@@ -205,7 +205,7 @@ export function AgentPerformanceMetrics({ filters }: AgentPerformanceMetricsProp
               #{position.ranking}
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              {t('dashboard.agent.performance.topPercentile')} {position.percentile.toFixed(0)}% {t('dashboard.agent.of')} {position.totalAgents} {t('dashboard.agent.performance.agents')}
+              {t('dashboard.agent.performance.topPercentile')} {position.percentile ? position.percentile.toFixed(0) : '0'}% {t('dashboard.agent.of')} {position.totalAgents || 0} {t('dashboard.agent.performance.agents')}
             </p>
           </CardContent>
         </Card>
@@ -217,7 +217,7 @@ export function AgentPerformanceMetrics({ filters }: AgentPerformanceMetricsProp
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-600">
-              {basic.avgResponseTimeHours.toFixed(1)}{t('dashboard.agent.performance.hours')}
+              {basic.avgResponseTimeHours ? basic.avgResponseTimeHours.toFixed(1) : '0.0'}{t('dashboard.agent.performance.hours')}
             </div>
             <div className="mt-1">
               {getPerformanceBadge(metrics.summary.responseLevel, basic.responseRate)}
@@ -350,7 +350,7 @@ export function AgentPerformanceMetrics({ filters }: AgentPerformanceMetricsProp
                           variant={route.successRate >= 50 ? "default" : "outline"}
                           className="text-xs"
                         >
-                          {route.successRate.toFixed(1)}%
+                          {route.successRate ? route.successRate.toFixed(1) : '0.0'}%
                         </Badge>
                       </td>
                       <td className="text-right p-2 font-medium">
@@ -437,7 +437,7 @@ export function AgentPerformanceMetrics({ filters }: AgentPerformanceMetricsProp
               </div>
               <p className="text-sm font-medium">{t('dashboard.agent.performance.responseLevel')}</p>
               <p className="text-xs text-muted-foreground">
-                {t('dashboard.agent.performance.averageTime')}: {basic.avgResponseTimeHours.toFixed(1)} {t('dashboard.agent.performance.hours')}
+                {t('dashboard.agent.performance.averageTime')}: {basic.avgResponseTimeHours ? basic.avgResponseTimeHours.toFixed(1) : '0.0'} {t('dashboard.agent.performance.hours')}
               </p>
             </div>
             
