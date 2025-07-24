@@ -222,9 +222,9 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
 
   return (
     <Card className="w-full">
-      <CardHeader className="flex justify-between flex-row w-full">
+      <CardHeader className="flex flex-col md:flex-row justify-start md:justify-between w-full space-y-3 md:space-y-0">
         <CardTitle className="font-bold">{t(`transport.${normalizeShippingType(shippingType)}`)}</CardTitle>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center justify-between md:justify-start md:space-x-2">
           <Button
             variant="outline"
             size="sm"
@@ -232,7 +232,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
             className="flex items-center space-x-2"
           >
             <Filter className="h-4 w-4" />
-            <span>{showFilters ? t('common.hideFilters') : t('common.showFilters')}</span>
+            <span className="hidden md:inline">{showFilters ? t('common.hideFilters') : t('common.showFilters')}</span>
           </Button>
         <CreateShipment onRefetch={refetch} />
         </div>

@@ -307,20 +307,20 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
 
         <SheetContent
           side="right"
-          className="w-full md:max-w-3xl overflow-y-scroll"
+          className="w-full sm:max-w-lg md:max-w-2xl lg:max-w-3xl overflow-y-scroll"
         >
-          <SheetHeader>
-            <SheetTitle>{t('createCargo.title')}</SheetTitle>
+          <SheetHeader className="px-3 md:px-6">
+            <SheetTitle className="text-lg md:text-xl">{t('createCargo.title')}</SheetTitle>
           </SheetHeader>
 
-          <form onSubmit={handleSubmit}>
-            <div className="space-y-6 py-4">
+          <form onSubmit={handleSubmit} className="px-3 md:px-6">
+            <div className="space-y-4 md:space-y-6 py-2 md:py-4">
               {/* Sección 1: Información básica */}
-              <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
-                <h3 className="text-xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2">📋 {t('createCargo.sections.basicInfo')}</h3>
-                <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-4 bg-gray-50 p-3 md:p-4 rounded-lg">
+                <h3 className="text-lg md:text-xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2">📋 {t('createCargo.sections.basicInfo')}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                                       <div className="grid gap-1">
-                      <Label htmlFor="tipoTransporte" className="text-sm font-semibold text-gray-700">{t('createCargo.transportType')}</Label>
+                      <Label htmlFor="tipoTransporte" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.transportType')}</Label>
                     <Select
                       value={formik.values.tipoTransporte}
                       onValueChange={(value) => {
@@ -337,18 +337,17 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                         <SelectItem value="Aéreo">{t('transport.air')}</SelectItem>
                       </SelectContent>
                     </Select>
-                    <div className="text-red-500 min-h-[20px]">
-                      {formik.errors.tipoTransporte &&
-                        formik.touched.tipoTransporte && (
-                          <ErrorMessage>
-                            {formik.errors.tipoTransporte}
-                          </ErrorMessage>
-                        )}
-                    </div>
+                    {formik.errors.tipoTransporte && formik.touched.tipoTransporte && (
+                      <div className="text-red-500">
+                        <ErrorMessage>
+                          {formik.errors.tipoTransporte}
+                        </ErrorMessage>
+                      </div>
+                    )}
                   </div>
 
                                       <div className="grid gap-1">
-                      <Label htmlFor="tipoComex" className="text-sm font-semibold text-gray-700">{t('createCargo.comexType')}</Label>
+                      <Label htmlFor="tipoComex" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.comexType')}</Label>
                     <Select
                       value={formik.values.tipoComex}
                       onValueChange={(value) => {
@@ -363,19 +362,19 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                         <SelectItem value="Exportación">{t('createCargo.comexTypes.exportation')}</SelectItem>
                       </SelectContent>
                     </Select>
-                    <div className="text-red-500 min-h-[20px]">
-                      {formik.errors.tipoComex && formik.touched.tipoComex && (
+                    {formik.errors.tipoComex && formik.touched.tipoComex && (
+                      <div className="text-red-500">
                         <ErrorMessage>{formik.errors.tipoComex}</ErrorMessage>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
 
               {/* Sección 2: Origen y Destino */}
-              <div className="space-y-4 bg-green-50 p-4 rounded-lg">
-                <h3 className="text-xl font-bold text-gray-800 border-b-2 border-green-500 pb-2">🌍 {t('createCargo.sections.originDestination')}</h3>
-                <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-4 bg-green-50 p-3 md:p-4 rounded-lg">
+                <h3 className="text-lg md:text-xl font-bold text-gray-800 border-b-2 border-green-500 pb-2">🌍 {t('createCargo.sections.originDestination')}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                   <div className="grid gap-1">
                     {formik.values.tipoTransporte === 'Marítimo' ? (
                       <>
@@ -387,11 +386,11 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                             formik.setFieldValue('origen', option.id.toString())
                           }}
                         />
-                        <div className="text-red-500 min-h-[20px]">
-                          {formik.errors.origen && formik.touched.origen && (
+                        {formik.errors.origen && formik.touched.origen && (
+                          <div className="text-red-500">
                             <ErrorMessage>{formik.errors.origen}</ErrorMessage>
-                          )}
-                        </div>
+                          </div>
+                        )}
                       </>
                     ) : (
                       <>
@@ -403,11 +402,11 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                             formik.setFieldValue('origen', option.id.toString())
                           }}
                         />
-                        <div className="text-red-500 min-h-[20px]">
-                          {formik.errors.origen && formik.touched.origen && (
+                        {formik.errors.origen && formik.touched.origen && (
+                          <div className="text-red-500">
                             <ErrorMessage>{formik.errors.origen}</ErrorMessage>
-                          )}
-                        </div>
+                          </div>
+                        )}
                       </>
                     )}
                   </div>
@@ -423,11 +422,11 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                             formik.setFieldValue('destino', option.id.toString())
                           }}
                         />
-                        <div className="text-red-500 min-h-[20px]">
-                          {formik.errors.destino && formik.touched.destino && (
+                        {formik.errors.destino && formik.touched.destino && (
+                          <div className="text-red-500">
                             <ErrorMessage>{formik.errors.destino}</ErrorMessage>
-                          )}
-                        </div>
+                          </div>
+                        )}
                       </>
                     ) : (
                       <>
@@ -439,11 +438,11 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                             formik.setFieldValue('destino', option.id.toString())
                           }}
                         />
-                        <div className="text-red-500 min-h-[20px]">
-                          {formik.errors.destino && formik.touched.destino && (
+                        {formik.errors.destino && formik.touched.destino && (
+                          <div className="text-red-500">
                             <ErrorMessage>{formik.errors.destino}</ErrorMessage>
-                          )}
-                        </div>
+                          </div>
+                        )}
                       </>
                     )}
                   </div>
@@ -451,11 +450,11 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
               </div>
 
               {/* Sección 3: Detalles del Envío */}
-              <div className="space-y-4 bg-yellow-50 p-4 rounded-lg">
-                <h3 className="text-xl font-bold text-gray-800 border-b-2 border-yellow-500 pb-2">📦 {t('createCargo.sections.shipmentDetails')}</h3>
-                <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-4 bg-yellow-50 p-3 md:p-4 rounded-lg">
+                <h3 className="text-lg md:text-xl font-bold text-gray-800 border-b-2 border-yellow-500 pb-2">📦 {t('createCargo.sections.shipmentDetails')}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                   <div className="grid gap-1">
-                    <Label htmlFor="tipoEnvio" className="text-sm font-semibold text-gray-700">{t('createCargo.shipmentType')}</Label>
+                    <Label htmlFor="tipoEnvio" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.shipmentType')}</Label>
                     <Select
                       value={formik.values.tipoEnvio}
                       onValueChange={(value) =>
@@ -471,15 +470,15 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                         <SelectItem value="LCL">{t('createCargo.shipmentTypes.lcl')}</SelectItem>
                       </SelectContent>
                     </Select>
-                    <div className="text-red-500 min-h-[20px]">
-                      {formik.errors.tipoEnvio && formik.touched.tipoEnvio && (
+                    {formik.errors.tipoEnvio && formik.touched.tipoEnvio && (
+                      <div className="text-red-500">
                         <ErrorMessage>{formik.errors.tipoEnvio}</ErrorMessage>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid gap-1">
-                    <Label htmlFor="tipoMercancia" className="text-sm font-semibold text-gray-700">{t('createCargo.merchandiseType')}</Label>
+                    <Label htmlFor="tipoMercancia" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.merchandiseType')}</Label>
                     <Input
                       id="tipoMercancia"
                       name="tipoMercancia"
@@ -488,16 +487,15 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                     />
-                    <div className="text-red-500 min-h-[20px]">
-                      {formik.errors.tipoMercancia &&
-                        formik.touched.tipoMercancia && (
-                          <ErrorMessage>{formik.errors.tipoMercancia}</ErrorMessage>
-                        )}
-                    </div>
+                    {formik.errors.tipoMercancia && formik.touched.tipoMercancia && (
+                      <div className="text-red-500">
+                        <ErrorMessage>{formik.errors.tipoMercancia}</ErrorMessage>
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid gap-1">
-                    <Label htmlFor="contenedor" className="text-sm font-semibold text-gray-700">
+                    <Label htmlFor="contenedor" className="text-xs md:text-sm font-semibold text-gray-700">
                       {formik.values.tipoTransporte === 'Marítimo' 
                         ? t('createCargo.labels.containerType') 
                         : t('createCargo.labels.packagingType')
@@ -531,11 +529,11 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
               </div>
 
               {/* Sección 4: Medidas y Cantidades */}
-              <div className="space-y-4 bg-purple-50 p-4 rounded-lg">
-                <h3 className="text-xl font-bold text-gray-800 border-b-2 border-purple-500 pb-2">⚖️ {t('createCargo.sections.measureQuantities')}</h3>
-                <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-4 bg-purple-50 p-3 md:p-4 rounded-lg">
+                <h3 className="text-lg md:text-xl font-bold text-gray-800 border-b-2 border-purple-500 pb-2">⚖️ {t('createCargo.sections.measureQuantities')}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                   <div className="grid gap-1">
-                    <Label htmlFor="pesoTotal" className="text-sm font-semibold text-gray-700">{t('createCargo.labels.totalWeight')}</Label>
+                    <Label htmlFor="pesoTotal" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.labels.totalWeight')}</Label>
                     <Input
                       id="pesoTotal"
                       name="pesoTotal"
@@ -548,7 +546,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                   </div>
 
                   <div className="grid gap-1">
-                    <Label htmlFor="tipoMedida" className="text-sm font-semibold text-gray-700">{t('createCargo.labels.measureType')}</Label>
+                    <Label htmlFor="tipoMedida" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.labels.measureType')}</Label>
                     <Select
                       value={formik.values.tipoMedida}
                       onValueChange={(value) =>
@@ -567,7 +565,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                   </div>
 
                   <div className="grid gap-1">
-                    <Label htmlFor="cbm" className="text-sm font-semibold text-gray-700">{t('createCargo.labels.volume')}</Label>
+                    <Label htmlFor="cbm" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.labels.volume')}</Label>
                     <Input
                       id="cbm"
                       name="cbm"
@@ -581,7 +579,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                   </div>
 
                   <div className="grid gap-1">
-                    <Label htmlFor="unidades" className="text-sm font-semibold text-gray-700">{t('createCargo.labels.units')}</Label>
+                    <Label htmlFor="unidades" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.labels.units')}</Label>
                     <Input
                       id="unidades"
                       name="unidades"
@@ -594,7 +592,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                   </div>
 
                   <div className="grid gap-1">
-                    <Label htmlFor="incoterm" className="text-sm font-semibold text-gray-700">{t('createCargo.labels.incoterm')}</Label>
+                    <Label htmlFor="incoterm" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.labels.incoterm')}</Label>
                     <Select
                       value={formik.values.incoterm}
                       onValueChange={(value) =>
@@ -615,7 +613,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                   </div>
 
                   <div className="grid gap-1">
-                    <Label htmlFor="cargaClasificacion" className="text-sm font-semibold text-gray-700">{t('createCargo.labels.cargoClassification')}</Label>
+                    <Label htmlFor="cargaClasificacion" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.labels.cargoClassification')}</Label>
                     <Select
                       value={formik.values.cargaClasificacion}
                       onValueChange={(value) =>
@@ -636,11 +634,11 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
               </div>
 
               {/* Sección 5: Información Comercial */}
-              <div className="space-y-4 bg-orange-50 p-4 rounded-lg">
-                <h3 className="text-xl font-bold text-gray-800 border-b-2 border-orange-500 pb-2">💰 {t('createCargo.sections.commercialInfo')}</h3>
-                <div className={`grid gap-4 ${formik.values.tipoTransporte === 'Marítimo' ? 'grid-cols-3' : 'grid-cols-2'}`}>
+              <div className="space-y-4 bg-orange-50 p-3 md:p-4 rounded-lg">
+                <h3 className="text-lg md:text-xl font-bold text-gray-800 border-b-2 border-orange-500 pb-2">💰 {t('createCargo.sections.commercialInfo')}</h3>
+                <div className={`grid gap-3 md:gap-4 ${formik.values.tipoTransporte === 'Marítimo' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1 md:grid-cols-2'}`}>
                   <div className="grid gap-1">
-                    <Label htmlFor="valor" className="text-sm font-semibold text-gray-700">{t('createCargo.value')}</Label>
+                    <Label htmlFor="valor" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.value')}</Label>
                     <Input
                       id="valor"
                       name="valor"
@@ -649,15 +647,15 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                     />
-                    <div className="text-red-500 min-h-[20px]">
-                      {formik.errors.valor && formik.touched.valor && (
+                    {formik.errors.valor && formik.touched.valor && (
+                      <div className="text-red-500">
                         <ErrorMessage>{formik.errors.valor}</ErrorMessage>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid gap-1">
-                    <Label htmlFor="moneda" className="text-sm font-semibold text-gray-700">{t('createCargo.currency')}</Label>
+                    <Label htmlFor="moneda" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.currency')}</Label>
                     <Select
                       value={formik.values.moneda}
                       onValueChange={(value) =>
@@ -675,15 +673,15 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                         ))}
                       </SelectContent>
                     </Select>
-                    <div className="text-red-500 min-h-[20px]">
-                      {formik.errors.moneda && formik.touched.moneda && (
+                    {formik.errors.moneda && formik.touched.moneda && (
+                      <div className="text-red-500">
                         <ErrorMessage>{formik.errors.moneda}</ErrorMessage>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid gap-1">
-                    <Label htmlFor="fechaExpiracion" className="text-sm font-semibold text-gray-700">{t('createCargo.shipmentDate')}</Label>
+                    <Label htmlFor="fechaExpiracion" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.shipmentDate')}</Label>
                     <DatePicker
                       value={formik.values.fechaExpiracion}
                       onChange={(date) => formik.setFieldValue('fechaExpiracion', date)}
@@ -691,18 +689,17 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                       minDate={new Date()} // No permitir fechas pasadas
                       maxDate={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)} // Máximo 1 año en el futuro
                     />
-                    <div className="text-red-500 min-h-[20px]">
-                      {formik.errors.fechaExpiracion &&
-                        formik.touched.fechaExpiracion && (
-                          <ErrorMessage>
-                            {formik.errors.fechaExpiracion}
-                          </ErrorMessage>
-                        )}
-                    </div>
+                    {formik.errors.fechaExpiracion && formik.touched.fechaExpiracion && (
+                      <div className="text-red-500">
+                        <ErrorMessage>
+                          {formik.errors.fechaExpiracion}
+                        </ErrorMessage>
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid gap-1">
-                    <Label htmlFor="partidaArancelaria" className="text-sm font-semibold text-gray-700">{t('createCargo.labels.tariffItem')}</Label>
+                    <Label htmlFor="partidaArancelaria" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.labels.tariffItem')}</Label>
                     <Input
                       id="partidaArancelaria"
                       name="partidaArancelaria"
@@ -711,19 +708,18 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                     />
-                    <div className="text-red-500 min-h-[20px]">
-                      {formik.errors.partidaArancelaria &&
-                        formik.touched.partidaArancelaria && (
-                          <ErrorMessage>
-                            {formik.errors.partidaArancelaria}
-                          </ErrorMessage>
-                        )}
-                    </div>
+                    {formik.errors.partidaArancelaria && formik.touched.partidaArancelaria && (
+                      <div className="text-red-500">
+                        <ErrorMessage>
+                          {formik.errors.partidaArancelaria}
+                        </ErrorMessage>
+                      </div>
+                    )}
                   </div>
 
                   {formik.values.tipoTransporte === 'Marítimo' && (
                     <div className="grid gap-1">
-                      <Label htmlFor="fechaEmbarque" className="text-sm font-semibold text-gray-700">{t('createCargo.shippingDate')}</Label>
+                      <Label htmlFor="fechaEmbarque" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.shippingDate')}</Label>
                       <DatePicker
                         value={formik.values.fechaEmbarque}
                         onChange={(date) => formik.setFieldValue('fechaEmbarque', date)}
@@ -731,24 +727,23 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                         minDate={formik.values.fechaExpiracion ? new Date(formik.values.fechaExpiracion) : new Date()} // Usar fecha de cierre como mínimo
                         maxDate={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)} // Máximo 1 año en el futuro
                       />
-                      <div className="text-red-500 min-h-[20px]">
-                        {formik.errors.fechaEmbarque &&
-                          formik.touched.fechaEmbarque && (
-                            <ErrorMessage>
-                              {formik.errors.fechaEmbarque}
-                            </ErrorMessage>
-                          )}
-                      </div>
+                      {formik.errors.fechaEmbarque && formik.touched.fechaEmbarque && (
+                        <div className="text-red-500">
+                          <ErrorMessage>
+                            {formik.errors.fechaEmbarque}
+                          </ErrorMessage>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
               </div>
 
               {/* Sección 6: Información Adicional */}
-              <div className="space-y-4 bg-teal-50 p-4 rounded-lg">
-                <h3 className="text-xl font-bold text-gray-800 border-b-2 border-teal-500 pb-2">📝 {t('createCargo.sections.additionalInfo')}</h3>
+              <div className="space-y-4 bg-teal-50 p-3 md:p-4 rounded-lg">
+                <h3 className="text-lg md:text-xl font-bold text-gray-800 border-b-2 border-teal-500 pb-2">📝 {t('createCargo.sections.additionalInfo')}</h3>
                 <div className="grid gap-1">
-                  <Label htmlFor="informacionAdicional" className="text-sm font-semibold text-gray-700">{t('createCargo.additionalInfo')}</Label>
+                  <Label htmlFor="informacionAdicional" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.additionalInfo')}</Label>
                   <Textarea
                     placeholder={t('createCargo.enterAdditionalInfo')}
                     name="informacionAdicional"
@@ -761,8 +756,8 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
               </div>
             </div>
 
-            <SheetFooter>
-              <Button type="submit" disabled={isPending} className="ml-auto">
+            <SheetFooter className="px-3 md:px-6">
+              <Button type="submit" disabled={isPending} className="w-full md:w-auto md:ml-auto text-sm md:text-base">
                 {isPending ? t('createCargo.buttons.creating') : t('createCargo.buttons.createShipment')}
               </Button>
             </SheetFooter>
