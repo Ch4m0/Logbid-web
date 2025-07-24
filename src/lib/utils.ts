@@ -76,3 +76,39 @@ export function convertToColombiaTime(utcDateStr: string) {
     return 'Error en fecha'
   }
 }
+
+/**
+ * Formatea una fecha UTC sin conversión de zona horaria
+ * Útil para fechas de cierre/embarque donde queremos mostrar la fecha exacta
+ * @param {string} utcDateStr - Fecha en formato UTC (ISO 8601)
+ * @return {string} - Fecha en formato 'yyyy-MM-dd HH:mm:ss' sin conversión de zona horaria
+ */
+export function formatDateUTCAsLocal(utcDateStr: string) {
+  // Validar que la fecha no esté vacía o sea null/undefined
+  if (!utcDateStr || utcDateStr.trim() === '') {
+    return 'Fecha no disponible'
+  }
+
+  try {
+    // Parsear la fecha UTC manualmente para extraer componentes sin conversión de zona horaria
+    const date = new Date(utcDateStr)
+    
+    // Verificar que la fecha sea válida
+    if (isNaN(date.getTime())) {
+      return 'Fecha inválida'
+    }
+
+    // Obtener componentes UTC directamente
+    const year = date.getUTCFullYear()
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+    const day = String(date.getUTCDate()).padStart(2, '0')
+    const hours = String(date.getUTCHours()).padStart(2, '0')
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0')
+    const seconds = String(date.getUTCSeconds()).padStart(2, '0')
+    
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+  } catch (error) {
+    console.error('Error formatting UTC date:', error)
+    return 'Error en fecha'
+  }
+}

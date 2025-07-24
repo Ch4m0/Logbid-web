@@ -27,6 +27,29 @@ interface CreateShipmentData {
   partidaArancelaria?: string // tariff_item
 }
 
+// Función para convertir fecha y hora a UTC correctamente
+// Input: "2025-07-31 23:59:59" -> Output: "2025-07-31T23:59:59.000Z"
+const formatDateTimeToUTC = (dateTimeString: string): string => {
+  if (!dateTimeString) return ''
+  
+  // Si ya viene con formato de hora
+  if (dateTimeString.includes(' ')) {
+    // Parseamos manualmente para evitar problemas de zona horaria
+    const [datePart, timePart] = dateTimeString.split(' ')
+    const [year, month, day] = datePart.split('-').map(Number)
+    const [hours, minutes, seconds] = timePart.split(':').map(Number)
+    
+    // Creamos la fecha en UTC directamente
+    const date = new Date(Date.UTC(year, month - 1, day, hours, minutes, seconds))
+    return date.toISOString()
+  }
+  
+  // Si solo viene la fecha, asumimos final del día (23:59:59)
+  const [year, month, day] = dateTimeString.split('-').map(Number)
+  const date = new Date(Date.UTC(year, month - 1, day, 23, 59, 59))
+  return date.toISOString()
+}
+
 interface ShipmentDetailsInsert {
   total_weight?: number
   measure_type?: string
@@ -125,11 +148,11 @@ export const useCreateShipment = () => {
         shipping_type: data.tipoTransporte,
         value: parseFloat(data.valor),
         currency: data.moneda,
-        expiration_date: new Date(data.fechaExpiracion).toISOString(),
+        expiration_date: formatDateTimeToUTC(data.fechaExpiracion),
         shipping_date: data.fechaEmbarque && 
           typeof data.fechaEmbarque === 'string' && 
           data.fechaEmbarque.trim() !== '' 
-          ? new Date(data.fechaEmbarque).toISOString() 
+          ? formatDateTimeToUTC(data.fechaEmbarque)
           : null,
         additional_info: data.informacionAdicional || data.tipoMercancia || '',
       }

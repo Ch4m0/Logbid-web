@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/src/components/ui/card'
-import { convertToColombiaTime } from '@/src/lib/utils'
+import { convertToColombiaTime, formatDateUTCAsLocal } from '@/src/lib/utils'
 import { useGetBidListByMarket } from '@/src/app/hooks/useGetBidListByMarket'
 import useAuthStore from '@/src/store/authStore'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -321,7 +321,7 @@ export function AgentShipmentList({ status }: CargoTransporListProps) {
                           <span className="text-xs text-muted-foreground">
                             {t('cargoList.finalization')}
                           </span>
-                          <span className="text-sm">{convertToColombiaTime(bid.expiration_date)}</span>
+                          <span className="text-sm">{formatDateUTCAsLocal(bid.expiration_date)}</span>
                         </div>
                       </div>
                     </div>

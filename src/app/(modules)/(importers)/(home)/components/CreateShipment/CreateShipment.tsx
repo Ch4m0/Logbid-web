@@ -202,6 +202,13 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
         return
       }
 
+      // Función para convertir fecha a datetime con hora 23:59:59
+      const formatDateTimeEndOfDay = (dateString: string): string => {
+        if (!dateString) return ''
+        // Añadir la hora 23:59:59 para representar el final del día
+        return `${dateString} 23:59:59`
+      }
+
       console.log('Iniciando creación de shipment...')
 
       createShipment(
@@ -213,8 +220,8 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
           tipoEnvio: values.tipoEnvio,
           valor: values.valor.toString(),
           moneda: values.moneda,
-          fechaExpiracion: values.fechaExpiracion,
-          fechaEmbarque: values.fechaEmbarque,
+          fechaExpiracion: formatDateTimeEndOfDay(values.fechaExpiracion),
+          fechaEmbarque: formatDateTimeEndOfDay(values.fechaEmbarque),
           informacionAdicional: values.informacionAdicional,
           tipoMercancia: values.tipoMercancia,
           market_id: parseInt(marketId),

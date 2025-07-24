@@ -34,16 +34,39 @@ export function DatePicker({
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false)
   
-  // Convertir el string value a Date si existe
-  const selectedDate = value ? new Date(value) : undefined
+  // Función para crear fecha en zona horaria local
+  // IMPORTANTE: new Date('2024-01-30') se interpreta como UTC y puede mostrar un día diferente
+  // en la zona horaria local. Parseamos manualmente para mantener la fecha exacta.
+  const parseLocalDate = (dateString: string): Date | undefined => {
+    if (!dateString) return undefined
+    
+    // Parsear manualmente YYYY-MM-DD para evitar problemas de zona horaria
+    const parts = dateString.split('-')
+    if (parts.length !== 3) return undefined
+    
+    const year = parseInt(parts[0], 10)
+    const month = parseInt(parts[1], 10) - 1 // Los meses en Date son 0-indexados
+    const day = parseInt(parts[2], 10)
+    
+    if (isNaN(year) || isNaN(month) || isNaN(day)) return undefined
+    
+    return new Date(year, month, day)
+  }
+  
+  // Convertir el string value a Date si existe, manteniendo zona horaria local
+  const selectedDate = value ? parseLocalDate(value) : undefined
   
   // Validar que la fecha sea válida
   const isValidDate = selectedDate && !isNaN(selectedDate.getTime())
   
   const handleSelect = (date: Date | undefined) => {
     if (date && onChange) {
-      // Formatear la fecha como YYYY-MM-DD para compatibilidad con el formulario
-      const formattedDate = format(date, 'yyyy-MM-dd')
+      // Asegurar que usamos la fecha local para evitar problemas de zona horaria
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0') // +1 porque getMonth() es 0-indexado
+      const day = String(date.getDate()).padStart(2, '0')
+      const formattedDate = `${year}-${month}-${day}`
+      
       onChange(formattedDate)
     }
     setOpen(false)

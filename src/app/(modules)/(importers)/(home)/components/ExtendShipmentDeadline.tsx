@@ -5,7 +5,7 @@ import { CalendarIcon, TruckIcon, PlaneIcon, ShipIcon, WarehouseIcon, Loader2 } 
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-import { cn } from "@/src/lib/utils"
+import { cn, formatDateUTCAsLocal } from "@/src/lib/utils"
 import { Button } from "@/src/components/ui/button"
 import { Calendar } from "@/src/components/ui/calendar"
 import {
@@ -123,7 +123,7 @@ export function ExtendShipmentDeadline({
               <div className="flex justify-between items-center">
                 <div>
                   <div className="text-sm text-muted-foreground mb-1">{t('extendCargo.currentExpiration')}:</div>
-                  <div className="font-medium">{format(new Date(expiration_date), "PPP")}</div>
+                  <div className="font-medium">{formatDateUTCAsLocal(expiration_date).split(' ')[0]}</div>
                 </div>
                 <Badge variant="secondary">
                   {shippingType}

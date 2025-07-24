@@ -1,5 +1,5 @@
 import React from 'react';
-import { convertToColombiaTime } from '@/src/lib/utils';
+import { convertToColombiaTime, formatDateUTCAsLocal } from '@/src/lib/utils';
 import { useTranslation } from '@/src/hooks/useTranslation';
 
 const BidInfo = ({ bidDataForAgent }: any) => {
@@ -55,7 +55,7 @@ const BidInfo = ({ bidDataForAgent }: any) => {
             </div>
             <div className="flex items-center gap-2">
               <span className="font-bold">{t('bidInfo.endDate')}:</span>
-              <span>{convertToColombiaTime(bidDataForAgent.expiration_date)}</span>
+              <span>{formatDateUTCAsLocal(bidDataForAgent.expiration_date)}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="font-bold">{t('bidInfo.status')}:</span>

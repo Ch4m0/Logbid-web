@@ -31,7 +31,7 @@ import {
 import { Badge } from '@/src/components/ui/badge'
 import { Separator } from '@/src/components/ui/separator'
 import { ShippingType } from '@/src/models/common'
-import { convertToColombiaTime } from '@/src/lib/utils'
+import { convertToColombiaTime, formatDateUTCAsLocal } from '@/src/lib/utils'
 import { useTranslation } from '@/src/hooks/useTranslation'
 
 interface ImporterShipmentCardsProps {
@@ -334,7 +334,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
                           <span className="text-xs text-muted-foreground">
                             {t('cargoList.finalization')}
                           </span>
-                          <span className="text-sm">{convertToColombiaTime(bid.expiration_date)}</span>
+                          <span className="text-sm">{formatDateUTCAsLocal(bid.expiration_date)}</span>
                         </div>
                       </div>
                       
