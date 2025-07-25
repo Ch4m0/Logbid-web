@@ -28,7 +28,7 @@
     "back": "Volver",
     "yes": "Sí",
     "no": "No",
-    "newShipment": "Nuevo envío",
+    "newShipment": "Nuevo embarque",
     "all": "Todos",
     "clearAll": "Limpiar todo"
   },
@@ -540,10 +540,10 @@
     "offer": "Oferta"
   },
   "createCargo": {
-    "title": "Crear Transporte de Carga",
+    "title": "Creación de Embarque",
     "transportType": "Tipo de transporte",
-    "origin": "Origen",
-    "destination": "Destino",
+    "origin": "Origen de embarque",
+    "destination": "Destino de embarque",
     "comexType": "Tipo COMEX",
     "shipmentType": "Tipo envío",
     "containerType": "Tipo de contenedor",
@@ -558,7 +558,7 @@
     "tariffItem": "Partida Arancelaria",
     "value": "Valor",
     "currency": "Moneda",
-          "shipmentDate": "Fecha cierre",
+          "shipmentDate": "Fecha de cierre",
       "shippingDate": "Fecha de Embarque",
     "additionalInfo": "Información adicional",
     "select": "Seleccionar",
@@ -593,7 +593,7 @@
       "valueRequired": "El valor es requerido",
       "onlyNumbers": "Solo se permiten números en el campo valor",
       "currencyRequired": "La moneda es requerida",
-      "shipmentDateRequired": "La fecha de despacho es requerida",
+      "shipmentDateRequired": "La fecha de cierre es requerida",
       "dateInvalid": "Fecha inválida",
       "dateMustBeFuture": "La fecha debe ser posterior a hoy",
       "dateNotMoreThanYear": "La fecha no puede ser más de 1 año en el futuro",
@@ -613,7 +613,7 @@
     },
     "sections": {
       "basicInfo": "Información Básica",
-      "originDestination": "Origen y Destino",
+      "originDestination": "Orígen y Destíno",
       "shipmentDetails": "Detalles del Envío",
       "measureQuantities": "Medidas y Cantidades",
       "commercialInfo": "Información Comercial",
@@ -648,7 +648,7 @@
       "tons": "Toneladas (Tons)"
     },
     "buttons": {
-      "createShipment": "Crear Shipment",
+      "createShipment": "Crear Embarque",
       "creating": "Creando..."
     }
   },

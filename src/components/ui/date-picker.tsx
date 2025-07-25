@@ -35,6 +35,7 @@ export function DatePicker({
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false)
   const [isMobile, setIsMobile] = React.useState(false)
+  const [showPlaceholder, setShowPlaceholder] = React.useState(true)
   
   // Detectar dispositivos móviles
   React.useEffect(() => {
@@ -51,6 +52,11 @@ export function DatePicker({
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
+
+  // Actualizar placeholder cuando hay valor
+  React.useEffect(() => {
+    setShowPlaceholder(!value)
+  }, [value])
   
   // Función para crear fecha en zona horaria local
   // IMPORTANTE: new Date('2024-01-30') se interpreta como UTC y puede mostrar un día diferente
@@ -98,6 +104,29 @@ export function DatePicker({
     }
   }
 
+  // Referencia al input para control directo
+  const inputRef = React.useRef<HTMLInputElement>(null)
+
+  // Manejar click en el overlay de placeholder
+  const handlePlaceholderClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    setShowPlaceholder(false)
+    
+    // Activar inmediatamente el input de fecha
+    if (inputRef.current) {
+      // Forzar focus y click en el input subyacente
+      inputRef.current.focus()
+      inputRef.current.showPicker?.() // Método moderno para abrir el picker
+      
+      // Fallback para navegadores que no soportan showPicker
+      if (!inputRef.current.showPicker) {
+        inputRef.current.click()
+      }
+    }
+  }
+
   // Configurar restricciones de fecha
   const today = new Date()
   today.setHours(0, 0, 0, 0) // Resetear horas para comparación de fechas
@@ -118,11 +147,13 @@ export function DatePicker({
   const minDateForInput = minDate ? formatDateForInput(minDate) : formatDateForInput(today)
   const maxDateForInput = maxDate ? formatDateForInput(maxDate) : undefined
 
-  // En dispositivos móviles, usar input nativo
+  // En dispositivos móviles, usar input nativo con overlay
   if (isMobile) {
     return (
-      <div className={cn('relative', className)}>
+      <div className={cn('relative w-full flex', className)}>
+        {/* Input nativo de fecha */}
         <Input
+          ref={inputRef}
           type="date"
           value={value || ''}
           onChange={handleNativeInputChange}
@@ -130,11 +161,23 @@ export function DatePicker({
           min={minDateForInput}
           max={maxDateForInput}
           className={cn(
-            'w-full',
-            !value && 'text-muted-foreground'
+            'w-full flex-1 pr-10 min-w-0',
+            showPlaceholder && !value && 'opacity-0',
+            '[&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:w-10 [&::-webkit-calendar-picker-indicator]:h-full [&::-webkit-calendar-picker-indicator]:cursor-pointer'
           )}
-          placeholder={placeholder}
+          style={{ width: '100%' }}
         />
+        
+        {/* Overlay de placeholder */}
+        {showPlaceholder && !value && !disabled && (
+          <div
+            onClick={handlePlaceholderClick}
+            className="absolute inset-0 flex items-center px-3 text-muted-foreground cursor-pointer bg-white border border-input rounded-md"
+          >
+            {placeholder}
+          </div>
+        )}
+        
         <CalendarIcon className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
       </div>
     )
