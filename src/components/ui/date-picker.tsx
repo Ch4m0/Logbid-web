@@ -12,6 +12,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/src/components/ui/popover'
+import { Input } from '@/src/components/ui/input'
 
 interface DatePickerProps {
   value?: string
@@ -33,6 +34,23 @@ export function DatePicker({
   maxDate,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false)
+  const [isMobile, setIsMobile] = React.useState(false)
+  
+  // Detectar dispositivos móviles
+  React.useEffect(() => {
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera
+      const isMobileDevice = /android|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase())
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+      const isSmallScreen = window.innerWidth <= 768
+      
+      setIsMobile(isMobileDevice || (isTouchDevice && isSmallScreen))
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
   
   // Función para crear fecha en zona horaria local
   // IMPORTANTE: new Date('2024-01-30') se interpreta como UTC y puede mostrar un día diferente
@@ -72,6 +90,14 @@ export function DatePicker({
     setOpen(false)
   }
 
+  // Manejar cambio en input nativo de fecha
+  const handleNativeInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const dateValue = event.target.value // Ya viene en formato YYYY-MM-DD
+    if (onChange) {
+      onChange(dateValue)
+    }
+  }
+
   // Configurar restricciones de fecha
   const today = new Date()
   today.setHours(0, 0, 0, 0) // Resetear horas para comparación de fechas
@@ -81,6 +107,40 @@ export function DatePicker({
     after: maxDate, // Si se especifica fecha máxima
   }
 
+  // Formatear fechas para input nativo
+  const formatDateForInput = (date: Date): string => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
+  const minDateForInput = minDate ? formatDateForInput(minDate) : formatDateForInput(today)
+  const maxDateForInput = maxDate ? formatDateForInput(maxDate) : undefined
+
+  // En dispositivos móviles, usar input nativo
+  if (isMobile) {
+    return (
+      <div className={cn('relative', className)}>
+        <Input
+          type="date"
+          value={value || ''}
+          onChange={handleNativeInputChange}
+          disabled={disabled}
+          min={minDateForInput}
+          max={maxDateForInput}
+          className={cn(
+            'w-full',
+            !value && 'text-muted-foreground'
+          )}
+          placeholder={placeholder}
+        />
+        <CalendarIcon className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+      </div>
+    )
+  }
+
+  // En desktop, usar el calendario personalizado
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
