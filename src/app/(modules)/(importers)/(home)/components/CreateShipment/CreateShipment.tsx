@@ -140,7 +140,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
         t('createCargo.validation.dateInvalid'),
         function(value) {
           const { tipoTransporte } = this.parent
-          if (tipoTransporte !== 'Marítimo' || !value) return true // Solo validar para marítimo
+          if ((tipoTransporte !== 'Marítimo' && tipoTransporte !== 'Aéreo') || !value) return true // Validar para marítimo y aéreo
           const date = new Date(value)
           return !isNaN(date.getTime())
         }
@@ -150,7 +150,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
         t('createCargo.validation.shippingDateMustBeAfterClosing'),
         function(value) {
           const { tipoTransporte, fechaExpiracion } = this.parent
-          if (tipoTransporte !== 'Marítimo' || !value) return true // Solo validar para marítimo
+          if ((tipoTransporte !== 'Marítimo' && tipoTransporte !== 'Aéreo') || !value) return true // Validar para marítimo y aéreo
           if (!fechaExpiracion) return true
           
           const shippingDate = new Date(value)
@@ -286,9 +286,8 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
 
   // Efecto para limpiar fecha de embarque cuando se cambia a transporte aéreo
   useEffect(() => {
-    if (formik.values.tipoTransporte === 'Aéreo' && formik.values.fechaEmbarque) {
-      formik.setFieldValue('fechaEmbarque', '')
-    }
+    // Removed the logic that cleared shipping date for air transport
+    // Now shipping date is available for both maritime and air transport
   }, [formik.values.tipoTransporte])
   
   const handleSubmit = (event: React.FormEvent) => {
@@ -724,7 +723,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                     )}
                   </div>
 
-                  {formik.values.tipoTransporte === 'Marítimo' && (
+                  {(formik.values.tipoTransporte === 'Marítimo' || formik.values.tipoTransporte === 'Aéreo') && (
                     <div className="grid gap-1">
                       <Label htmlFor="fechaEmbarque" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.shippingDate')}</Label>
                       <DatePicker

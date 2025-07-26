@@ -85,6 +85,7 @@ export const useGetShipment = ({ shipment_id }: Args) => {
         shipping_type: shipmentData.shipping_type,
         inserted_at: shipmentData.inserted_at,
         expiration_date: shipmentData.expiration_date,
+        shipping_date: shipmentData.shipping_date,
         currency: shipmentData.currency,
         value: shipmentData.value,
         additional_info: shipmentData.additional_info,

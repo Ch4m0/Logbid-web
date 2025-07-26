@@ -57,6 +57,12 @@ const BidInfo = ({ bidDataForAgent }: any) => {
               <span className="font-bold">{t('bidInfo.endDate')}:</span>
               <span>{convertToColombiaTime(bidDataForAgent.expiration_date)}</span>
             </div>
+            {bidDataForAgent.shipping_date && (
+              <div className="flex items-center gap-2">
+                <span className="font-bold">{t('bidInfo.shippingDate')}:</span>
+                <span>{convertToColombiaTime(bidDataForAgent.shipping_date)}</span>
+              </div>
+            )}
             <div className="flex items-center gap-2">
               <span className="font-bold">{t('bidInfo.status')}:</span>
               <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">

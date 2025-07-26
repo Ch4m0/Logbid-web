@@ -63,6 +63,7 @@ export const useGetBidListByMarket = (
         uuid: shipment.uuid,
         inserted_at: shipment.inserted_at,
         expiration_date: shipment.expiration_date,
+        shipping_date: shipment.shipping_date,
         shipping_type: shipment.shipping_type,
         origin: `${shipment.origin_country} - ${shipment.origin_name}`,
         destination: `${shipment.destination_country} - ${shipment.destination_name}`,

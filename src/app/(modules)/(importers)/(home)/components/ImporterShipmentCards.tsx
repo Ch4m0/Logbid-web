@@ -319,7 +319,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
                     </div>
 
                     <Separator className="my-2" />
-                    <div className={`grid gap-4 ${shippingType === 'Marítimo' && bid.shipping_date ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                    <div className={`grid gap-4 ${(shippingType === 'Marítimo' || shippingType === 'Aéreo') && bid.shipping_date ? 'grid-cols-3' : 'grid-cols-2'}`}>
                       <div className="flex items-center space-x-2">
                         <Calendar className="h-4 w-4 text-muted-foreground" />
                         <div className="flex flex-col">
@@ -340,7 +340,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
                         </div>
                       </div>
                       
-                      {shippingType === 'Marítimo' && bid.shipping_date && (
+                      {(shippingType === 'Marítimo' || shippingType === 'Aéreo') && bid.shipping_date && (
                         <div className="flex items-center space-x-2">
                           <Package className="h-4 w-4 text-blue-600" />
                           <div className="flex flex-col">

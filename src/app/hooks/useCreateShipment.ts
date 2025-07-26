@@ -108,13 +108,13 @@ export const useCreateShipment = () => {
         // Obtener aeropuertos
         const { data: originAirport, error: originError } = await supabase
           .from('airports')
-          .select('airport_name, country')
+          .select('country_code, country')
           .eq('id', parseInt(data.origen))
           .single()
 
         const { data: destinationAirport, error: destinationError } = await supabase
           .from('airports')
-          .select('airport_name, country')
+          .select('country_code, country')
           .eq('id', parseInt(data.destino))
           .single()
 
@@ -126,8 +126,8 @@ export const useCreateShipment = () => {
           throw new Error(`Error al buscar aeropuerto destino: ${destinationError.message}`)
         }
 
-        originData = { name: originAirport.airport_name, country: originAirport.country }
-        destinationData = { name: destinationAirport.airport_name, country: destinationAirport.country }
+        originData = { name: originAirport.country_code, country: originAirport.country }
+        destinationData = { name: destinationAirport.country_code, country: destinationAirport.country }
       }
 
       if (!originData || !destinationData) {

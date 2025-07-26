@@ -39,6 +39,7 @@ interface Shipment {
   shipping_type: string
   inserted_at: string
   expiration_date: string
+  shipping_date?: string | null
   offers: Offer[]
   currency: string
   value: string
