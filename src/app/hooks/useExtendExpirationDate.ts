@@ -4,11 +4,13 @@ import { supabase } from '@/src/utils/supabase/client'
 interface ExtendExpirationDateParams {
   bidListItemId: string
   newExpirationDate: string
+  newShippingDate: string
 }
 
 const extendExpirationDateSupabase = async ({ 
   bidListItemId, 
-  newExpirationDate 
+  newExpirationDate,
+  newShippingDate
 }: ExtendExpirationDateParams) => {
   console.log('🔄 Extending expiration date:', { bidListItemId, newExpirationDate })
   
@@ -16,7 +18,8 @@ const extendExpirationDateSupabase = async ({
   const { data, error } = await supabase
     .rpc('extend_shipment_deadline_and_notify', {
       shipment_id_param: parseInt(bidListItemId),
-      new_expiration_date_param: newExpirationDate
+      new_expiration_date_param: newExpirationDate,
+      new_shipping_date_param: newShippingDate
     })
 
   if (error) {

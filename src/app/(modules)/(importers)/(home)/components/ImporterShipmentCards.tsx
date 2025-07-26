@@ -119,7 +119,8 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
     expiration_date: string,
     origin: string,
     destination: string,
-    id: string
+    id: string,
+    shipping_date?: string | null
   ) => {
           modalService.showModal({
         component: ExtendShipmentDeadline,
@@ -128,7 +129,8 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
         origin: origin,
         destination: destination,
         id,
-        shippingType
+        shippingType,
+        shipping_date
       },
     })
   }
@@ -345,7 +347,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
                             <span className="text-xs text-muted-foreground">
                               {t('cargoList.shipping')}
                             </span>
-                            <span className="text-sm">{convertToColombiaTime(bid.shipping_date)}</span>
+                            <span className="text-sm">{formatDateUTCAsLocal(bid.shipping_date)}</span>
                           </div>
                         </div>
                       )}
@@ -367,7 +369,8 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
                           bid.expiration_date,
                           bid.origin,
                           bid.destination,
-                          bid.id.toString()
+                          bid.id.toString(),
+                          bid.shipping_date
                         )
                       }}
                     >

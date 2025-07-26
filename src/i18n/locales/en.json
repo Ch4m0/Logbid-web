@@ -660,7 +660,11 @@
     "dateUpdated": "Date updated!",
     "errorUpdating": "Error updating date",
     "selectDate": "Select a date",
-    "selectDateAfter": "Select a date after"
+    "selectDateAfter": "Select a date after",
+    "validation": {
+      "dateRequired": "A date is required",
+      "dateMustBeBeforeShipping": "The closing date must be before the shipping date"
+    }
   },
   "filters": {
     "filterCreationDate": "Filter creation date",
