@@ -130,7 +130,8 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
         destination: destination,
         id,
         shippingType,
-        shipping_date
+        shipping_date,
+        onRefetch: refetch
       },
     })
   }

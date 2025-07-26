@@ -655,15 +655,25 @@
   "extendCargo": {
     "title": "Extend Shipment Deadline",
     "newDate": "New Expiration Date",
+    "shippingDate": "Shipping Date",
     "route": "Route",
     "currentExpiration": "Current Expiration",
     "dateUpdated": "Date updated!",
     "errorUpdating": "Error updating date",
     "selectDate": "Select a date",
+    "selectShippingDate": "Select shipping date",
     "selectDateAfter": "Select a date after",
     "validation": {
       "dateRequired": "A date is required",
-      "dateMustBeBeforeShipping": "The closing date must be before the shipping date"
+      "dateMustBeAfterCurrentClosing": "The new closing date must be after the current one",
+      "shippingMustBeAfterClosing": "The shipping date must be at least 1 day after the closing date",
+      "closingMustBeBeforeShipping": "The closing date must be before the shipping date"
+    },
+    "shippingTypes": {
+      "air": "Air",
+      "maritime": "Maritime",
+      "land": "Land", 
+      "warehouse": "Warehouse"
     }
   },
   "filters": {

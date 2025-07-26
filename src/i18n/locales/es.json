@@ -653,17 +653,27 @@
     }
   },
   "extendCargo": {
-    "title": "Extender Plazo de Envío",
+    "title": "Extender Plazo de Embarque",
     "newDate": "Nueva Fecha de cierre",
+    "shippingDate": "Fecha de Embarque",
     "route": "Ruta",
     "currentExpiration": "Fecha de cierre actual",
     "dateUpdated": "¡Fecha actualizada!",
     "errorUpdating": "Error al actualizar la fecha",
     "selectDate": "Selecciona una fecha",
+    "selectShippingDate": "Selecciona fecha de embarque",
     "selectDateAfter": "Selecciona una fecha posterior a",
     "validation": {
       "dateRequired": "Una fecha es requerida",
-      "dateMustBeBeforeShipping": "La fecha de cierre debe ser anterior a la fecha de embarque"
+      "dateMustBeAfterCurrentClosing": "La nueva fecha de cierre debe ser posterior a la actual",
+      "shippingMustBeAfterClosing": "La fecha de embarque debe ser al menos 1 día después de la fecha de cierre",
+      "closingMustBeBeforeShipping": "La fecha de cierre debe ser anterior a la fecha de embarque"
+    },
+    "shippingTypes": {
+      "air": "Aéreo",
+      "maritime": "Marítimo", 
+      "land": "Terrestre",
+      "warehouse": "Almacén"
     }
   },
   "filters": {

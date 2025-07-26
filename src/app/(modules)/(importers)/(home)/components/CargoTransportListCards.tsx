@@ -87,6 +87,8 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
     shipping_type: shippingType as ShippingType,
   })
 
+
+
   useEffect(() => {
     refetch()
   }, [shippingType, refetch])
@@ -125,16 +127,21 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
     id: string,
     shipping_date?: string | null
   ) => {
-          modalService.showModal({
-        component: ExtendShipmentDeadline,
-        props: {
+      const modalProps = {
         expiration_date: expiration_date,
         origin: origin,
         destination: destination,
         id,
         shippingType,
-        shipping_date
-      },
+        shipping_date,
+        onRefetch: refetch
+      }
+      
+
+      
+      modalService.showModal({
+        component: ExtendShipmentDeadline,
+        props: modalProps,
     })
   }
 

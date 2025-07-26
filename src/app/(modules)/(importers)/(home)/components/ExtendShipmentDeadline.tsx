@@ -1,6 +1,7 @@
 "use client"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
+import { es, enUS } from "date-fns/locale"
 import { CalendarIcon, TruckIcon, PlaneIcon, ShipIcon, WarehouseIcon, Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -36,29 +37,29 @@ const parseDateSimple = (dateString: string): Date => {
 
 const createFormSchema = (expiration_date: string, shipping_date?: string | null, t?: any) => z.object({
   dob_cierre: z.date({
-    required_error: t?.('extendCargo.validation.dateRequired') || "Una fecha es requerida.",
+    required_error: t?.('extendCargo.validation.dateRequired') || "A date is required.",
   }),
   dob_embarque: z.date({
-    required_error: t?.('extendCargo.validation.dateRequired') || "Una fecha es requerida.",
+    required_error: t?.('extendCargo.validation.dateRequired') || "A date is required.",
   })
 }).refine((data) => {
   // dob_cierre debe ser mayor a la fecha de cierre actual
   const cierreActual = parseDateSimple(expiration_date)
   return data.dob_cierre > cierreActual
 }, {
-  message: t?.('extendCargo.validation.dateMustBeAfterCurrentClosing') || "La nueva fecha de cierre debe ser posterior a la actual",
+  message: t?.('extendCargo.validation.dateMustBeAfterCurrentClosing') || "The new closing date must be after the current one",
   path: ['dob_cierre']
 }).refine((data) => {
   // dob_embarque debe ser al menos 1 día después de dob_cierre
   return differenceInCalendarDays(data.dob_embarque, data.dob_cierre) >= 1
 }, {
-  message: t?.('extendCargo.validation.shippingMustBeAfterClosing') || "La fecha de embarque debe ser al menos 1 día después de la fecha de cierre",
+  message: t?.('extendCargo.validation.shippingMustBeAfterClosing') || "The shipping date must be at least 1 day after the closing date",
   path: ['dob_embarque']
 }).refine((data) => {
   // dob_cierre debe ser menor a dob_embarque
   return data.dob_cierre < data.dob_embarque
 }, {
-  message: t?.('extendCargo.validation.closingMustBeBeforeShipping') || "La fecha de cierre debe ser anterior a la fecha de embarque",
+  message: t?.('extendCargo.validation.closingMustBeBeforeShipping') || "The closing date must be before the shipping date",
   path: ['dob_cierre']
 })
 
@@ -69,6 +70,7 @@ export function ExtendShipmentDeadline({
   id,
   shippingType,
   shipping_date, // Fecha de embarque
+  onRefetch,
 }: {
   expiration_date: string
   origin: string
@@ -76,8 +78,16 @@ export function ExtendShipmentDeadline({
   id: string
   shippingType: string
   shipping_date?: string | null
+  onRefetch?: () => void
 }) {
-  const { t } = useTranslation()
+ 
+
+  const { t, getCurrentLanguage } = useTranslation()
+  
+  // Función para obtener el locale correcto basado en el idioma actual
+  const getCurrentLocale = () => {
+    return getCurrentLanguage() === 'es' ? es : enUS
+  }
   const { mutate: extendExpirationDate, isPending } = useExtendExpirationDate()
 
   // Crear el schema de validación con las fechas
@@ -108,15 +118,27 @@ export function ExtendShipmentDeadline({
     },
   })
 
+  // Función para mapear tipos de shipping a claves de traducción
+  const getShippingTypeKey = (type: string) => {
+    const typeMap: { [key: string]: string } = {
+      'Aéreo': 'air',
+      'Marítimo': 'maritime', 
+      'Terrestre': 'land',
+      'Almacén': 'warehouse'
+    }
+    return typeMap[type] || 'warehouse'
+  }
+
   const getShippingIcon = () => {
-    switch (shippingType) {
-      case "Aéreo":
+    const typeKey = getShippingTypeKey(shippingType)
+    switch (typeKey) {
+      case "air":
         return <PlaneIcon className="h-5 w-5 text-muted-foreground" />
-      case "Marítimo":
+      case "maritime":
         return <ShipIcon className="h-5 w-5 text-muted-foreground" />
-      case "Terrestre":
+      case "land":
         return <TruckIcon className="h-5 w-5 text-muted-foreground" />
-      case "Almacén":
+      case "warehouse":
       default:
         return <WarehouseIcon className="h-5 w-5 text-muted-foreground" />
     }
@@ -133,6 +155,11 @@ export function ExtendShipmentDeadline({
           toast({
             title: t('extendCargo.dateUpdated'),
           })
+          
+          // Refrescar la lista manualmente
+          if (onRefetch) {
+            onRefetch()
+          }
           modalService.closeModal()
         },
         onError: (error) => {
@@ -174,7 +201,7 @@ export function ExtendShipmentDeadline({
                   <div className="font-medium">{formatDateUTCAsLocal(expiration_date).split(' ')[0]}</div>
                 </div>
                 <Badge variant="secondary">
-                  {shippingType}
+                  {t(`extendCargo.shippingTypes.${getShippingTypeKey(shippingType)}`)}
                 </Badge>
               </div>
             </div>
@@ -192,7 +219,7 @@ export function ExtendShipmentDeadline({
                           variant="outline"
                           className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
                         >
-                          {field.value ? format(field.value, "PPP") : <span>{t('extendCargo.selectDate')}</span>}
+                          {field.value ? format(field.value, "PPP", { locale: getCurrentLocale() }) : <span>{t('extendCargo.selectDate')}</span>}
                           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
                       </FormControl>
@@ -202,6 +229,8 @@ export function ExtendShipmentDeadline({
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
+                        defaultMonth={field.value || expirationDate}
+                        locale={getCurrentLocale()}
                         disabled={(date) => {
                           // No permitir fechas antes de expirationDatePlusOne
                           if (date < expirationDate) return true
@@ -215,7 +244,7 @@ export function ExtendShipmentDeadline({
                     </PopoverContent>
                   </Popover>
                   <FormDescription>
-                    {t('extendCargo.selectDateAfter')} {format(expirationDate, "PPP")}
+                    {t('extendCargo.selectDateAfter')} {format(expirationDate, "PPP", { locale: getCurrentLocale() })}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -226,7 +255,7 @@ export function ExtendShipmentDeadline({
               name="dob_embarque"
               render={({ field }) => (
                 <FormItem className="space-y-2">
-                  <FormLabel>Fecha de Embarque</FormLabel>
+                  <FormLabel>{t('extendCargo.shippingDate')}</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -234,7 +263,7 @@ export function ExtendShipmentDeadline({
                           variant="outline"
                           className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
                         >
-                          {field.value ? format(field.value, "PPP") : <span>Selecciona fecha de embarque</span>}
+                          {field.value ? format(field.value, "PPP", { locale: getCurrentLocale() }) : <span>{t('extendCargo.selectShippingDate')}</span>}
                           <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
                       </FormControl>
@@ -244,6 +273,8 @@ export function ExtendShipmentDeadline({
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
+                        defaultMonth={field.value || shippingDateInitial}
+                        locale={getCurrentLocale()}
                         disabled={(date) => {
                           // No permitir fechas antes de 1 día después de la fecha de cierre seleccionada
                           const cierre = form.getValues('dob_cierre')
@@ -255,7 +286,7 @@ export function ExtendShipmentDeadline({
                     </PopoverContent>
                   </Popover>
                   <FormDescription>
-                    Debe ser al menos 1 día después de la fecha de cierre
+                    {t('extendCargo.validation.shippingMustBeAfterClosing')}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

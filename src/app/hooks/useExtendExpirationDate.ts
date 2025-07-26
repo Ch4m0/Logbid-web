@@ -45,8 +45,10 @@ export const useExtendExpirationDate = () => {
     mutationFn: extendExpirationDateSupabase,
     onSuccess: (data) => {
       console.log('✅ Extend expiration date success:', data)
-      // Invalidar queries relacionadas para refrescar la data
-      queryClient.invalidateQueries({ queryKey: ['shipments'] })
+      // Invalidar todas las queries que empiecen con 'shipments'
+      queryClient.invalidateQueries({ 
+        predicate: (query) => query.queryKey[0] === 'shipments'
+      })
       return data
     },
     onError: (error) => {
