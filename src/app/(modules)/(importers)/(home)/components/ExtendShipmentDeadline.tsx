@@ -26,6 +26,14 @@ import { Badge } from "@/src/components/ui/badge"
 import { useTranslation } from "@/src/hooks/useTranslation"
 import { differenceInCalendarDays, addDays, parseISO, startOfDay } from 'date-fns'
 
+// Función helper para parsear fechas de forma simple
+const parseDateSimple = (dateString: string): Date => {
+  // Usar solo la parte de la fecha (YYYY-MM-DD) y crear fecha local
+  const dateOnly = dateString.split('T')[0]
+  // Usar parseISO con solo la parte de fecha para evitar problemas de zona horaria
+  return parseISO(dateOnly + 'T12:00:00') // Usar mediodía para evitar problemas de zona horaria
+}
+
 const createFormSchema = (expiration_date: string, shipping_date?: string | null, t?: any) => z.object({
   dob_cierre: z.date({
     required_error: t?.('extendCargo.validation.dateRequired') || "Una fecha es requerida.",
@@ -35,8 +43,7 @@ const createFormSchema = (expiration_date: string, shipping_date?: string | null
   })
 }).refine((data) => {
   // dob_cierre debe ser mayor a la fecha de cierre actual
-  const cierreActual = new Date(expiration_date)
-  cierreActual.setHours(0,0,0,0)
+  const cierreActual = parseDateSimple(expiration_date)
   return data.dob_cierre > cierreActual
 }, {
   message: t?.('extendCargo.validation.dateMustBeAfterCurrentClosing') || "La nueva fecha de cierre debe ser posterior a la actual",
@@ -76,40 +83,27 @@ export function ExtendShipmentDeadline({
   // Crear el schema de validación con las fechas
   const FormSchema = createFormSchema(expiration_date, shipping_date, t)
 
-  // Crear expirationDatePlusOne de forma consistente
-  const expirationDateOnly = expiration_date.split('T')[0]
-  const [expYear, expMonth, expDay] = expirationDateOnly.split('-').map(Number)
-  const expirationDateLocal = new Date(expYear, expMonth - 1, expDay)
-  const expirationDatePlusOne = addDays(expirationDateLocal, 1)
+  // Crear fechas de forma simple
+  const expirationDate = parseDateSimple(expiration_date)
   
-  // Crear shippingDateInitial de forma más segura usando date-fns
+  // Crear shippingDateInitial de forma simple
   let shippingDateInitial: Date
   if (shipping_date) {
     try {
-      // Extraer solo la parte de fecha (YYYY-MM-DD) para evitar problemas de zona horaria
-      const dateOnly = shipping_date.split('T')[0]
-      const [year, month, day] = dateOnly.split('-').map(Number)
-      shippingDateInitial = new Date(year, month - 1, day) // month - 1 porque Date usa 0-based months
+      shippingDateInitial = parseDateSimple(shipping_date)
     } catch (error) {
-      // Si falla, usar la fecha por defecto
-      shippingDateInitial = addDays(expirationDatePlusOne, 1)
+      // Si falla, usar fecha por defecto
+      shippingDateInitial = addDays(expirationDate, 1)
     }
   } else {
-    shippingDateInitial = addDays(expirationDatePlusOne, 1)
+    // Fecha por defecto: 2 días después de la fecha de expiración actual
+    shippingDateInitial = addDays(expirationDate, 1)
   }
   
-  console.log('🔍 Debug fechas:', {
-    shipping_date,
-    shippingDateInitial: shippingDateInitial.toISOString(),
-    expirationDatePlusOne: expirationDatePlusOne.toISOString(),
-    shippingDateInitialLocal: shippingDateInitial.toLocaleDateString(),
-    expirationDatePlusOneLocal: expirationDatePlusOne.toLocaleDateString()
-  })
-
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      dob_cierre: expirationDatePlusOne,
+      dob_cierre: expirationDate,
       dob_embarque: shippingDateInitial,
     },
   })
@@ -210,7 +204,7 @@ export function ExtendShipmentDeadline({
                         onSelect={field.onChange}
                         disabled={(date) => {
                           // No permitir fechas antes de expirationDatePlusOne
-                          if (date < expirationDatePlusOne) return true
+                          if (date < expirationDate) return true
                           // No permitir fechas igual o después de la fecha de embarque seleccionada
                           const embarque = form.getValues('dob_embarque')
                           if (embarque && date >= embarque) return true
@@ -221,7 +215,7 @@ export function ExtendShipmentDeadline({
                     </PopoverContent>
                   </Popover>
                   <FormDescription>
-                    {t('extendCargo.selectDateAfter')} {format(expirationDatePlusOne, "PPP")}
+                    {t('extendCargo.selectDateAfter')} {format(expirationDate, "PPP")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
