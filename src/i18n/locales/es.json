@@ -650,6 +650,42 @@
     "buttons": {
       "createShipment": "Crear Embarque",
       "creating": "Creando..."
+    },
+    "confirmation": {
+      "title": "Confirmar creación de embarque",
+      "description": "¿Estás seguro de que quieres crear este embarque con la información proporcionada?",
+      "summary": "Resumen completo del embarque:",
+      "sections": {
+        "basicInfo": "Información básica",
+        "originDestination": "Origen y destino",
+        "shipmentDetails": "Detalles del envío",
+        "measureQuantities": "Medidas y cantidades",
+        "commercialInfo": "Información comercial",
+        "additionalInfo": "Información adicional"
+      },
+      "fields": {
+        "transportType": "Tipo de transporte",
+        "comexType": "Tipo Comex",
+        "origin": "Origen",
+        "destination": "Destino",
+        "shipmentType": "Tipo de envío",
+        "merchandiseType": "Tipo de mercancía",
+        "container": "Contenedor/Embalaje",
+        "totalWeight": "Peso total",
+        "measureType": "Tipo de medida",
+        "volume": "Volumen (CBM)",
+        "units": "Unidades",
+        "incoterm": "Incoterm",
+        "cargoClassification": "Clasificación de carga",
+        "value": "Valor",
+        "tariffItem": "Partida arancelaria",
+        "expirationDate": "Fecha de expiración",
+        "shippingDate": "Fecha de embarque"
+      },
+      "buttons": {
+        "cancel": "Cancelar",
+        "confirm": "Confirmar y crear"
+      }
     }
   },
   "extendCargo": {

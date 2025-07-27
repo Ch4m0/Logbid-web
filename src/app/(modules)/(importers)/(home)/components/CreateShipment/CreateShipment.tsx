@@ -882,28 +882,28 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-orange-500" />
-              Confirmar creación de shipment
+              {t('createCargo.confirmation.title')}
             </DialogTitle>
             <DialogDescription>
-              ¿Estás seguro de que quieres crear este shipment con la información proporcionada?
+              {t('createCargo.confirmation.description')}
             </DialogDescription>
           </DialogHeader>
 
           {pendingValues && (
             <div className="space-y-3 text-sm max-h-96 overflow-y-auto">
               <div className="bg-gray-50 p-3 rounded-lg">
-                <h4 className="font-semibold mb-3 text-base">Resumen completo del shipment:</h4>
+                <h4 className="font-semibold mb-3 text-base">{t('createCargo.confirmation.summary')}</h4>
                 <div className="space-y-2">
                   {/* Información básica */}
                   <div className="border-b border-gray-200 pb-2">
-                    <h5 className="font-medium text-gray-800 mb-1">📋 Información básica</h5>
+                    <h5 className="font-medium text-gray-800 mb-1">📋 {t('createCargo.confirmation.sections.basicInfo')}</h5>
                     <div className="space-y-1">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Tipo de transporte:</span>
+                        <span className="text-gray-600">{t('createCargo.confirmation.fields.transportType')}:</span>
                         <span className="font-medium">{pendingValues.tipoTransporte}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Tipo Comex:</span>
+                        <span className="text-gray-600">{t('createCargo.confirmation.fields.comexType')}:</span>
                         <span className="font-medium">{pendingValues.tipoComex}</span>
                       </div>
                     </div>
@@ -911,14 +911,14 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
 
                   {/* Origen y destino */}
                   <div className="border-b border-gray-200 pb-2">
-                    <h5 className="font-medium text-gray-800 mb-1">🌍 Origen y destino</h5>
+                    <h5 className="font-medium text-gray-800 mb-1">🌍 {t('createCargo.confirmation.sections.originDestination')}</h5>
                     <div className="space-y-1">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Origen:</span>
+                        <span className="text-gray-600">{t('createCargo.confirmation.fields.origin')}:</span>
                         <span className="font-medium">{getOriginName(pendingValues.origen)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Destino:</span>
+                        <span className="text-gray-600">{t('createCargo.confirmation.fields.destination')}:</span>
                         <span className="font-medium">{getDestinationName(pendingValues.destino)}</span>
                       </div>
                     </div>
@@ -926,19 +926,19 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
 
                   {/* Detalles del envío */}
                   <div className="border-b border-gray-200 pb-2">
-                    <h5 className="font-medium text-gray-800 mb-1">📦 Detalles del envío</h5>
+                    <h5 className="font-medium text-gray-800 mb-1">📦 {t('createCargo.confirmation.sections.shipmentDetails')}</h5>
                     <div className="space-y-1">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Tipo de envío:</span>
+                        <span className="text-gray-600">{t('createCargo.confirmation.fields.shipmentType')}:</span>
                         <span className="font-medium">{pendingValues.tipoEnvio}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Tipo de mercancía:</span>
+                        <span className="text-gray-600">{t('createCargo.confirmation.fields.merchandiseType')}:</span>
                         <span className="font-medium">{pendingValues.tipoMercancia}</span>
                       </div>
                       {pendingValues.contenedor && (
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Contenedor/Embalaje:</span>
+                          <span className="text-gray-600">{t('createCargo.confirmation.fields.container')}:</span>
                           <span className="font-medium">{getContainerName(pendingValues.contenedor)}</span>
                         </div>
                       )}
@@ -947,41 +947,41 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
 
                   {/* Medidas y cantidades */}
                   <div className="border-b border-gray-200 pb-2">
-                    <h5 className="font-medium text-gray-800 mb-1">⚖️ Medidas y cantidades</h5>
+                    <h5 className="font-medium text-gray-800 mb-1">⚖️ {t('createCargo.confirmation.sections.measureQuantities')}</h5>
                     <div className="space-y-1">
                       {pendingValues.pesoTotal && (
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Peso total:</span>
+                          <span className="text-gray-600">{t('createCargo.confirmation.fields.totalWeight')}:</span>
                           <span className="font-medium">{pendingValues.pesoTotal}</span>
                         </div>
                       )}
                       {pendingValues.tipoMedida && (
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Tipo de medida:</span>
+                          <span className="text-gray-600">{t('createCargo.confirmation.fields.measureType')}:</span>
                           <span className="font-medium">{pendingValues.tipoMedida}</span>
                         </div>
                       )}
                       {pendingValues.cbm && (
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Volumen (CBM):</span>
+                          <span className="text-gray-600">{t('createCargo.confirmation.fields.volume')}:</span>
                           <span className="font-medium">{pendingValues.cbm}</span>
                         </div>
                       )}
                       {pendingValues.unidades && (
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Unidades:</span>
+                          <span className="text-gray-600">{t('createCargo.confirmation.fields.units')}:</span>
                           <span className="font-medium">{pendingValues.unidades}</span>
                         </div>
                       )}
                       {pendingValues.incoterm && (
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Incoterm:</span>
+                          <span className="text-gray-600">{t('createCargo.confirmation.fields.incoterm')}:</span>
                           <span className="font-medium">{getIncotermName(pendingValues.incoterm)}</span>
                         </div>
                       )}
                       {pendingValues.cargaClasificacion && (
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Clasificación de carga:</span>
+                          <span className="text-gray-600">{t('createCargo.confirmation.fields.cargoClassification')}:</span>
                           <span className="font-medium">{pendingValues.cargaClasificacion}</span>
                         </div>
                       )}
@@ -990,25 +990,25 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
 
                   {/* Información comercial */}
                   <div className="border-b border-gray-200 pb-2">
-                    <h5 className="font-medium text-gray-800 mb-1">💰 Información comercial</h5>
+                    <h5 className="font-medium text-gray-800 mb-1">💰 {t('createCargo.confirmation.sections.commercialInfo')}</h5>
                     <div className="space-y-1">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Valor:</span>
+                        <span className="text-gray-600">{t('createCargo.confirmation.fields.value')}:</span>
                         <span className="font-medium">{pendingValues.valor} {pendingValues.moneda}</span>
                       </div>
                       {pendingValues.partidaArancelaria && (
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Partida arancelaria:</span>
+                          <span className="text-gray-600">{t('createCargo.confirmation.fields.tariffItem')}:</span>
                           <span className="font-medium">{pendingValues.partidaArancelaria}</span>
                         </div>
                       )}
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Fecha de expiración:</span>
+                        <span className="text-gray-600">{t('createCargo.confirmation.fields.expirationDate')}:</span>
                         <span className="font-medium">{pendingValues.fechaExpiracion}</span>
                       </div>
                       {pendingValues.fechaEmbarque && (
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Fecha de embarque:</span>
+                          <span className="text-gray-600">{t('createCargo.confirmation.fields.shippingDate')}:</span>
                           <span className="font-medium">{pendingValues.fechaEmbarque}</span>
                         </div>
                       )}
@@ -1018,7 +1018,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                   {/* Información adicional */}
                   {pendingValues.informacionAdicional && (
                     <div>
-                      <h5 className="font-medium text-gray-800 mb-1">📝 Información adicional</h5>
+                      <h5 className="font-medium text-gray-800 mb-1">📝 {t('createCargo.confirmation.sections.additionalInfo')}</h5>
                       <div className="bg-white p-2 rounded border text-gray-700 text-xs">
                         {pendingValues.informacionAdicional}
                       </div>
@@ -1035,7 +1035,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
               onClick={handleCancelConfirmation}
               disabled={isPending}
             >
-              Cancelar
+              {t('createCargo.confirmation.buttons.cancel')}
             </Button>
             <Button
               onClick={handleConfirmShipment}
@@ -1045,12 +1045,12 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
               {isPending ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Creando...
+                  {t('createCargo.buttons.creating')}
                 </>
               ) : (
                 <>
                   <CheckCircle className="h-4 w-4 mr-2" />
-                  Confirmar y crear
+                  {t('createCargo.confirmation.buttons.confirm')}
                 </>
               )}
             </Button>

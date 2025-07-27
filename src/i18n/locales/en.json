@@ -650,6 +650,42 @@
     "buttons": {
       "createShipment": "Create Shipment",
       "creating": "Creating..."
+    },
+    "confirmation": {
+      "title": "Confirm shipment creation",
+      "description": "Are you sure you want to create this shipment with the provided information?",
+      "summary": "Complete shipment summary:",
+      "sections": {
+        "basicInfo": "Basic information",
+        "originDestination": "Origin and destination",
+        "shipmentDetails": "Shipment details",
+        "measureQuantities": "Measures and quantities",
+        "commercialInfo": "Commercial information",
+        "additionalInfo": "Additional information"
+      },
+      "fields": {
+        "transportType": "Transport type",
+        "comexType": "COMEX type",
+        "origin": "Origin",
+        "destination": "Destination",
+        "shipmentType": "Shipment type",
+        "merchandiseType": "Merchandise type",
+        "container": "Container/Packaging",
+        "totalWeight": "Total weight",
+        "measureType": "Measure type",
+        "volume": "Volume (CBM)",
+        "units": "Units",
+        "incoterm": "Incoterm",
+        "cargoClassification": "Cargo classification",
+        "value": "Value",
+        "tariffItem": "Tariff item",
+        "expirationDate": "Expiration date",
+        "shippingDate": "Shipping date"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "confirm": "Confirm and create"
+      }
     }
   },
   "extendCargo": {
