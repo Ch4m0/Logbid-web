@@ -1,5 +1,5 @@
 import React from 'react';
-import { convertToColombiaTime, formatDateUTCAsLocal } from '@/src/lib/utils';
+import { convertToColombiaTime, formatDateUTCAsLocal, formatShippingDate } from '@/src/lib/utils';
 import { useTranslation } from '@/src/hooks/useTranslation';
 
 const BidInfo = ({ bidDataForAgent }: any) => {
@@ -92,7 +92,7 @@ const BidInfo = ({ bidDataForAgent }: any) => {
               <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
                 <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.shippingDate')}:</span>
                 <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">
-                  {formatDateUTCAsLocal(bidDataForAgent.shipping_date)}
+                  {formatShippingDate(bidDataForAgent.shipping_date)}
                 </span>
               </div>
             )}

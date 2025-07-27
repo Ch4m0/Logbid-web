@@ -31,7 +31,7 @@ import {
 import { Badge } from '@/src/components/ui/badge'
 import { Separator } from '@/src/components/ui/separator'
 import { ShippingType } from '@/src/models/common'
-import { convertToColombiaTime, formatDateUTCAsLocal } from '@/src/lib/utils'
+import { convertToColombiaTime, formatDateUTCAsLocal, formatShippingDate } from '@/src/lib/utils'
 import { useTranslation } from '@/src/hooks/useTranslation'
 
 interface ImporterShipmentCardsProps {
@@ -258,61 +258,70 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
               className="w-full cursor-pointer hover:shadow-md transition-shadow border-l-4 border-l-primary"
               onClick={() => goDetails(bid.uuid)}
             >
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                <div className="md:col-span-3 p-4 bg-muted/10">
+              <div className="flex flex-col md:grid md:grid-cols-12 gap-2 md:gap-4">
+                {/* Mobile: Top section with ID, agent code, and offers */}
+                <div className="md:col-span-3 p-3 md:p-4 bg-muted/10">
                   <div className="space-y-2">
-                    <Badge variant="outline" className="w-full justify-center">
-                      ID: {bid.uuid.substring(0, 20)}
+                    <Badge variant="outline" className="w-full justify-center text-xs">
+                      ID: {bid.uuid.substring(0, 15)}...
                     </Badge>
 
                     {shouldShowStatusElements() && (
                       <Badge
-                        className="w-full justify-center"
+                        className="w-full justify-center text-xs"
                         variant="secondary"
                       >
                         {t('cargoList.agentCode')}: {bid.agent_code}
                       </Badge>
                     )}
 
-                    {shouldShowStatusElements() && (
-                      <div className="flex items-center justify-center space-x-2 mt-3 bg-primary/10 p-2 rounded-md">
-                        <DollarSign className="h-4 w-4 text-primary" />
-                        <span className="text-sm font-medium">
-                          USD {bid.last_price}
+                    <div className="grid grid-cols-1 gap-2">
+                      {shouldShowStatusElements() && (
+                        <div className="flex items-center justify-center space-x-2 bg-primary/10 p-2 rounded-md">
+                          <DollarSign className="h-4 w-4 text-primary" />
+                          <span className="text-xs md:text-sm font-medium">
+                            USD {bid.last_price}
+                          </span>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center justify-center space-x-2 bg-blue-50 p-2 rounded-md">
+                        <Users className="h-4 w-4 text-blue-600" />
+                        <span className="text-xs md:text-sm font-medium text-blue-600">
+                          {bid.offers_count} {bid.offers_count === 1 ? t('cargoList.offer') : t('cargoList.offers')}
                         </span>
                       </div>
-                    )}
-                    <div className="flex items-center justify-center space-x-2 mt-2 bg-blue-50 p-2 rounded-md">
-                      <Users className="h-4 w-4 text-blue-600" />
-                      <span className="text-sm font-medium text-blue-600">
-                        {bid.offers_count} {bid.offers_count === 1 ? t('cargoList.offer') : t('cargoList.offers')}
-                      </span>
                     </div>
                   </div>
                 </div>
 
-                <div className={`p-4 ${status === 'Closed' ? 'md:col-span-9' : 'md:col-span-6'}`}>
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-4">
+                {/* Main content section */}
+                <div className={`p-3 md:p-4 ${status === 'Closed' ? 'md:col-span-9' : 'md:col-span-6'}`}>
+                  <div className="space-y-3 md:space-y-4">
+                    {/* Origin and Destination - Mobile stacked, Desktop horizontal */}
+                    <div className="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-4">
                       <div className="flex items-center space-x-2 flex-1">
-                        <MapPin className="h-5 w-5 text-primary" />
+                        <MapPin className="h-4 w-4 md:h-5 md:w-5 text-primary" />
                         <div className="flex flex-col">
-                          <span className="text-sm text-muted-foreground">
+                          <span className="text-xs text-muted-foreground">
                             {t('cargoList.origin')}
                           </span>
-                          <span className="font-medium">{bid.origin}</span>
+                          <span className="font-medium text-sm md:text-base">{bid.origin}</span>
                         </div>
                       </div>
 
-                      <ArrowRight className="h-5 w-5 text-muted-foreground hidden md:block" />
+                      <ArrowRight className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground hidden md:block mx-auto" />
+                      <div className="flex md:hidden justify-center">
+                        <div className="h-px w-full bg-muted-foreground/20"></div>
+                      </div>
 
                       <div className="flex items-center space-x-2 flex-1">
-                        <MapPin className="h-5 w-5 text-destructive" />
+                        <MapPin className="h-4 w-4 md:h-5 md:w-5 text-destructive" />
                         <div className="flex flex-col">
-                          <span className="text-sm text-muted-foreground">
+                          <span className="text-xs text-muted-foreground">
                             {t('cargoList.destination')}
                           </span>
-                          <span className="font-medium">
+                          <span className="font-medium text-sm md:text-base">
                             {bid.destination}
                           </span>
                         </div>
@@ -320,50 +329,55 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
                     </div>
 
                     <Separator className="my-2" />
-                    <div className={`grid gap-4 ${(shippingType === 'Marítimo' || shippingType === 'Aéreo') && bid.shipping_date ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                    
+                    {/* Dates section - Mobile: 1 column, Tablet: 2 columns, Desktop: 2-3 columns */}
+                    <div className={`grid gap-3 md:gap-4 
+                      ${(shippingType === 'Marítimo' || shippingType === 'Aéreo') && bid.shipping_date 
+                        ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' 
+                        : 'grid-cols-1 sm:grid-cols-2'}`}>
+                      
                       <div className="flex items-center space-x-2">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                        <div className="flex flex-col">
+                        <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <div className="flex flex-col min-w-0">
                           <span className="text-xs text-muted-foreground">
                             {t('cargoList.creation')}
                           </span>
-                          <span className="text-sm">{convertToColombiaTime(bid.inserted_at)}</span>
+                          <span className="text-xs md:text-sm truncate">{convertToColombiaTime(bid.inserted_at)}</span>
                         </div>
                       </div>
 
                       <div className="flex items-center space-x-2">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        <div className="flex flex-col">
+                        <Clock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <div className="flex flex-col min-w-0">
                           <span className="text-xs text-muted-foreground">
                             {t('cargoList.finalization')}
                           </span>
-                          <span className="text-sm">{formatDateUTCAsLocal(bid.expiration_date)}</span>
+                          <span className="text-xs md:text-sm truncate">{formatDateUTCAsLocal(bid.expiration_date)}</span>
                         </div>
                       </div>
                       
                       {(shippingType === 'Marítimo' || shippingType === 'Aéreo') && bid.shipping_date && (
-                        <div className="flex items-center space-x-2">
-                          <Package className="h-4 w-4 text-blue-600" />
-                          <div className="flex flex-col">
+                        <div className="flex items-center space-x-2 sm:col-span-2 lg:col-span-1">
+                          <Package className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                          <div className="flex flex-col min-w-0">
                             <span className="text-xs text-muted-foreground">
                               {t('cargoList.shipping')}
                             </span>
-                            <span className="text-sm">{formatDateUTCAsLocal(bid.shipping_date)}</span>
+                            <span className="text-xs md:text-sm truncate">{formatShippingDate(bid.shipping_date)}</span>
                           </div>
                         </div>
                       )}
-                      
-
                     </div>
                   </div>
                 </div>
 
+                {/* Extend button section */}
                 {filterType !== 'closed' && (
-                  <div className="md:col-span-3 p-4 flex items-center justify-center border-t md:border-t-0 md:border-l">
+                  <div className="md:col-span-3 p-3 md:p-4 flex items-center justify-center border-t md:border-t-0 md:border-l">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="w-full"
+                      className="w-full text-xs md:text-sm"
                       onClick={(e) => {
                         e.stopPropagation()
                         showExtendFinalDate(

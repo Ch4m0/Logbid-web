@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/src/components/ui/card'
-import { convertToColombiaTime, formatDateUTCAsLocal } from '@/src/lib/utils'
+import { convertToColombiaTime, formatDateUTCAsLocal, formatShippingDate } from '@/src/lib/utils'
 import { useGetBidListByMarket } from '@/src/app/hooks/useGetBidListByMarket'
 import useAuthStore from '@/src/store/authStore'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -297,57 +297,72 @@ export function AgentShipmentList({ status }: AgentShipmentListProps) {
               className="w-full cursor-pointer hover:shadow-md transition-shadow border-l-4 border-l-primary"
               onClick={() => handleViewShipment(shipment.uuid)}
             >
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                <div className="md:col-span-3 p-4 bg-muted/10">
+              <div className="flex flex-col md:grid md:grid-cols-12 gap-2 md:gap-4">
+                {/* Mobile: Top section with ID, agent code, price and offers */}
+                <div className="md:col-span-3 p-3 md:p-4 bg-muted/10">
                   <div className="space-y-2">
-                    <Badge variant="outline" className="w-full justify-center">
-                      ID: {shipment.uuid.substring(0, 20)}
+                    <Badge variant="outline" className="w-full justify-center text-xs">
+                      ID: {shipment.uuid.substring(0, 15)}...
                     </Badge>
+                    
                     {STATUS.includes(status) && (
                       <Badge
-                        className="w-full justify-center"
+                        className="w-full justify-center text-xs"
                         variant="secondary"
                       >
                         {t('cargoList.agentCode')}: {shipment.agent_code}
                       </Badge>
                     )}
-                    {STATUS.includes(status) && (
-                      <div className="flex items-center justify-center space-x-2 mt-3 bg-primary/10 p-2 rounded-md">
-                        <DollarSign className="h-4 w-4 text-primary" />
-                        <span className="text-sm font-medium">
-                          USD {shipment.last_price}
+                    
+                    <div className="grid grid-cols-1 gap-2">
+                      {STATUS.includes(status) && (
+                        <div className="flex items-center justify-center space-x-2 bg-primary/10 p-2 rounded-md">
+                          <DollarSign className="h-4 w-4 text-primary" />
+                          <span className="text-xs md:text-sm font-medium">
+                            USD {shipment.last_price}
+                          </span>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center justify-center space-x-2 bg-blue-50 p-2 rounded-md">
+                        <Users className="h-4 w-4 text-blue-600" />
+                        <span className="text-xs md:text-sm font-medium text-blue-600">
+                          {shipment.offers_count} {shipment.offers_count === 1 ? t('cargoList.offer') : t('cargoList.offers')}
                         </span>
                       </div>
-                    )}
-                    <div className="flex items-center justify-center space-x-2 mt-2 bg-blue-50 p-2 rounded-md">
-                      <Users className="h-4 w-4 text-blue-600" />
-                      <span className="text-sm font-medium text-blue-600">
-                        {shipment.offers_count} {shipment.offers_count === 1 ? t('cargoList.offer') : t('cargoList.offers')}
-                      </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="md:col-span-9 p-4">
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-4">
+                {/* Main content section */}
+                <div className="md:col-span-9 p-3 md:p-4">
+                  <div className="space-y-3 md:space-y-4">
+                    {/* Origin and Destination - Mobile stacked, Desktop horizontal */}
+                    <div className="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-4">
                       <div className="flex items-center space-x-2 flex-1">
-                        <MapPin className="h-5 w-5 text-primary" />
-                        <div className="flex flex-col">
-                          <span className="text-sm text-muted-foreground">
+                        <MapPin className="h-4 w-4 md:h-5 md:w-5 text-primary" />
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-xs text-muted-foreground">
                             {t('cargoList.origin')}
                           </span>
-                          <span className="font-medium">{shipment.origin_country} - {shipment.origin_name}</span>
+                          <span className="font-medium text-sm md:text-base truncate">
+                            {shipment.origin_country} - {shipment.origin_name}
+                          </span>
                         </div>
                       </div>
-                      <ArrowRight className="h-5 w-5 text-muted-foreground hidden md:block" />
+                      
+                      <ArrowRight className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground hidden md:block mx-auto" />
+                      <div className="flex md:hidden justify-center">
+                        <div className="h-px w-full bg-muted-foreground/20"></div>
+                      </div>
+                      
                       <div className="flex items-center space-x-2 flex-1">
-                        <MapPin className="h-5 w-5 text-destructive" />
-                        <div className="flex flex-col">
-                          <span className="text-sm text-muted-foreground">
+                        <MapPin className="h-4 w-4 md:h-5 md:w-5 text-destructive" />
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-xs text-muted-foreground">
                             {t('cargoList.destination')}
                           </span>
-                          <span className="font-medium">
+                          <span className="font-medium text-sm md:text-base truncate">
                             {shipment.destination_country} - {shipment.destination_name}
                           </span>
                         </div>
@@ -356,34 +371,40 @@ export function AgentShipmentList({ status }: AgentShipmentListProps) {
 
                     <Separator className="my-2" />
 
-                    <div className={`grid gap-4 ${(shippingType === 'Marítimo' || shippingType === 'Aéreo') && shipment.shipping_date ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                    {/* Dates section - Mobile: 1 column, Tablet: 2 columns, Desktop: 2-3 columns */}
+                    <div className={`grid gap-3 md:gap-4 
+                      ${(shippingType === 'Marítimo' || shippingType === 'Aéreo') && shipment.shipping_date 
+                        ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' 
+                        : 'grid-cols-1 sm:grid-cols-2'}`}>
+                      
                       <div className="flex items-center space-x-2">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                        <div className="flex flex-col">
+                        <Calendar className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <div className="flex flex-col min-w-0">
                           <span className="text-xs text-muted-foreground">
                             {t('cargoList.creation')}
                           </span>
-                          <span className="text-sm">{convertToColombiaTime(shipment.inserted_at)}</span>
+                          <span className="text-xs md:text-sm truncate">{convertToColombiaTime(shipment.inserted_at)}</span>
                         </div>
                       </div>
+                      
                       <div className="flex items-center space-x-2">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        <div className="flex flex-col">
+                        <Clock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <div className="flex flex-col min-w-0">
                           <span className="text-xs text-muted-foreground">
                             {t('cargoList.finalization')}
                           </span>
-                          <span className="text-sm">{formatDateUTCAsLocal(shipment.expiration_date)}</span>
+                          <span className="text-xs md:text-sm truncate">{formatDateUTCAsLocal(shipment.expiration_date)}</span>
                         </div>
                       </div>
                       
                       {(shippingType === 'Marítimo' || shippingType === 'Aéreo') && shipment.shipping_date && (
-                        <div className="flex items-center space-x-2">
-                          <Package className="h-4 w-4 text-blue-600" />
-                          <div className="flex flex-col">
+                        <div className="flex items-center space-x-2 sm:col-span-2 lg:col-span-1">
+                          <Package className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                          <div className="flex flex-col min-w-0">
                             <span className="text-xs text-muted-foreground">
                               {t('cargoList.shipping')}
                             </span>
-                            <span className="text-sm">{formatDateUTCAsLocal(shipment.shipping_date)}</span>
+                            <span className="text-xs md:text-sm truncate">{formatShippingDate(shipment.shipping_date)}</span>
                           </div>
                         </div>
                       )}

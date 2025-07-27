@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/src/components/ui/card'
-import { convertToColombiaTime, formatDateUTCAsLocal } from '@/src/lib/utils'
+import { convertToColombiaTime, formatDateUTCAsLocal, formatShippingDate } from '@/src/lib/utils'
 import { useGetBidListByMarket } from '@/src/app/hooks/useGetBidListByMarket'
 import useAuthStore from '@/src/store/authStore'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -333,7 +333,7 @@ export function AgentShipmentList({ status }: CargoTransporListProps) {
                             <span className="text-xs text-muted-foreground">
                               {t('cargoList.shipping')}
                             </span>
-                            <span className="text-sm">{formatDateUTCAsLocal(bid.shipping_date)}</span>
+                            <span className="text-sm">{formatShippingDate(bid.shipping_date)}</span>
                           </div>
                         </div>
                       )}

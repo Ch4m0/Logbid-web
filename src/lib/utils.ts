@@ -112,3 +112,35 @@ export function formatDateUTCAsLocal(utcDateStr: string) {
     return 'Error en fecha'
   }
 }
+
+/**
+ * Formatea una fecha de embarque mostrando solo la fecha (sin horas)
+ * @param {string} utcDateStr - Fecha en formato UTC (ISO 8601)
+ * @return {string} - Fecha en formato 'yyyy-MM-dd' sin conversión de zona horaria
+ */
+export function formatShippingDate(utcDateStr: string) {
+  // Validar que la fecha no esté vacía o sea null/undefined
+  if (!utcDateStr || utcDateStr.trim() === '') {
+    return 'Fecha no disponible'
+  }
+
+  try {
+    // Parsear la fecha UTC manualmente para extraer solo la fecha
+    const date = new Date(utcDateStr)
+    
+    // Verificar que la fecha sea válida
+    if (isNaN(date.getTime())) {
+      return 'Fecha inválida'
+    }
+
+    // Obtener solo los componentes de fecha UTC
+    const year = date.getUTCFullYear()
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+    const day = String(date.getUTCDate()).padStart(2, '0')
+    
+    return `${year}-${month}-${day}`
+  } catch (error) {
+    console.error('Error formatting shipping date:', error)
+    return 'Error en fecha'
+  }
+}
