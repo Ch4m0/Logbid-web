@@ -724,7 +724,15 @@
     "agentCode": "Código de Agente",
     "dangerousCargo": "Carga Peligrosa",
     "yes": "Sí",
-    "no": "No"
+    "no": "No",
+    "additionalDetails": "Detalles Adicionales",
+    "container": "Contenedor",
+    "incoterm": "Incoterm",
+    "dimensions": "Dimensiones",
+    "specialRequirements": "Requerimientos Especiales",
+    "additionalInfo": "Información Adicional",
+    "shipmentId": "ID de Envío",
+    "offersCount": "Número de Ofertas"
   },
   "offerCard": {
     "accepting": "Aceptando...",
