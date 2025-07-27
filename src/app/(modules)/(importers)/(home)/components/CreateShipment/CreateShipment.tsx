@@ -20,6 +20,14 @@ import {
   SheetTrigger,
 } from '@/src/components/ui/sheet'
 import { Textarea } from '@/src/components/ui/textarea'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/src/components/ui/dialog'
 import { container_sea, container_airplane, incoterms } from './data'
 import FilterableSelectAirport from '../../../../common/components/FilterableSelectAirport'
 import styled from 'styled-components'
@@ -31,10 +39,12 @@ import { drawerService } from '@/src/service/drawerService'
 import { useState, useEffect } from 'react'
 import { useGetIncotermList } from '@/src/app/hooks/useGetIncotermList'
 import { useGetListContainer } from '@/src/app/hooks/useGetContainerList'
+import { useGetAirportList } from '@/src/app/hooks/useGetAirportList'
+import { useGetMaritimeList } from '@/src/app/hooks/useGetMaritimeList'
 import { useCreateShipment } from '@/src/app/hooks/useCreateShipment'
 import FilterableSelectMaritimePort from '@/src/app/(modules)/common/components/FilterableSelectMaritimePort'
 import { useTranslation } from '@/src/hooks/useTranslation'
-import { Plus } from 'lucide-react'
+import { Plus, CheckCircle, AlertTriangle } from 'lucide-react'
 import { DatePicker } from '@/src/components/ui/date-picker'
 
 // Definir el tipo para los valores del formulario
@@ -73,6 +83,8 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
   const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [shippingType, setShippingType] = useState('Marítimo')
+  const [showConfirmation, setShowConfirmation] = useState(false)
+  const [pendingValues, setPendingValues] = useState<FormValues | null>(null)
 
   const profile = useAuthStore((state) => state.profile)
   const searchParams = useSearchParams()
@@ -159,6 +171,8 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
         }
       ),
     tipoMercancia: Yup.string().required(t('createCargo.validation.merchandiseTypeRequired')),
+    informacionAdicional: Yup.string()
+      .max(250, t('createCargo.validation.additionalInfoMaxLength')),
   })
 
   const formik = useFormik<FormValues>({
@@ -202,74 +216,154 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
         return
       }
 
-      // Función para convertir fecha a datetime con hora 23:59:59
-      const formatDateTimeEndOfDay = (dateString: string): string => {
-        if (!dateString) return ''
-        // Añadir la hora 23:59:59 para representar el final del día
-        return `${dateString} 23:59:59`
-      }
-
-      console.log('Iniciando creación de shipment...')
-
-      createShipment(
-        {
-          tipoTransporte: values.tipoTransporte,
-          origen: values.origen,
-          destino: values.destino,
-          tipoComex: values.tipoComex,
-          tipoEnvio: values.tipoEnvio,
-          valor: values.valor.toString(),
-          moneda: values.moneda,
-          fechaExpiracion: formatDateTimeEndOfDay(values.fechaExpiracion),
-          fechaEmbarque: formatDateTimeEndOfDay(values.fechaEmbarque),
-          informacionAdicional: values.informacionAdicional,
-          tipoMercancia: values.tipoMercancia,
-          market_id: parseInt(marketId),
-          // Campos adicionales del formulario
-          contenedor: values.contenedor,
-          pesoTotal: typeof values.pesoTotal === 'number' ? values.pesoTotal : undefined,
-          tipoMedida: values.tipoMedida,
-          cbm: typeof values.cbm === 'number' ? values.cbm : undefined,
-          unidades: typeof values.unidades === 'number' ? values.unidades : undefined,
-          incoterm: values.incoterm,
-          cargaClasificacion: values.cargaClasificacion,
-          partidaArancelaria: values.partidaArancelaria,
-        },
-        {
-          onSuccess: (data) => {
-            console.log('Shipment created successfully:', data)
-            toast({
-              title: '¡Shipment creado exitosamente!',
-              description: `Ruta: ${data.origin_name} → ${data.destination_name}`,
-              variant: 'default',
-            })
-            setIsOpen(false)
-            formik.resetForm()
-            
-            // 🔄 Refrescar la lista manualmente
-            console.log('🔄 Ejecutando refetch manual...')
-            if (onRefetch) {
-              onRefetch()
-              console.log('✅ Refetch ejecutado - la lista se actualizará automáticamente')
-            } else {
-              console.log('⚠️ No se proporcionó función onRefetch')
-            }
-          },
-          onError: (error) => {
-            console.error('Error creating shipment:', error)
-            toast({
-              title: 'Error al crear el shipment',
-              description: error.message || 'Ocurrió un error inesperado',
-              variant: 'destructive',
-            })
-          },
-        }
-      )
+      // Mostrar diálogo de confirmación
+      setPendingValues(values)
+      setShowConfirmation(true)
     },
   })
 
   const { data: listIncoterm } = useGetIncotermList()
   const { mutate: createShipment, isPending } = useCreateShipment()
+  
+  // Obtener datos de puertos y aeropuertos para el mapeo
+  const { data: airportData } = useGetAirportList('', true)
+  const { data: maritimeData } = useGetMaritimeList('', true)
+
+  // Función para convertir fecha a datetime con hora 23:59:59
+  const formatDateTimeEndOfDay = (dateString: string): string => {
+    if (!dateString) return ''
+    // Añadir la hora 23:59:59 para representar el final del día
+    return `${dateString} 23:59:59`
+  }
+
+  // Función para confirmar y crear el shipment
+  const handleConfirmShipment = () => {
+    if (!pendingValues) return
+
+    console.log('Iniciando creación de shipment...')
+
+    createShipment(
+      {
+        tipoTransporte: pendingValues.tipoTransporte,
+        origen: pendingValues.origen,
+        destino: pendingValues.destino,
+        tipoComex: pendingValues.tipoComex,
+        tipoEnvio: pendingValues.tipoEnvio,
+        valor: pendingValues.valor.toString(),
+        moneda: pendingValues.moneda,
+        fechaExpiracion: formatDateTimeEndOfDay(pendingValues.fechaExpiracion),
+        fechaEmbarque: formatDateTimeEndOfDay(pendingValues.fechaEmbarque),
+        informacionAdicional: pendingValues.informacionAdicional,
+        tipoMercancia: pendingValues.tipoMercancia,
+        market_id: parseInt(marketId),
+        // Campos adicionales del formulario
+        contenedor: pendingValues.contenedor,
+        pesoTotal: typeof pendingValues.pesoTotal === 'number' ? pendingValues.pesoTotal : undefined,
+        tipoMedida: pendingValues.tipoMedida,
+        cbm: typeof pendingValues.cbm === 'number' ? pendingValues.cbm : undefined,
+        unidades: typeof pendingValues.unidades === 'number' ? pendingValues.unidades : undefined,
+        incoterm: pendingValues.incoterm,
+        cargaClasificacion: pendingValues.cargaClasificacion,
+        partidaArancelaria: pendingValues.partidaArancelaria,
+      },
+      {
+        onSuccess: (data) => {
+          console.log('Shipment created successfully:', data)
+          toast({
+            title: '¡Shipment creado exitosamente!',
+            description: `Ruta: ${data.origin_name} → ${data.destination_name}`,
+            variant: 'default',
+          })
+          setIsOpen(false)
+          setShowConfirmation(false)
+          setPendingValues(null)
+          formik.resetForm()
+          
+          // 🔄 Refrescar la lista manualmente
+          console.log('🔄 Ejecutando refetch manual...')
+          if (onRefetch) {
+            onRefetch()
+            console.log('✅ Refetch ejecutado - la lista se actualizará automáticamente')
+          } else {
+            console.log('⚠️ No se proporcionó función onRefetch')
+          }
+        },
+        onError: (error) => {
+          console.error('Error creating shipment:', error)
+          toast({
+            title: 'Error al crear el shipment',
+            description: error.message || 'Ocurrió un error inesperado',
+            variant: 'destructive',
+          })
+          setShowConfirmation(false)
+          setPendingValues(null)
+        },
+      }
+    )
+  }
+
+  // Función para cancelar la confirmación
+  const handleCancelConfirmation = () => {
+    setShowConfirmation(false)
+    setPendingValues(null)
+  }
+
+  // Funciones para mapear IDs a nombres
+  const getContainerName = (containerId: string) => {
+    if (!containerId) return ''
+    const container = containerList.find(c => c.id.toString() === containerId)
+    return container?.name || containerId
+  }
+
+  const getIncotermName = (incotermId: string) => {
+    if (!incotermId) return ''
+    const incoterm = listIncoterm?.find(i => i.id.toString() === incotermId)
+    return incoterm?.name || incotermId
+  }
+
+  const getOriginName = (originId: string) => {
+    if (!originId) return ''
+    
+    // Buscar en puertos marítimos
+    const maritimePort = maritimeData?.pages?.flatMap(page => page.data)?.find(
+      port => port.id.toString() === originId
+    )
+    if (maritimePort) {
+      return `${maritimePort.port_name} - ${maritimePort.country}`
+    }
+    
+    // Buscar en aeropuertos
+    const airport = airportData?.pages?.flatMap(page => page.data)?.find(
+      airport => airport.id.toString() === originId
+    )
+    if (airport) {
+      return `${airport.airport_name} - ${airport.country}`
+    }
+    
+    return originId
+  }
+
+  const getDestinationName = (destinationId: string) => {
+    if (!destinationId) return ''
+    
+    // Buscar en puertos marítimos
+    const maritimePort = maritimeData?.pages?.flatMap(page => page.data)?.find(
+      port => port.id.toString() === destinationId
+    )
+    if (maritimePort) {
+      return `${maritimePort.port_name} - ${maritimePort.country}`
+    }
+    
+    // Buscar en aeropuertos
+    const airport = airportData?.pages?.flatMap(page => page.data)?.find(
+      airport => airport.id.toString() === destinationId
+    )
+    if (airport) {
+      return `${airport.airport_name} - ${airport.country}`
+    }
+    
+    return destinationId
+  }
 
   // Efecto para limpiar fecha de embarque si es anterior a la nueva fecha de cierre
   useEffect(() => {
@@ -757,7 +851,18 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     rows={4}
+                    maxLength={250}
                   />
+                  <div className="flex justify-between items-center text-xs text-gray-500">
+                    <span>
+                      {formik.errors.informacionAdicional && formik.touched.informacionAdicional && (
+                        <ErrorMessage>{formik.errors.informacionAdicional}</ErrorMessage>
+                      )}
+                    </span>
+                    <span>
+                      {formik.values.informacionAdicional?.length || 0}/250
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -770,6 +875,188 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
           </form>
         </SheetContent>
       </Sheet>
+
+      {/* Diálogo de confirmación */}
+      <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
+        <DialogContent className="max-w-2xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-orange-500" />
+              Confirmar creación de shipment
+            </DialogTitle>
+            <DialogDescription>
+              ¿Estás seguro de que quieres crear este shipment con la información proporcionada?
+            </DialogDescription>
+          </DialogHeader>
+
+          {pendingValues && (
+            <div className="space-y-3 text-sm max-h-96 overflow-y-auto">
+              <div className="bg-gray-50 p-3 rounded-lg">
+                <h4 className="font-semibold mb-3 text-base">Resumen completo del shipment:</h4>
+                <div className="space-y-2">
+                  {/* Información básica */}
+                  <div className="border-b border-gray-200 pb-2">
+                    <h5 className="font-medium text-gray-800 mb-1">📋 Información básica</h5>
+                    <div className="space-y-1">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Tipo de transporte:</span>
+                        <span className="font-medium">{pendingValues.tipoTransporte}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Tipo Comex:</span>
+                        <span className="font-medium">{pendingValues.tipoComex}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Origen y destino */}
+                  <div className="border-b border-gray-200 pb-2">
+                    <h5 className="font-medium text-gray-800 mb-1">🌍 Origen y destino</h5>
+                    <div className="space-y-1">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Origen:</span>
+                        <span className="font-medium">{getOriginName(pendingValues.origen)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Destino:</span>
+                        <span className="font-medium">{getDestinationName(pendingValues.destino)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Detalles del envío */}
+                  <div className="border-b border-gray-200 pb-2">
+                    <h5 className="font-medium text-gray-800 mb-1">📦 Detalles del envío</h5>
+                    <div className="space-y-1">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Tipo de envío:</span>
+                        <span className="font-medium">{pendingValues.tipoEnvio}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Tipo de mercancía:</span>
+                        <span className="font-medium">{pendingValues.tipoMercancia}</span>
+                      </div>
+                      {pendingValues.contenedor && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Contenedor/Embalaje:</span>
+                          <span className="font-medium">{getContainerName(pendingValues.contenedor)}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Medidas y cantidades */}
+                  <div className="border-b border-gray-200 pb-2">
+                    <h5 className="font-medium text-gray-800 mb-1">⚖️ Medidas y cantidades</h5>
+                    <div className="space-y-1">
+                      {pendingValues.pesoTotal && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Peso total:</span>
+                          <span className="font-medium">{pendingValues.pesoTotal}</span>
+                        </div>
+                      )}
+                      {pendingValues.tipoMedida && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Tipo de medida:</span>
+                          <span className="font-medium">{pendingValues.tipoMedida}</span>
+                        </div>
+                      )}
+                      {pendingValues.cbm && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Volumen (CBM):</span>
+                          <span className="font-medium">{pendingValues.cbm}</span>
+                        </div>
+                      )}
+                      {pendingValues.unidades && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Unidades:</span>
+                          <span className="font-medium">{pendingValues.unidades}</span>
+                        </div>
+                      )}
+                      {pendingValues.incoterm && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Incoterm:</span>
+                          <span className="font-medium">{getIncotermName(pendingValues.incoterm)}</span>
+                        </div>
+                      )}
+                      {pendingValues.cargaClasificacion && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Clasificación de carga:</span>
+                          <span className="font-medium">{pendingValues.cargaClasificacion}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Información comercial */}
+                  <div className="border-b border-gray-200 pb-2">
+                    <h5 className="font-medium text-gray-800 mb-1">💰 Información comercial</h5>
+                    <div className="space-y-1">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Valor:</span>
+                        <span className="font-medium">{pendingValues.valor} {pendingValues.moneda}</span>
+                      </div>
+                      {pendingValues.partidaArancelaria && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Partida arancelaria:</span>
+                          <span className="font-medium">{pendingValues.partidaArancelaria}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Fecha de expiración:</span>
+                        <span className="font-medium">{pendingValues.fechaExpiracion}</span>
+                      </div>
+                      {pendingValues.fechaEmbarque && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Fecha de embarque:</span>
+                          <span className="font-medium">{pendingValues.fechaEmbarque}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Información adicional */}
+                  {pendingValues.informacionAdicional && (
+                    <div>
+                      <h5 className="font-medium text-gray-800 mb-1">📝 Información adicional</h5>
+                      <div className="bg-white p-2 rounded border text-gray-700 text-xs">
+                        {pendingValues.informacionAdicional}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={handleCancelConfirmation}
+              disabled={isPending}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleConfirmShipment}
+              disabled={isPending}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {isPending ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Creando...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Confirmar y crear
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
