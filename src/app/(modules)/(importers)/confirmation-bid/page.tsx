@@ -152,16 +152,16 @@ ${t('confirmationBid.date')}: ${formatDate(offerData.inserted_at)}
         </CardHeader>
 
         <CardContent className="pt-6">
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-0 mb-6">
             <div className="flex flex-col gap-1">
               <span className="text-sm text-muted-foreground">{t('confirmationBid.offerCode')}</span>
-              <Badge variant="outline" className="text-sm font-medium border-2 border-primary px-3 py-1">
+              <Badge variant="outline" className="text-sm font-medium border-2 border-primary px-3 py-1 w-fit">
                 {offerData.uuid}
               </Badge>
             </div>
-            <div className="flex flex-col gap-1 items-end">
+            <div className="flex flex-col gap-1 sm:items-end">
               <span className="text-sm text-muted-foreground">{t('confirmationBid.auctionCode')}</span>
-              <Badge variant="outline" className="text-sm font-medium px-3 py-1">
+              <Badge variant="outline" className="text-sm font-medium px-3 py-1 w-fit">
                 {offerData.codeBid}
               </Badge>
             </div>

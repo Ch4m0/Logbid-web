@@ -11,6 +11,12 @@ export const useGetBidListByMarket = (
   return useQuery({
     queryKey: ['bidListByMarket', marketId, status, user_id, shippingType],
     queryFn: async () => {
+      console.log('🔍 BIDLIST QUERY: Ejecutando query con parámetros:', {
+        marketId,
+        status,
+        user_id,
+        shippingType
+      })
       let query = supabase
         .from('shipments')
         .select(`
@@ -53,9 +59,11 @@ export const useGetBidListByMarket = (
       const { data, error } = await query
 
       if (error) {
-        console.error('Error fetching bid list by market:', error)
+        console.error('❌ BIDLIST QUERY: Error fetching bid list by market:', error)
         throw error
       }
+
+      console.log('✅ BIDLIST QUERY: Query ejecutada exitosamente, registros encontrados:', data?.length || 0)
 
       // Transformar los datos para mantener compatibilidad con el componente existente
       return data?.map((shipment) => ({
@@ -81,6 +89,6 @@ export const useGetBidListByMarket = (
         status: shipment.status
       })) || []
     },
-    enabled: !!marketId,
+    enabled: !!marketId
   })
 }

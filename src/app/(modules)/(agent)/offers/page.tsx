@@ -8,7 +8,7 @@ import { modalService } from "@/src/service/modalService"
 import useAuthStore from "@/src/store/authStore"
 import { ArrowLeft, DollarSign } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Suspense, useCallback, useMemo, useState } from "react"
+import { Suspense, useCallback, useMemo, useState, useEffect } from "react"
 import Pagination from "../../common/components/pagination/Pagination"
 import AdvancedFilters from "./components/AdvancedFilters"
 import BidInfo from "./components/BidInfo"
@@ -19,8 +19,10 @@ const OffersPageContent = () => {
   const { t } = useTranslation()
   const searchParams = useSearchParams()
   const user = useAuthStore((state) => state.user)
+  const router = useRouter()
 
   const offer_id = searchParams.get('offer_id')
+  const market_id = searchParams.get('market_id')
 
   const { mutate: createOffer } = useCreateOffer()
   const { data: bidDataForAgent, isPending: loading } = useGetShipment({ shipment_id: offer_id })
@@ -28,7 +30,21 @@ const OffersPageContent = () => {
   // Use the actual shipping type from the shipment data, fallback to URL param
   const shippingType = bidDataForAgent?.shipping_type || searchParams.get('shipping_type') || 'Marítimo'
 
-
+  // Efecto para redirigir cuando el shipment sea aceptado (estado 'Closed')
+  useEffect(() => {
+    if (bidDataForAgent?.status === 'Closed') {
+      toast({
+        title: t('agentOffers.shipmentClosed'),
+        description: t('agentOffers.shipmentClosedMessage'),
+        variant: "default",
+      })
+      
+      // Redirigir a la lista de ofertas después de un breve delay para que el usuario vea la notificación
+      setTimeout(() => {
+        router.push(`/bid_list?market_id=${market_id}&status=WithoutOffers`)
+      }, 2000)
+    }
+  }, [bidDataForAgent?.status, router, t])
 
   const currentPage = Number(searchParams.get("page")) || 1
   const [sort, setSort] = useState({ key: "id", order: "asc" })
@@ -49,7 +65,6 @@ const OffersPageContent = () => {
     "details.additional_fees.fuel": "",
   });
 
-  const router = useRouter()
   const [expandedOffers, setExpandedOffers] = useState<Record<string, boolean>>({})
 
   // Esta función ya no es necesaria porque useGetShipment maneja todo automáticamente

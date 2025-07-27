@@ -19,6 +19,7 @@ import { Separator } from '@/src/components/ui/separator'
 import { useTranslation } from '@/src/hooks/useTranslation'
 import { ShipmentFilters } from '@/src/app/(modules)/(importers)/(home)/components/ShipmentFilters'
 import { format } from 'date-fns'
+import { useRealtimeShipmentsWithPagination } from '@/src/hooks/useRealtimeShipmentsWithPagination'
 
 interface ShipmentData {
   id: string
@@ -55,10 +56,18 @@ const normalizeShippingType = (shippingType: string) => {
 }
 
 export function AgentShipmentList({ status }: AgentShipmentListProps) {
+  console.log('🔧 AGENT COMPONENT: Iniciando componente AgentShipmentList con status:', status)
+  
   const { t } = useTranslation()
   const searchParams = useSearchParams()
   const user = useAuthStore((state) => state.user)
   const router = useRouter()
+  
+  console.log('🔧 AGENT COMPONENT: Usuario cargado:', { 
+    userId: user?.id, 
+    markets: user?.all_markets?.length,
+    firstMarket: user?.all_markets?.[0]?.id 
+  })
 
   const marketId =
     searchParams.get('market_id') ??
@@ -67,14 +76,32 @@ export function AgentShipmentList({ status }: AgentShipmentListProps) {
 
   const shippingType = searchParams.get('shipping_type') || 'Marítimo'
 
-  const { data: shipmentList, refetch } = useGetBidListByMarket(
+  console.log('🔍 DEBUGGING: Parámetros para useGetBidListByMarket:', {
+    marketId,
+    status,
+    userId: user?.id,
+    shippingType
+  })
+
+  const { data: shipmentList, refetch, isLoading, error } = useGetBidListByMarket(
     marketId,
     status,
     user?.id || null,
     shippingType as ShippingType
   )
+  
+  // Hook híbrido - detecta nuevos shipments automáticamente (Realtime + Polling fallback)
+  useRealtimeShipmentsWithPagination(refetch)
 
-  console.log({ shipmentList })
+  console.log('🔍 DEBUGGING: Resultado de query:', { 
+    shipmentList, 
+    isLoading, 
+    error,
+    listLength: shipmentList?.length,
+    queryEnabled: !!marketId,
+    marketIdExists: !!marketId,
+    userExists: !!user?.id
+  })
 
   const [filters, setFilters] = useState({
     uuid: 'all',
@@ -205,9 +232,26 @@ export function AgentShipmentList({ status }: AgentShipmentListProps) {
 
   const STATUS = ['Offered', 'Closed']
 
+  // Debug: Detectar cambios en datos
   useEffect(() => {
+    console.log('🔍 DEBUGGING: shipmentList cambió:', {
+      length: shipmentList?.length,
+      isArray: Array.isArray(shipmentList),
+      firstItem: shipmentList?.[0]?.uuid
+    })
+  }, [shipmentList])
+
+  // Debug: Detectar cambios en parámetros
+  useEffect(() => {
+    console.log('🔍 DEBUGGING: Parámetros cambiaron, haciendo refetch...', {
+      shippingType,
+      marketId,
+      status
+    })
     refetch()
-  }, [shippingType, refetch])
+  }, [shippingType, refetch, marketId, status])
+
+  // Debug: Detectar eventos de realtime removido
 
   return (
     <Card className="w-full">

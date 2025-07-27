@@ -829,7 +829,9 @@
     "proposePrice": "Create Quote",
     "proposeNewPrice": "Create New Quote",
     "myOffers": "My Offers",
-    "noOffersMessage": "You haven't made offers on any active shipments"
+    "noOffersMessage": "You haven't made offers on any active shipments",
+    "shipmentClosed": "Shipment Closed",
+    "shipmentClosedMessage": "This shipment has been closed. An offer has been accepted by the importer."
   },
   "agentFilters": {
     "clearFilters": "Clear filters",

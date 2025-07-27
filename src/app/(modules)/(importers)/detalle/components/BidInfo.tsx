@@ -180,7 +180,7 @@ const BidInfo = ({ bidDataForAgent }: any) => {
       </div>
 
       {/* Información adicional si está disponible */}
-      {(bidDataForAgent.container_name || bidDataForAgent.incoterm_name || bidDataForAgent.dimensions || bidDataForAgent.special_requirements) && (
+      {(bidDataForAgent.container_name || bidDataForAgent.incoterm_name || bidDataForAgent.dimensions) && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
           <div className="bg-blue-50 p-3 sm:p-4 rounded-md overflow-hidden">
             <h3 className="font-bold text-base sm:text-lg mb-3 text-blue-700">{t('bidInfo.additionalDetails')}</h3>
@@ -202,14 +202,6 @@ const BidInfo = ({ bidDataForAgent }: any) => {
                   <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.dimensions')}:</span>
                   <span className="text-xs sm:text-sm break-all font-mono bg-gray-100 p-1 rounded w-full sm:flex-1 min-w-0 overflow-hidden">
                     {JSON.stringify(bidDataForAgent.dimensions)}
-                  </span>
-                </div>
-              )}
-              {bidDataForAgent.special_requirements && (
-                <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-                  <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.specialRequirements')}:</span>
-                  <span className="text-sm sm:text-base break-words overflow-wrap-anywhere w-full sm:flex-1 min-w-0 leading-relaxed">
-                    {bidDataForAgent.special_requirements}
                   </span>
                 </div>
               )}
@@ -244,7 +236,7 @@ const BidInfo = ({ bidDataForAgent }: any) => {
       )}
 
       {/* Mostrar identificación como sección individual si no hay detalles adicionales */}
-      {!(bidDataForAgent.container_name || bidDataForAgent.incoterm_name || bidDataForAgent.dimensions || bidDataForAgent.special_requirements) && (
+      {!(bidDataForAgent.container_name || bidDataForAgent.incoterm_name || bidDataForAgent.dimensions) && (
         <div className="bg-blue-50 p-3 sm:p-4 rounded-md mb-4 sm:mb-6 overflow-hidden">
           <h3 className="font-bold text-base sm:text-lg mb-3 text-blue-700">{t('bidInfo.identification')}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">

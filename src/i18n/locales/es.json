@@ -829,7 +829,9 @@
     "proposePrice": "Crear Cotización",
     "proposeNewPrice": "Crear Nueva Cotización",
     "myOffers": "Mis Ofertas",
-    "noOffersMessage": "No has realizado ofertas en ningún shipment activo"
+    "noOffersMessage": "No has realizado ofertas en ningún shipment activo",
+    "shipmentClosed": "Envío Cerrado",
+    "shipmentClosedMessage": "Este envío ha sido cerrado. Una oferta ha sido aceptada por el importador."
   },
   "agentFilters": {
     "clearFilters": "Limpiar filtros",
