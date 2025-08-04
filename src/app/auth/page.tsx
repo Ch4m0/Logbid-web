@@ -225,7 +225,7 @@ export default function Auth() {
                 </p>
               </div>
 
-              <form onSubmit={handleLogin} action="#" method="post" className="space-y-6">
+              <form id="login-form" onSubmit={handleLogin} action="#" method="post" className="space-y-6">
                 <div>
                   <Label htmlFor="email" className="text-sm font-semibold text-gray-700 block mb-2">
                     {t('auth.email')}
@@ -259,6 +259,7 @@ export default function Auth() {
                 </div>
 
                 <Button
+                  id="login-submit-btn"
                   type="submit"
                   className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-base rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
                   disabled={isLoading}
@@ -277,7 +278,7 @@ export default function Auth() {
                 </Button>
 
                 {error && (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div id="login-error-message" className="p-4 bg-red-50 border border-red-200 rounded-lg">
                     <p className="text-red-700 text-sm text-center font-medium">
                       {error}
                     </p>
@@ -288,6 +289,7 @@ export default function Auth() {
                   <Dialog open={showResetDialog} onOpenChange={setShowResetDialog}>
                     <DialogTrigger asChild>
                       <button
+                        id="forgot-password-btn"
                         type="button"
                         className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors block w-full cursor-pointer"
                       >
@@ -302,7 +304,7 @@ export default function Auth() {
                       </DialogHeader>
                       
                       {!resetSuccess ? (
-                        <form onSubmit={handlePasswordReset} className="space-y-4">
+                        <form id="reset-password-form" onSubmit={handlePasswordReset} className="space-y-4">
                           <div className="text-sm text-gray-600 mb-4">
                             Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.
                           </div>
@@ -324,13 +326,14 @@ export default function Auth() {
                           </div>
 
                           {resetError && (
-                            <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                            <div id="reset-error-message" className="p-3 bg-red-50 border border-red-200 rounded-md">
                               <p className="text-red-700 text-sm">{resetError}</p>
                             </div>
                           )}
 
                           <div className="flex space-x-3 pt-4">
                             <Button
+                              id="reset-cancel-btn"
                               type="button"
                               variant="outline"
                               onClick={handleResetDialogClose}
@@ -341,6 +344,7 @@ export default function Auth() {
                               Cancelar
                             </Button>
                             <Button
+                              id="reset-submit-btn"
                               type="submit"
                               className="flex-1 bg-blue-600 hover:bg-blue-700"
                               disabled={isResetLoading || !resetEmail}
@@ -355,7 +359,7 @@ export default function Auth() {
                           </div>
                         </form>
                       ) : (
-                        <div className="text-center py-6">
+                        <div id="reset-success-message" className="text-center py-6">
                           <div className="mx-auto flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
                             <Mail className="w-8 h-8 text-green-600" />
                           </div>
@@ -367,6 +371,7 @@ export default function Auth() {
                             Revisa tu bandeja de entrada y sigue las instrucciones.
                           </p>
                           <Button 
+                            id="reset-success-btn"
                             onClick={handleResetDialogClose}
                             className="w-full bg-blue-600 hover:bg-blue-700"
                           >
@@ -378,6 +383,7 @@ export default function Auth() {
                   </Dialog>
                   
                   <Link
+                    id="register-link"
                     href="/auth/register"
                     className="text-sm text-green-600 hover:text-green-800 font-medium transition-colors block"
                     prefetch={false}

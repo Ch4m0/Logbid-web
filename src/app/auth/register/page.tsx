@@ -412,7 +412,7 @@ export default function Register() {
                 </p>
               </div>
 
-              <form onSubmit={handleRegister} className="space-y-6">
+              <form id="register-form" onSubmit={handleRegister} className="space-y-6">
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-gray-800">Información Personal</h3>
                   
@@ -502,13 +502,13 @@ export default function Register() {
                   <Label className="text-sm font-semibold text-gray-700 block mb-2">
                     Rol
                   </Label>
-                  <Select value={formData.role} onValueChange={(value) => handleInputChange('role', value)}>
-                    <SelectTrigger className="h-12 border-2 border-gray-200 focus:border-green-500">
+                  <Select id="role-select" value={formData.role} onValueChange={(value) => handleInputChange('role', value)}>
+                    <SelectTrigger id="role-select-trigger" className="h-12 border-2 border-gray-200 focus:border-green-500">
                       <SelectValue placeholder="Selecciona tu rol" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="customer">Cliente</SelectItem>
-                      <SelectItem value="agent">Agente de Carga</SelectItem>
+                      <SelectItem id="role-customer" value="customer">Cliente</SelectItem>
+                      <SelectItem id="role-agent" value="agent">Agente de Carga</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -517,13 +517,13 @@ export default function Register() {
                   <Label className="text-sm font-semibold text-gray-700 block mb-2">
                     {t('auth.language')}
                   </Label>
-                  <Select value={formData.language} onValueChange={(value) => handleInputChange('language', value)}>
-                    <SelectTrigger className="h-12 border-2 border-gray-200 focus:border-green-500">
+                  <Select id="language-select" value={formData.language} onValueChange={(value) => handleInputChange('language', value)}>
+                    <SelectTrigger id="language-select-trigger" className="h-12 border-2 border-gray-200 focus:border-green-500">
                       <SelectValue placeholder={t('auth.selectLanguage')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="es">🇪🇸 {t('auth.spanish')}</SelectItem>
-                      <SelectItem value="en">🇺🇸 {t('auth.english')}</SelectItem>
+                      <SelectItem id="language-spanish" value="es">🇪🇸 {t('auth.spanish')}</SelectItem>
+                      <SelectItem id="language-english" value="en">🇺🇸 {t('auth.english')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -533,11 +533,11 @@ export default function Register() {
                   
                   <div className="flex items-center space-x-2">
                     <Checkbox
-                      id="newCompany"
+                      id="new-company-checkbox"
                       checked={isCreatingNewCompany}
                       onCheckedChange={setIsCreatingNewCompany}
                     />
-                    <Label htmlFor="newCompany" className="text-sm text-gray-700">
+                    <Label htmlFor="new-company-checkbox" className="text-sm text-gray-700">
                       Crear nueva empresa
                     </Label>
                   </div>
@@ -562,13 +562,13 @@ export default function Register() {
                       <Label className="text-sm font-semibold text-gray-700 block mb-2">
                         Empresa Existente
                       </Label>
-                      <Select value={formData.companyId} onValueChange={(value) => handleInputChange('companyId', value)}>
-                        <SelectTrigger className="h-12 border-2 border-gray-200 focus:border-green-500">
+                      <Select id="existing-company-select" value={formData.companyId} onValueChange={(value) => handleInputChange('companyId', value)}>
+                        <SelectTrigger id="existing-company-select-trigger" className="h-12 border-2 border-gray-200 focus:border-green-500">
                           <SelectValue placeholder="Selecciona una empresa" />
                         </SelectTrigger>
                         <SelectContent>
                           {companies.map((company) => (
-                            <SelectItem key={company.id} value={company.id.toString()}>
+                            <SelectItem id={`company-${company.id}`} key={company.id} value={company.id.toString()}>
                               {company.name}
                             </SelectItem>
                           ))}
@@ -584,11 +584,11 @@ export default function Register() {
                     {markets.map((market) => (
                       <div key={market.id} className="flex items-center space-x-2">
                         <Checkbox
-                          id={`market-${market.id}`}
+                          id={`market-checkbox-${market.id}`}
                           checked={selectedMarkets.includes(market.id)}
                           onCheckedChange={() => handleMarketToggle(market.id)}
                         />
-                        <Label htmlFor={`market-${market.id}`} className="text-sm text-gray-700">
+                        <Label htmlFor={`market-checkbox-${market.id}`} className="text-sm text-gray-700">
                           {market.name}
                         </Label>
                       </div>
@@ -597,6 +597,7 @@ export default function Register() {
                 </div>
 
                 <Button
+                  id="register-submit-btn"
                   type="submit"
                   className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-semibold text-base rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
                   disabled={isLoading}
@@ -615,7 +616,7 @@ export default function Register() {
                 </Button>
 
                 {error && (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div id="register-error-message" className="p-4 bg-red-50 border border-red-200 rounded-lg">
                     <p className="text-red-700 text-sm text-center font-medium">
                       {error}
                     </p>
@@ -624,6 +625,7 @@ export default function Register() {
 
                 <div className="text-center pt-2">
                   <Link
+                    id="login-link"
                     href="/auth"
                     className="text-sm text-green-600 hover:text-green-800 font-medium transition-colors"
                     prefetch={false}

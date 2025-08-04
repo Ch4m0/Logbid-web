@@ -47,7 +47,7 @@ export const fetchHistoricalBidsForAgent = async ({
   user_id: number | null
   market_id: string | null
   status: 'Active' | 'Closed'
-  shipping_type: '1' | '2'
+  shipping_type: string
 }) => {
   const response = await apiClient.get(
     `/agent/offers_history_by_agent_id_and_market_id?shipping_type=${shipping_type}&user_id=${user_id}&market_id=${market_id}`

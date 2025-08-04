@@ -1,12 +1,11 @@
-import { useQuery } from '@tanstack/react-query'
-import { supabase } from '@/src/utils/supabase/client'
-import { ShippingType } from '../../models/common';
+import { supabase } from '@/src/utils/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 export const useGetBidListByMarket = (
   marketId: string | null,
   status: string,
   user_id: number | null,
-  shippingType: ShippingType
+  shippingType: string
 ) => {
   return useQuery({
     queryKey: ['bidListByMarket', marketId, status, user_id, shippingType],

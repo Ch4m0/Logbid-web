@@ -6,8 +6,9 @@ interface Args {
   market_id: string | null
   user_id: number | null
   status: 'Active' | 'Closed'
-  shipping_type: '1' | '2'
+  shipping_type: string
 }
+
 export const useHistoricalBidsForAgent = ({
   user_id,
   market_id,

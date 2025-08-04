@@ -135,6 +135,7 @@ function ResetPasswordContent() {
               Tu contraseña ha sido actualizada exitosamente. Serás redirigido al login en unos segundos.
             </p>
             <Button 
+              id="success-go-to-login-btn"
               onClick={() => router.push('/auth')}
               className="w-full bg-blue-600 hover:bg-blue-700"
             >
@@ -169,13 +170,13 @@ function ResetPasswordContent() {
             </div>
 
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-2">
+              <div id="reset-password-error-message" className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-2">
                 <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
                 <p className="text-red-700 text-sm">{error}</p>
               </div>
             )}
 
-            <form onSubmit={handleResetPassword} className="space-y-6">
+            <form id="reset-password-form" onSubmit={handleResetPassword} className="space-y-6">
               <div>
                 <Label htmlFor="password" className="text-sm font-semibold text-gray-700 block mb-2">
                   Nueva contraseña
@@ -192,6 +193,7 @@ function ResetPasswordContent() {
                     disabled={isLoading}
                   />
                   <button
+                    id="toggle-password-visibility"
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
@@ -221,6 +223,7 @@ function ResetPasswordContent() {
                     disabled={isLoading}
                   />
                   <button
+                    id="toggle-confirm-password-visibility"
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
@@ -235,6 +238,7 @@ function ResetPasswordContent() {
               </div>
 
               <Button
+                id="reset-password-submit-btn"
                 type="submit"
                 className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-base rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
                 disabled={isLoading || !password || !confirmPassword}
@@ -254,6 +258,7 @@ function ResetPasswordContent() {
 
               <div className="text-center">
                 <button
+                  id="back-to-login-btn"
                   type="button"
                   onClick={() => router.push('/auth')}
                   className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
