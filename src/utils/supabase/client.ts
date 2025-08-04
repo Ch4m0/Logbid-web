@@ -11,10 +11,7 @@ if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
 
 // Función para crear un cliente de Supabase
 export function createSupabaseClient() {
-  console.log('🔧 SUPABASE CLIENT: Creando cliente con:', {
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL,
-    hasAnonKey: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  })
+ 
 
   const client = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -35,7 +32,6 @@ export function createSupabaseClient() {
     }
   )
 
-  console.log('✅ SUPABASE CLIENT: Cliente creado exitosamente')
   return client
 }
 

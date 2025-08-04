@@ -6,8 +6,8 @@ import useAuthStore from '@/src/store/authStore'
 type TransportType = 'air' | 'sea' | 'land' | 'warehouse' | null
 
 const transportToShippingType = {
-  air: 'Aéreo',
-  sea: 'Marítimo',
+  air: '2',
+  sea: '1',
   land: 'Terrestre',
   warehouse: 'Almacén',
 }
@@ -27,10 +27,10 @@ const MenuHeaderContent: React.FC = () => {
   const initializeSelectedFromURL = (): TransportType => {
     const shippingParam = searchParams.get('shipping_type')
 
-    if (shippingParam === 'Aéreo') return 'air'
-    if (shippingParam === 'Marítimo') return 'sea'
+    if (shippingParam === '2') return 'air'
+    if (shippingParam === '1') return 'sea'
     if (shippingParam === 'Terrestre') return 'land'
-    if (shippingParam === 'Almacén') return 'warehouse'
+    if (shippingParam === '3') return 'warehouse'
 
     return 'sea'
   }

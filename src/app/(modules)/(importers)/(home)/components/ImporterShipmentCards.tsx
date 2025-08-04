@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/src/components/ui/card'
-import { Input } from '@/src/components/ui/input'
 import { modalService } from '@/src/service/modalService'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
@@ -41,10 +40,10 @@ interface ImporterShipmentCardsProps {
 // Function to normalize shipping type to translation key
 const normalizeShippingType = (shippingType: string) => {
   const typeMap: { [key: string]: string } = {
-    'Marítimo': 'maritime',
-    'Aéreo': 'air',
     'Terrestre': 'land',
-    'Almacén': 'warehouse'
+    'Almacén': 'warehouse',
+    '1': 'maritime',  // Marítimo en español, Sea en inglés
+    '2': 'air'        // Aéreo en español, Air en inglés
   }
   return typeMap[shippingType] || shippingType.toLowerCase()
 }
@@ -77,7 +76,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
     profile?.all_markets?.[0]?.id?.toString() ??
     null
 
-  const shippingType = searchParams.get('shipping_type') || 'Marítimo'
+  const shippingType = searchParams.get('shipping_type') || '1'
 
   const { data: shipmentList, refetch } = useGetShipments({
     user_id: profile?.id ? Number(profile.id) : null,
@@ -96,7 +95,19 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
 
   const [showFilters, setShowFilters] = useState(false)
 
-  const [filters, setFilters] = useState({
+  // Filtros que el usuario está configurando (no aplicados aún)
+  const [pendingFilters, setPendingFilters] = useState({
+    uuid: '',
+    origin: '',
+    destination: '',
+    inserted_at: '',
+    expiration_date: '',
+    value: '',
+    offers_count: '',
+  })
+
+  // Filtros realmente aplicados para el filtrado
+  const [appliedFilters, setAppliedFilters] = useState({
     uuid: '',
     origin: '',
     destination: '',
@@ -112,7 +123,27 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
   }
 
   const handleFilterChange = (key: string, value: string) => {
-    setFilters((prev) => ({ ...prev, [key]: value }))
+    setPendingFilters((prev) => ({ ...prev, [key]: value }))
+  }
+
+  const handleApplyFilters = () => {
+    // Aplicar los filtros pendientes
+    setAppliedFilters(pendingFilters)
+    console.log('Filtros aplicados:', pendingFilters)
+  }
+
+  const handleClearFilters = () => {
+    const emptyFilters = {
+      uuid: '',
+      origin: '',
+      destination: '',
+      inserted_at: '',
+      expiration_date: '',
+      value: '',
+      offers_count: '',
+    }
+    setPendingFilters(emptyFilters)
+    setAppliedFilters(emptyFilters)
   }
 
   const showExtendFinalDate = (
@@ -122,7 +153,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
     id: string,
     shipping_date?: string | null
   ) => {
-          modalService.showModal({
+    modalService.showModal({
         component: ExtendShipmentDeadline,
         props: {
         expiration_date: expiration_date,
@@ -168,8 +199,8 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
       }
 
       // Then apply other filters
-      return Object.keys(filters).every((key) => {
-        const filterValue = filters[key as keyof typeof filters];
+      return Object.keys(appliedFilters).every((key) => {
+        const filterValue = appliedFilters[key as keyof typeof appliedFilters];
         // If filter is empty or set to 'all', don't apply this filter
         if (!filterValue || filterValue.trim() === '' || filterValue === 'all') {
           return true;
@@ -224,7 +255,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
   )
 
   return (
-    <Card className="w-full">
+    <Card className="w-full bg-gray-50">
       <CardHeader className="flex flex-col md:flex-row justify-start md:justify-between w-full space-y-3 md:space-y-0">
         <CardTitle className="font-bold">{t(`transport.${normalizeShippingType(shippingType)}`)}</CardTitle>
         <div className="flex items-center justify-between md:justify-start md:space-x-2">
@@ -244,10 +275,12 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
         {showFilters && (
           <ShipmentFilters
             shipmentList={shipmentList}
-            filters={filters}
+            filters={pendingFilters}
             onFilterChange={handleFilterChange}
             onSort={handleSort}
             shouldShowStatusElements={shouldShowStatusElements()}
+            onApplyFilters={handleApplyFilters}
+            onClearFilters={handleClearFilters}
           />
         )}
 
@@ -255,7 +288,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
           {paginatedList?.map((bid) => (
             <Card
               key={bid.uuid}
-              className="w-full cursor-pointer hover:shadow-md transition-shadow border-l-4 border-l-primary"
+              className="w-full cursor-pointer hover:shadow-md transition-shadow border-l-4 border-l-primary bg-white"
               onClick={() => goDetails(bid.uuid)}
             >
               <div className="flex flex-col md:grid md:grid-cols-12 gap-2 md:gap-4">
@@ -332,7 +365,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
                     
                     {/* Dates section - Mobile: 1 column, Tablet: 2 columns, Desktop: 2-3 columns */}
                     <div className={`grid gap-3 md:gap-4 
-                      ${(shippingType === 'Marítimo' || shippingType === 'Aéreo') && bid.shipping_date 
+                      ${(shippingType === '1' || shippingType === '2') && bid.shipping_date 
                         ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' 
                         : 'grid-cols-1 sm:grid-cols-2'}`}>
                       
@@ -356,7 +389,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
                         </div>
                       </div>
                       
-                      {(shippingType === 'Marítimo' || shippingType === 'Aéreo') && bid.shipping_date && (
+                      {(shippingType === '1' || shippingType === '2') && bid.shipping_date && (
                         <div className="flex items-center space-x-2 sm:col-span-2 lg:col-span-1">
                           <Package className="h-4 w-4 text-blue-600 flex-shrink-0" />
                           <div className="flex flex-col min-w-0">

@@ -21,14 +21,14 @@ const OffersPageContent = () => {
   const user = useAuthStore((state) => state.user)
   const router = useRouter()
 
-  const offer_id = searchParams.get('offer_id')
+  const shipment_id = searchParams.get('shipment_id')
   const market_id = searchParams.get('market_id')
 
   const { mutate: createOffer } = useCreateOffer()
-  const { data: bidDataForAgent, isPending: loading } = useGetShipment({ shipment_id: offer_id })
+  const { data: bidDataForAgent, isPending: loading } = useGetShipment({ shipment_id })
 
   // Use the actual shipping type from the shipment data, fallback to URL param
-  const shippingType = bidDataForAgent?.shipping_type || searchParams.get('shipping_type') || 'Marítimo'
+  const shippingType = bidDataForAgent?.shipping_type
 
   // Efecto para redirigir cuando el shipment sea aceptado (estado 'Closed')
   useEffect(() => {

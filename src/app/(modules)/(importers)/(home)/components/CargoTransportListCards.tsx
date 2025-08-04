@@ -41,8 +41,8 @@ interface ImporterShipmentCardsProps {
 // Function to normalize shipping type to translation key
 const normalizeShippingType = (shippingType: string) => {
   const typeMap: { [key: string]: string } = {
-    'Marítimo': 'maritime',
-    'Aéreo': 'air',
+    '1': 'maritime',
+    '2': 'air',
     'Terrestre': 'land',
     'Almacén': 'warehouse'
   }
@@ -78,7 +78,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
     profile?.all_markets?.[0]?.id?.toString() ??
     null
 
-  const shippingType = searchParams.get('shipping_type') || 'Marítimo'
+  const shippingType = searchParams.get('shipping_type') || '1'
 
   const { data: shipmentList, refetch } = useGetShipments({
     user_id: profile?.id ? Number(profile.id) : null,
@@ -474,7 +474,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
 
                     <Separator className="my-2" />
 
-                    <div className={`grid gap-4 ${(shippingType === 'Marítimo' || shippingType === 'Aéreo') && bid.shipping_date ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                    <div className={`grid gap-4 ${(shippingType === '1' || shippingType === '2') && bid.shipping_date ? 'grid-cols-3' : 'grid-cols-2'}`}>
                       <div className="flex items-center space-x-2">
                         <Calendar className="h-4 w-4 text-muted-foreground" />
                         <div className="flex flex-col">
@@ -494,7 +494,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
                         </div>
                       </div>
                       
-                      {(shippingType === 'Marítimo' || shippingType === 'Aéreo') && bid.shipping_date && (
+                      {(shippingType === '1' || shippingType === '2') && bid.shipping_date && (
                         <div className="flex items-center space-x-2">
                           <Package className="h-4 w-4 text-blue-600" />
                           <div className="flex flex-col">

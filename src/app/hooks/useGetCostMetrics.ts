@@ -20,7 +20,7 @@ export interface CostMetrics {
 export interface CostFilters {
   marketId: string | 'all'
   dateRange: '7d' | '30d' | '3m' | '6m' | '1y'
-  transportType: 'all' | 'Aéreo' | 'Marítimo'
+  transportType: 'all' | '2' | '1'
   userId: string
   enabled?: boolean
 }

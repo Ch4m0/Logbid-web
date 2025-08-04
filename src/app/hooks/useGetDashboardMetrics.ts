@@ -4,7 +4,7 @@ import { supabase } from '@/src/utils/supabase/client'
 export interface DashboardFilters {
   marketId: string | 'all'
   dateRange: '7d' | '30d' | '3m' | '6m' | '1y'
-  transportType: 'all' | 'Aéreo' | 'Marítimo'
+  transportType: 'all' | '2' | '1'
   userId: string
   userRole: 'customer' | 'agent'
   enabled?: boolean

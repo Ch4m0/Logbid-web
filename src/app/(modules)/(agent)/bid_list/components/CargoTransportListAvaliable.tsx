@@ -46,8 +46,8 @@ interface CargoTransporListProps {
 
 const normalizeShippingType = (shippingType: string) => {
   const typeMap: { [key: string]: string } = {
-    'Marítimo': 'maritime',
-    'Aéreo': 'air',
+    '1': 'maritime',
+    '2': 'air',
     'Terrestre': 'land',
     'Almacén': 'warehouse'
   }
@@ -65,7 +65,7 @@ export function AgentShipmentList({ status }: CargoTransporListProps) {
     user?.all_markets[0]?.id?.toString() ??
     null
 
-  const shippingType = searchParams.get('shipping_type') || 'Marítimo'
+  const shippingType = searchParams.get('shipping_type') || '1'
 
   const { data: bidList, refetch } = useGetBidListByMarket(
     marketId,
@@ -99,7 +99,7 @@ export function AgentShipmentList({ status }: CargoTransporListProps) {
   }
 
   const handleGetOffers = (uuid: string) => {
-    router.push(`/offers?offer_id=${uuid}&market_id=${marketId}&shipping_type=${shippingType}`)
+    router.push(`/offers?shipment_id=${uuid}&market_id=${marketId}&shipping_type=${shippingType}`)
   }
 
   const handleSort = (key: string) => {
@@ -306,7 +306,7 @@ export function AgentShipmentList({ status }: CargoTransporListProps) {
 
                     <Separator className="my-2" />
 
-                    <div className={`grid gap-4 ${(shippingType === 'Marítimo' || shippingType === 'Aéreo') && bid.shipping_date ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                    <div className={`grid gap-4 ${(shippingType === '1' || shippingType === '2') && bid.shipping_date ? 'grid-cols-3' : 'grid-cols-2'}`}>
                       <div className="flex items-center space-x-2">
                         <Calendar className="h-4 w-4 text-muted-foreground" />
                         <div className="flex flex-col">
@@ -326,7 +326,7 @@ export function AgentShipmentList({ status }: CargoTransporListProps) {
                         </div>
                       </div>
                       
-                      {(shippingType === 'Marítimo' || shippingType === 'Aéreo') && bid.shipping_date && (
+                      {(shippingType === '1' || shippingType === '2') && bid.shipping_date && (
                         <div className="flex items-center space-x-2">
                           <Package className="h-4 w-4 text-blue-600" />
                           <div className="flex flex-col">

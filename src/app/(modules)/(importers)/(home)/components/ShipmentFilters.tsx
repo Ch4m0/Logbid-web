@@ -28,6 +28,8 @@ interface ShipmentFiltersProps {
   onFilterChange: (key: string, value: string) => void
   onSort: (key: string) => void
   shouldShowStatusElements: boolean
+  onApplyFilters?: () => void
+  onClearFilters?: () => void
 }
 
 export function ShipmentFilters({
@@ -35,7 +37,9 @@ export function ShipmentFilters({
   filters,
   onFilterChange,
   onSort,
-  shouldShowStatusElements
+  shouldShowStatusElements,
+  onApplyFilters,
+  onClearFilters
 }: ShipmentFiltersProps) {
   const { t } = useTranslation()
   const [creationDate, setCreationDate] = useState<Date>()
@@ -65,7 +69,14 @@ export function ShipmentFilters({
   }
 
   const clearAllFilters = () => {
-    Object.keys(filters).forEach(key => clearFilter(key))
+    if (onClearFilters) {
+      onClearFilters()
+    } else {
+      Object.keys(filters).forEach(key => clearFilter(key))
+    }
+    // Limpiar también los estados locales de fecha
+    setCreationDate(undefined)
+    setExpirationDate(undefined)
   }
 
   const hasActiveFilters = Object.values(filters).some(value => value && value !== 'all')
@@ -379,6 +390,19 @@ export function ShipmentFilters({
             </div>
           </div>
         </div>
+
+        {/* Botón de filtrar */}
+        {onApplyFilters && (
+          <div className="flex justify-center mt-6 pt-4 border-t">
+            <Button
+              onClick={onApplyFilters}
+              className="w-full sm:w-auto px-8"
+            >
+              <Filter className="h-4 w-4 mr-2" />
+              {t('common.filter')}
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   )

@@ -101,13 +101,13 @@ export function OfferConfirmationDialog(offerData: any) {
       {/* Route information */}
       <div className="bg-muted/30 rounded-lg p-4">
         <div className="flex items-center gap-2 mb-2">
-          {offerData.shipping_type === "Aéreo" ? (
+          {offerData.shipping_type === "2" ? (
             <Plane className="h-5 w-5 text-primary" />
           ) : (
             <Ship className="h-5 w-5 text-primary" />
           )}
           <span className="font-medium">
-            {t('offerConfirmation.route')} {offerData.shipping_type === "Aéreo" ? t('offerConfirmation.air') : t('offerConfirmation.maritime')}
+            {t('offerConfirmation.route')} {offerData.shipping_type === "2" ? t('offerConfirmation.air') : t('offerConfirmation.maritime')}
           </span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -155,7 +155,7 @@ export function OfferConfirmationDialog(offerData: any) {
           <div className="flex items-center gap-2">
             <Package className="h-5 w-5 text-primary" />
             <div>
-              {offerData.shipping_type === "Marítimo" ? (
+              {offerData.shipping_type === "1" ? (
                 <>
                   <p className="text-sm text-muted-foreground">{t('common.container')}</p>
                   <p className="font-medium">{offerData.details.freight_fees?.container}</p>
@@ -223,7 +223,7 @@ export function OfferConfirmationDialog(offerData: any) {
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
             {/* Para envíos marítimos */}
-            {offerData.shipping_type === "Marítimo" && (
+            {offerData.shipping_type === "1" && (
               <div className="flex justify-between p-2 bg-white/50 rounded">
                 <span>{t('common.container')}:</span>
                 <span className="font-medium">{offerData.details.freight_fees?.container}</span>
@@ -231,7 +231,7 @@ export function OfferConfirmationDialog(offerData: any) {
             )}
             
             {/* Para envíos aéreos */}
-            {offerData.shipping_type === "Aéreo" && offerData.details.freight_fees?.dimensions && (
+            {offerData.shipping_type === "2" && offerData.details.freight_fees?.dimensions && (
               <>
                 <div className="flex justify-between p-2 bg-white/50 rounded">
                   <span>{t('offerCard.length')}:</span>
@@ -256,7 +256,7 @@ export function OfferConfirmationDialog(offerData: any) {
         </div>
 
         {/* Cargos Adicionales (solo para aéreo) */}
-        {offerData.shipping_type === "Aéreo" && offerData.details?.additional_fees && (
+        {offerData.shipping_type === "2" && offerData.details?.additional_fees && (
           <div className="bg-muted/30 rounded-lg p-4">
             <h4 className="text-sm font-medium mb-3">{t('offerCard.additionalCharges')}</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">

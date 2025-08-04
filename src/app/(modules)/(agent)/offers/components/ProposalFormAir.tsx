@@ -217,7 +217,7 @@ export default function ProposalFormAir({
 
   const formik = useFormik({
     initialValues: {
-      shipping_type: 'Aéreo',
+      shipping_type: '2',
       price: 0,
       freight_fees: {
         value: 0,

@@ -114,7 +114,7 @@ export async function createTestNotifications(userId: string) {
         market_name: 'Mercado Norte',
         value: '15400',
         currency: 'USD',
-        shipping_type: 'Marítimo',
+        shipping_type: '1',
         origin: 'Colombia - Santa Marta',
         destination: 'Estados Unidos - New York',
         expiration_date: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString()

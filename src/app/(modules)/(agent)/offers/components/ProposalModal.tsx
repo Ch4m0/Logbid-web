@@ -35,7 +35,7 @@ export default function ProposalModal({
   }
 
   // Use the actual shipment type to determine which form to show
-  const isMaritimo = bidDataShippingType === 'Marítimo'
+  const isMaritimo = bidDataShippingType === '1'
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

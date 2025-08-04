@@ -9,6 +9,7 @@ import { convertToColombiaTime } from "@/src/lib/utils";
 import { Offer } from "@/src/models/Offer";
 import { modalService } from "@/src/service/modalService";
 import { useTranslation } from "@/src/hooks/useTranslation";
+import { getTransportTypeName } from "@/src/utils/translateTypeName";
 
 interface OfferCardProps {
     offer: Offer;
@@ -87,9 +88,9 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
                   "bg-gray-100 text-gray-800"
                 }
               >
-                {offer.status === "pending" ? "Pendiente" : 
-                 offer.status === "accepted" ? "Aceptada" :
-                 offer.status === "rejected" ? "Rechazada" : offer.status}
+                {offer.status === "pending" ? t('offerCard.pending') : 
+                 offer.status === "accepted" ? t('offerCard.accepted') :
+                 offer.status === "rejected" ? t('offerCard.rejected') : offer.status}
               </Badge>
             </div>
           </div>
@@ -108,7 +109,7 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
                 <Ship className="h-5 w-5 text-muted-foreground" />
                 <div className="flex flex-col">
                   <span className="text-sm text-muted-foreground">{t('offerCard.shippingType')}</span>
-                  <span className="font-medium">{offer.shipping_type}</span>
+                  <span className="font-medium">{getTransportTypeName(offer.shipping_type, t)}</span>
                 </div>
               </div>
             </div>

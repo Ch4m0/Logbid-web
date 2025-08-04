@@ -6,6 +6,7 @@ export interface Airport {
   airport_name: string
   name: string
   country: string
+  country_code?: string
   city?: string
   code?: string
   iata?: string

@@ -82,8 +82,8 @@ export function ImporterDashboardView({ profile }: ImporterDashboardViewProps) {
 
   const transportTypeOptions = [
     { value: 'all', label: t('dashboard.customer.allTransportTypes') },
-    { value: 'Marítimo', label: t('transport.maritime') },
-    { value: 'Aéreo', label: t('transport.air') }
+    { value: '1', label: t('transport.maritime') },
+    { value: '2', label: t('transport.air') }
   ]
 
   return (

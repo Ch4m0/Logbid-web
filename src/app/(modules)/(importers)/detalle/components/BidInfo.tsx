@@ -1,6 +1,7 @@
 import React from 'react';
 import { convertToColombiaTime, formatDateUTCAsLocal, formatShippingDate } from '@/src/lib/utils';
 import { useTranslation } from '@/src/hooks/useTranslation';
+import { getTransportTypeName, getTypeShipmentName } from '@/src/utils/translateTypeName';
 
 const BidInfo = ({ bidDataForAgent }: any) => {
   const { t } = useTranslation();
@@ -64,7 +65,7 @@ const BidInfo = ({ bidDataForAgent }: any) => {
             </div>
             <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
               <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[100px]">{t('bidInfo.shipmentType')}:</span>
-              <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">{displayValue(bidDataForAgent.shipping_type)}</span>
+              <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">{displayValue(getTransportTypeName(bidDataForAgent.shipping_type, t))}</span>
             </div>
             <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
               <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[100px]">{t('bidInfo.transport')}:</span>
@@ -165,7 +166,7 @@ const BidInfo = ({ bidDataForAgent }: any) => {
             </div>
             <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
               <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.comexType')}:</span>
-              <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">{displayValue(bidDataForAgent.comex_type)}</span>
+              <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">{displayValue(getTypeShipmentName(bidDataForAgent.comex_type, t))}</span>
             </div>
             {bidDataForAgent.offers && bidDataForAgent.offers.length > 0 && (
               <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">

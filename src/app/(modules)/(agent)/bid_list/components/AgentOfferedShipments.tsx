@@ -39,7 +39,7 @@ export function AgentOfferedShipments({ status }: AgentOfferedShipmentsProps) {
                    profile?.all_markets?.[0]?.id?.toString() ?? 
                    null
 
-  const shippingType = (searchParams.get('shipping_type') as 'Aéreo' | 'Marítimo') ?? 'Marítimo'
+  const shippingType = searchParams.get('shipping_type') || '1'
   
   // Paginación
   const currentPage = Number(searchParams.get('page')) || 1
@@ -174,7 +174,7 @@ export function AgentOfferedShipments({ status }: AgentOfferedShipmentsProps) {
                           </span>
                         </TableCell>
                         <TableCell>
-                          <Link href={`/offers?offer_id=${shipment.uuid}&market_id=${marketId}&shipping_type=${shippingType}`}>
+                          <Link href={`/offers?shipment_id=${shipment.uuid}&market_id=${marketId}&shipping_type=${shippingType}`}>
                             <Button 
                               variant="outline" 
                               size="sm"
@@ -262,7 +262,7 @@ export function AgentOfferedShipments({ status }: AgentOfferedShipmentsProps) {
 
                       {/* Action Button */}
                       <div className="pt-3 border-t border-gray-100">
-                        <Link href={`/offers?offer_id=${shipment.uuid}&market_id=${marketId}&shipping_type=${shippingType}`}>
+                        <Link href={`/offers?shipment_id=${shipment.uuid}&market_id=${marketId}&shipping_type=${shippingType}`}>
                           <Button 
                             variant="outline" 
                             size="sm"

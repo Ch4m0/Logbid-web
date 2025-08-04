@@ -235,7 +235,7 @@ export default function ProposalFormSea({
 
   const formik = useFormik({
     initialValues: initialData || {
-      shipping_type: 'Marítimo',
+      shipping_type: '1',
       price: 0,
       basic_service: {
         cancellation_fee: 100,

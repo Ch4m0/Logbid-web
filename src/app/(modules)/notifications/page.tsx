@@ -114,8 +114,8 @@ export default function NotificationsPage() {
         if (userRole === 'agent') {
           // Para agentes: navegar a offers con offer_id
           const market_id = shipmentData.market_id || profile?.all_markets?.[0]?.id || '4'
-          const shipping_type = shipmentData.shipping_type || 'Marítimo'
-          router.push(`/offers?offer_id=${shipmentData.shipment_uuid}&market_id=${market_id}&shipping_type=${shipping_type}`)
+          const shipping_type = shipmentData.shipping_type || '1'
+          router.push(`/offers?shipment_id=${shipmentData.shipment_uuid}&market_id=${market_id}&shipping_type=${shipping_type}`)
         } else {
           // Fallback por defecto
           router.push(`/detalle?offer_id=${shipmentData.shipment_uuid}`)

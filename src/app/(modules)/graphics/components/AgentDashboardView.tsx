@@ -94,7 +94,7 @@ export function AgentDashboardView({ profile }: AgentDashboardViewProps) {
     user_id: profile?.id ? Number(profile.id) : null,
     market_id: filters.marketId === 'all' ? null : filters.marketId,
     status: 'Active',
-    shipping_type: filters.transportType === 'all' ? 'Marítimo' : filters.transportType as any
+    shipping_type: filters.transportType === 'all' ? '1' : filters.transportType as any
   })
 
   const dateRangeOptions = [
@@ -107,8 +107,8 @@ export function AgentDashboardView({ profile }: AgentDashboardViewProps) {
 
   const transportTypeOptions = [
     { value: 'all', label: t('dashboard.agent.allTransportTypes') },
-    { value: 'Marítimo', label: t('transport.maritime') },
-    { value: 'Aéreo', label: t('transport.air') }
+    { value: '1', label: t('transport.maritime') },
+    { value: '2', label: t('transport.air') }
   ]
 
   return (

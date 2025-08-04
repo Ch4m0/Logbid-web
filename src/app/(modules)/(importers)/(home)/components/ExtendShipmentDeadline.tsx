@@ -121,8 +121,8 @@ export function ExtendShipmentDeadline({
   // Función para mapear tipos de shipping a claves de traducción
   const getShippingTypeKey = (type: string) => {
     const typeMap: { [key: string]: string } = {
-      'Aéreo': 'air',
-      'Marítimo': 'maritime', 
+      '2': 'air',
+      '1': 'maritime', 
       'Terrestre': 'land',
       'Almacén': 'warehouse'
     }

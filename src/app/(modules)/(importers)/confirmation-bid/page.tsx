@@ -32,7 +32,7 @@ const ConfirmationPage = () => {
     uuid: (bidStoreData as any).uuid || t('common.notSpecified'),
     status: (bidStoreData as any).status || "Active",
     bid_id: (bidStoreData as any).bid_id || null,
-    shipping_type: (bidStoreData as any).shipping_type || "Marítimo",
+    shipping_type: (bidStoreData as any).shipping_type || "1",
     details: (bidStoreData as any).details || {
       basic_service: {
         cancellation_fee: 0,
@@ -172,7 +172,7 @@ ${t('confirmationBid.date')}: ${formatDate(offerData.inserted_at)}
             <div className="flex items-center gap-2 mb-3">
               <Ship className="h-5 w-5 text-primary" />
               <span className="font-medium">
-                {t('confirmationBid.route')} {offerData.shipping_type === "Aéreo" ? t('confirmationBid.air') : t('confirmationBid.maritime')}
+                {t('confirmationBid.route')} {offerData.shipping_type === "2" ? t('confirmationBid.air') : t('confirmationBid.maritime')}
               </span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -211,7 +211,7 @@ ${t('confirmationBid.date')}: ${formatDate(offerData.inserted_at)}
               <div className="flex items-center gap-2">
                 <Package className="h-5 w-5 text-primary" />
                 <div>
-                  {offerData.shipping_type === "Marítimo" ? (
+                  {offerData.shipping_type === "1" ? (
                     <>
                       <p className="text-sm text-muted-foreground">{t('confirmationBid.container')}</p>
                       <p className="font-medium">{offerData.details?.freight_fees?.container || t('common.notSpecified')}</p>
@@ -278,16 +278,16 @@ ${t('confirmationBid.date')}: ${formatDate(offerData.inserted_at)}
                 {t('confirmationBid.freightRates')}
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                {/* Para envíos marítimos */}
-                {offerData.shipping_type === "Marítimo" && (
+                {/* Para envíos 1s */}
+                {offerData.shipping_type === "1" && (
                   <div className="flex justify-between p-2 bg-white/50 rounded">
                     <span>{t('confirmationBid.container')}:</span>
                     <span className="font-medium">{offerData.details?.freight_fees?.container || t('common.notSpecified')}</span>
                   </div>
                 )}
                 
-                {/* Para envíos aéreos */}
-                {offerData.shipping_type === "Aéreo" && offerData.details?.freight_fees?.dimensions && (
+                {/* Para envíos 2s */}
+                {offerData.shipping_type === "2" && offerData.details?.freight_fees?.dimensions && (
                   <>
                     <div className="flex justify-between p-2 bg-white/50 rounded">
                       <span>{t('confirmationBid.length')}:</span>
@@ -311,8 +311,8 @@ ${t('confirmationBid.date')}: ${formatDate(offerData.inserted_at)}
               </div>
             </div>
 
-            {/* Cargos Adicionales (solo para aéreo) */}
-            {offerData.shipping_type === "Aéreo" && offerData.details?.additional_fees && (
+            {/* Cargos Adicionales (solo para 2) */}
+            {offerData.shipping_type === "2" && offerData.details?.additional_fees && (
               <div className="bg-muted/30 rounded-lg p-4">
                 <h4 className="text-sm font-medium mb-3">{t('confirmationBid.additionalCharges')}</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">

@@ -49,7 +49,7 @@ export const useGetShipments = ({
         query = query.eq('status', status)
       }
 
-      // Filtrar por shipping_type
+      // Filtrar por shipping_type - mapear valores descriptivos a numéricos
       if (shipping_type) {
         query = query.eq('shipping_type', shipping_type)
       }

@@ -46,6 +46,7 @@ import FilterableSelectMaritimePort from '@/src/app/(modules)/common/components/
 import { useTranslation } from '@/src/hooks/useTranslation'
 import { Plus, CheckCircle, AlertTriangle } from 'lucide-react'
 import { DatePicker } from '@/src/components/ui/date-picker'
+import { getTransportTypeName, getTypeShipmentName } from '@/src/utils/translateTypeName'
 
 // Definir el tipo para los valores del formulario
 interface FormValues {
@@ -67,7 +68,7 @@ interface FormValues {
   moneda: string
   fechaExpiracion: string
   fechaEmbarque: string
-  informacionAdicional?: string
+  informacionAdicional: string
 }
 
 interface CreateShipmentProps {
@@ -82,12 +83,13 @@ const ErrorMessage = styled.span`
 export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) {
   const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
-  const [shippingType, setShippingType] = useState('Marítimo')
+  const searchParams = useSearchParams()
+
+  const [shippingType, setShippingType] = useState('1')
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [pendingValues, setPendingValues] = useState<FormValues | null>(null)
 
   const profile = useAuthStore((state) => state.profile)
-  const searchParams = useSearchParams()
   const { data: containerList = [] } = useGetListContainer(shippingType)
 
   // Obtener el market_id del perfil del usuario
@@ -147,12 +149,13 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
         }
       ),
     fechaEmbarque: Yup.string()
+      .required(t('createCargo.validation.shippingDateRequired'))
       .test(
         'is-valid-date',
         t('createCargo.validation.dateInvalid'),
         function(value) {
           const { tipoTransporte } = this.parent
-          if ((tipoTransporte !== 'Marítimo' && tipoTransporte !== 'Aéreo') || !value) return true // Validar para marítimo y aéreo
+          if ((tipoTransporte !== '1' && tipoTransporte !== '2') || !value) return true // Validar para marítimo y aéreo
           const date = new Date(value)
           return !isNaN(date.getTime())
         }
@@ -162,7 +165,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
         t('createCargo.validation.shippingDateMustBeAfterClosing'),
         function(value) {
           const { tipoTransporte, fechaExpiracion } = this.parent
-          if ((tipoTransporte !== 'Marítimo' && tipoTransporte !== 'Aéreo') || !value) return true // Validar para marítimo y aéreo
+          if ((tipoTransporte !== '1' && tipoTransporte !== '2') || !value) return true // Validar para marítimo y aéreo
           if (!fechaExpiracion) return true
           
           const shippingDate = new Date(value)
@@ -170,14 +173,61 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
           return shippingDate >= closingDate
         }
       ),
-    tipoMercancia: Yup.string().required(t('createCargo.validation.merchandiseTypeRequired')),
+    tipoMercancia: Yup.string()
+      .required(t('createCargo.validation.merchandiseTypeRequired'))
+      .test(
+        'no-numbers',
+        t('createCargo.validation.noNumbersAllowed'),
+        (value) => {
+          if (!value) return true // Allow empty values (required validation will catch this)
+          return !/\d/.test(value) // Return false if any digit is found
+        }
+      ),
+    contenedor: Yup.string().required(t('createCargo.validation.containerRequired')),
+    pesoTotal: Yup.mixed()
+      .required(t('createCargo.validation.totalWeightRequired'))
+      .test(
+        'is-numeric',
+        t('createCargo.validation.onlyNumbers'),
+        (value) => {
+          if (value === '' || value === null || value === undefined) return false
+          const stringValue = value.toString()
+          return /^[0-9.]+$/.test(stringValue) && parseFloat(stringValue) > 0
+        }
+      ),
+    tipoMedida: Yup.string().required(t('createCargo.validation.measureTypeRequired')),
+    cbm: Yup.mixed()
+      .required(t('createCargo.validation.cbmRequired'))
+      .test(
+        'is-numeric',
+        t('createCargo.validation.onlyNumbers'),
+        (value) => {
+          if (value === '' || value === null || value === undefined) return false
+          const stringValue = value.toString()
+          return /^[0-9.]+$/.test(stringValue) && parseFloat(stringValue) > 0
+        }
+      ),
+    unidades: Yup.mixed()
+      .required(t('createCargo.validation.unitsRequired'))
+      .test(
+        'is-numeric',
+        t('createCargo.validation.onlyNumbers'),
+        (value) => {
+          if (value === '' || value === null || value === undefined) return false
+          const stringValue = value.toString()
+          return /^[0-9]+$/.test(stringValue) && parseInt(stringValue) > 0
+        }
+      ),
+    incoterm: Yup.string().required(t('createCargo.validation.incotermsRequired')),
+    cargaClasificacion: Yup.string().required(t('createCargo.validation.cargoClassificationRequired')),
+    partidaArancelaria: Yup.string(),
     informacionAdicional: Yup.string()
       .max(250, t('createCargo.validation.additionalInfoMaxLength')),
   })
 
   const formik = useFormik<FormValues>({
     initialValues: {
-      tipoTransporte: 'Marítimo',
+      tipoTransporte: '1',
       origen: '',
       destino: '',
       tipoComex: '',
@@ -200,6 +250,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
     validationSchema,
     onSubmit: (values) => {
       console.log('Valores del formulario:', values)
+      console.log('Información adicional específica:', values.informacionAdicional)
       
       // Validación adicional para asegurar que tenemos los datos necesarios
       if (!values.origen || !values.destino || !values.valor) {
@@ -208,14 +259,22 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
           destino: values.destino,
           valor: values.valor
         })
+        
+        // Crear lista de campos faltantes
+        const missingFields = []
+        if (!values.origen) missingFields.push(t('createCargo.origin'))
+        if (!values.destino) missingFields.push(t('createCargo.destination'))
+        if (!values.valor) missingFields.push(t('createCargo.value'))
+        
         toast({
-          title: 'Error de validación',
-          description: 'Por favor completa todos los campos requeridos',
+          title: t('createCargo.validation.title'),
+          description: `${t('createCargo.validation.missingFields')}: ${missingFields.join(', ')}`,
           variant: 'destructive',
         })
         return
       }
 
+      console.log({ values })
       // Mostrar diálogo de confirmación
       setPendingValues(values)
       setShowConfirmation(true)
@@ -241,6 +300,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
     if (!pendingValues) return
 
     console.log('Iniciando creación de shipment...')
+    console.log({ pendingValues })
 
     createShipment(
       {
@@ -270,8 +330,11 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
         onSuccess: (data) => {
           console.log('Shipment created successfully:', data)
           toast({
-            title: '¡Shipment creado exitosamente!',
-            description: `Ruta: ${data.origin_name} → ${data.destination_name}`,
+            title: t('notifications.toasts.shipmentCreatedSuccess'),
+            description: t('notifications.toasts.routeDescription', { 
+              origin: data.origin_name, 
+              destination: data.destination_name 
+            }),
             variant: 'default',
           })
           setIsOpen(false)
@@ -291,8 +354,8 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
         onError: (error) => {
           console.error('Error creating shipment:', error)
           toast({
-            title: 'Error al crear el shipment',
-            description: error.message || 'Ocurrió un error inesperado',
+            title: t('notifications.toasts.shipmentCreationError'),
+            description: error.message || t('notifications.toasts.unexpectedError'),
             variant: 'destructive',
           })
           setShowConfirmation(false)
@@ -337,7 +400,9 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
       airport => airport.id.toString() === originId
     )
     if (airport) {
-      return `${airport.airport_name} - ${airport.country}`
+      const airportName = airport.country || 'Aeropuerto'
+      const iataCode = airport.country_code ? ` (${airport.country_code})` : ''
+      return `${airportName}${iataCode}`
     }
     
     return originId
@@ -359,11 +424,15 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
       airport => airport.id.toString() === destinationId
     )
     if (airport) {
-      return `${airport.airport_name} - ${airport.country}`
+      const airportName = airport.country || 'Aeropuerto'
+      const iataCode = airport.country_code ? ` (${airport.country_code})` : ''
+      return `${airportName}${iataCode}`
     }
     
     return destinationId
   }
+
+
 
   // Efecto para limpiar fecha de embarque si es anterior a la nueva fecha de cierre
   useEffect(() => {
@@ -376,6 +445,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
         formik.setFieldValue('fechaEmbarque', '')
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.fechaExpiracion])
 
   // Efecto para limpiar fecha de embarque cuando se cambia a transporte aéreo
@@ -383,6 +453,24 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
     // Removed the logic that cleared shipping date for air transport
     // Now shipping date is available for both maritime and air transport
   }, [formik.values.tipoTransporte])
+
+  // Efecto para capturar el shipping_type actual de la URL cada vez que se abra el modal
+  useEffect(() => {
+    if (isOpen) {
+      const currentShippingType = searchParams.get('shipping_type') || '1'
+      console.log('Modal abierto - Capturando shipping_type actual:', currentShippingType)
+      
+      // Solo actualizar si el valor ha cambiado para evitar bucles infinitos
+      if (currentShippingType !== formik.values.tipoTransporte) {
+        // Actualizar el estado local
+        setShippingType(currentShippingType)
+        
+        // Actualizar el valor del formik
+        formik.setFieldValue('tipoTransporte', currentShippingType)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, searchParams])
   
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault()
@@ -390,6 +478,38 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
 
     if (Object.keys(formik.errors).length > 0) {
       console.log('Errores de validación:', formik.errors)
+      
+      // Crear lista de campos con errores
+      const errorFields = Object.keys(formik.errors).map(field => {
+        const fieldLabels: { [key: string]: string } = {
+          tipoTransporte: t('createCargo.transportType'),
+          origen: t('createCargo.origin'),
+          destino: t('createCargo.destination'),
+          tipoComex: t('createCargo.comexType'),
+          tipoEnvio: t('createCargo.shipmentType'),
+          contenedor: formik.values.tipoTransporte === '1' ? t('createCargo.labels.containerType') : t('createCargo.labels.packagingType'),
+          pesoTotal: t('createCargo.labels.totalWeight'),
+          tipoMedida: t('createCargo.labels.measureType'),
+          cbm: t('createCargo.labels.volume'),
+          unidades: t('createCargo.labels.units'),
+          incoterm: t('createCargo.labels.incoterm'),
+          tipoMercancia: t('createCargo.merchandiseType'),
+          cargaClasificacion: t('createCargo.labels.cargoClassification'),
+          partidaArancelaria: t('createCargo.labels.tariffItem'),
+          valor: t('createCargo.value'),
+          moneda: t('createCargo.currency'),
+          fechaExpiracion: t('createCargo.shipmentDate'),
+          fechaEmbarque: t('createCargo.shippingDate'),
+          informacionAdicional: t('createCargo.additionalInfo')
+        }
+        return fieldLabels[field] || field
+      })
+      
+      toast({
+        title: t('createCargo.validation.title'),
+        description: `${t('createCargo.validation.validationErrors')}: ${errorFields.join(', ')}`,
+        variant: 'destructive',
+      })
     } else {
       console.log('Formulario válido, sin errores')
     }
@@ -418,9 +538,9 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
               {/* Sección 1: Información básica */}
               <div className="space-y-4 bg-gray-50 p-3 md:p-4 rounded-lg">
                 <h3 className="text-lg md:text-xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2">📋 {t('createCargo.sections.basicInfo')}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                                      <div className="grid gap-1">
-                      <Label htmlFor="tipoTransporte" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.transportType')}</Label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 items-start">
+                  <div className="grid gap-1">
+                    <Label htmlFor="tipoTransporte" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.transportType')}</Label>
                     <Select
                       value={formik.values.tipoTransporte}
                       onValueChange={(value) => {
@@ -433,21 +553,23 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                         <SelectValue placeholder={t('createCargo.select')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Marítimo">{t('transport.maritime')}</SelectItem>
-                        <SelectItem value="Aéreo">{t('transport.air')}</SelectItem>
+                        <SelectItem value="1">{t('transport.maritime')}</SelectItem>
+                        <SelectItem value="2">{t('transport.air')}</SelectItem>
                       </SelectContent>
                     </Select>
                     {formik.errors.tipoTransporte && formik.touched.tipoTransporte && (
-                      <div className="text-red-500">
-                        <ErrorMessage>
-                          {formik.errors.tipoTransporte}
-                        </ErrorMessage>
+                      <div className="min-h-[20px]">
+                        <div className="text-red-500">
+                          <ErrorMessage>
+                            {formik.errors.tipoTransporte}
+                          </ErrorMessage>
+                        </div>
                       </div>
                     )}
                   </div>
 
-                                      <div className="grid gap-1">
-                      <Label htmlFor="tipoComex" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.comexType')}</Label>
+                  <div className="grid gap-1">
+                    <Label htmlFor="tipoComex" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.comexType')}</Label>
                     <Select
                       value={formik.values.tipoComex}
                       onValueChange={(value) => {
@@ -458,13 +580,37 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                         <SelectValue placeholder={t('createCargo.select')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Importación">{t('createCargo.comexTypes.importation')}</SelectItem>
-                        <SelectItem value="Exportación">{t('createCargo.comexTypes.exportation')}</SelectItem>
+                        <SelectItem value="1">{t('createCargo.comexTypes.importation')}</SelectItem>
+                        <SelectItem value="2">{t('createCargo.comexTypes.exportation')}</SelectItem>
                       </SelectContent>
                     </Select>
                     {formik.errors.tipoComex && formik.touched.tipoComex && (
-                      <div className="text-red-500">
-                        <ErrorMessage>{formik.errors.tipoComex}</ErrorMessage>
+                      <div className="min-h-[20px]">
+                        <div className="text-red-500">
+                          <ErrorMessage>{formik.errors.tipoComex}</ErrorMessage>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 items-start">
+                  <div className="grid gap-1">
+                    <Label htmlFor="fechaExpiracion" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.shipmentDate')}</Label>
+                    <DatePicker
+                      value={formik.values.fechaExpiracion}
+                      onChange={(date) => formik.setFieldValue('fechaExpiracion', date)}
+                      placeholder={t('extendCargo.selectDate')}
+                      minDate={new Date()} // No permitir fechas pasadas
+                      maxDate={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)} // Máximo 1 año en el futuro
+                    />
+                    {formik.errors.fechaExpiracion && formik.touched.fechaExpiracion && (
+                      <div className="min-h-[20px]">
+                        <div className="text-red-500">
+                          <ErrorMessage>
+                            {formik.errors.fechaExpiracion}
+                          </ErrorMessage>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -476,7 +622,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                 <h3 className="text-lg md:text-xl font-bold text-gray-800 border-b-2 border-green-500 pb-2">🌍 {t('createCargo.sections.originDestination')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                   <div className="grid gap-1">
-                    {formik.values.tipoTransporte === 'Marítimo' ? (
+                    {formik.values.tipoTransporte === '1' ? (
                       <>
                         <FilterableSelectMaritimePort
                           label={t('createCargo.origin')}
@@ -512,7 +658,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                   </div>
 
                   <div className="grid gap-1">
-                    {formik.values.tipoTransporte === 'Marítimo' ? (
+                    {formik.values.tipoTransporte === '1' ? (
                       <>
                         <FilterableSelectMaritimePort
                           label={t('createCargo.destination')}
@@ -596,7 +742,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
 
                   <div className="grid gap-1">
                     <Label htmlFor="contenedor" className="text-xs md:text-sm font-semibold text-gray-700">
-                      {formik.values.tipoTransporte === 'Marítimo' 
+                      {formik.values.tipoTransporte === '1' 
                         ? t('createCargo.labels.containerType') 
                         : t('createCargo.labels.packagingType')
                       }
@@ -609,7 +755,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                     >
                       <SelectTrigger>
                         <SelectValue placeholder={
-                          formik.values.tipoTransporte === 'Marítimo' 
+                          formik.values.tipoTransporte === '1' 
                             ? t('createCargo.placeholders.selectContainer')
                             : t('createCargo.placeholders.selectPackaging')
                         } />
@@ -622,6 +768,11 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                         ))}
                       </SelectContent>
                     </Select>
+                    {formik.errors.contenedor && formik.touched.contenedor && (
+                      <div className="text-red-500">
+                        <ErrorMessage>{formik.errors.contenedor}</ErrorMessage>
+                      </div>
+                    )}
                   </div>
 
 
@@ -643,6 +794,11 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                     />
+                    {formik.errors.pesoTotal && formik.touched.pesoTotal && (
+                      <div className="text-red-500">
+                        <ErrorMessage>{formik.errors.pesoTotal}</ErrorMessage>
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid gap-1">
@@ -662,6 +818,11 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                         <SelectItem value="Tons">{t('createCargo.measures.tons')}</SelectItem>
                       </SelectContent>
                     </Select>
+                    {formik.errors.tipoMedida && formik.touched.tipoMedida && (
+                      <div className="text-red-500">
+                        <ErrorMessage>{formik.errors.tipoMedida}</ErrorMessage>
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid gap-1">
@@ -676,6 +837,11 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                     />
+                    {formik.errors.cbm && formik.touched.cbm && (
+                      <div className="text-red-500">
+                        <ErrorMessage>{formik.errors.cbm}</ErrorMessage>
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid gap-1">
@@ -689,6 +855,11 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                     />
+                    {formik.errors.unidades && formik.touched.unidades && (
+                      <div className="text-red-500">
+                        <ErrorMessage>{formik.errors.unidades}</ErrorMessage>
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid gap-1">
@@ -710,6 +881,11 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                         ))}
                       </SelectContent>
                     </Select>
+                    {formik.errors.incoterm && formik.touched.incoterm && (
+                      <div className="text-red-500">
+                        <ErrorMessage>{formik.errors.incoterm}</ErrorMessage>
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid gap-1">
@@ -729,6 +905,11 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                         <SelectItem value="Refrigerada">{t('createCargo.cargoClassifications.refrigerated')}</SelectItem>
                       </SelectContent>
                     </Select>
+                    {formik.errors.cargaClasificacion && formik.touched.cargaClasificacion && (
+                      <div className="text-red-500">
+                        <ErrorMessage>{formik.errors.cargaClasificacion}</ErrorMessage>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -736,7 +917,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
               {/* Sección 5: Información Comercial */}
               <div className="space-y-4 bg-orange-50 p-3 md:p-4 rounded-lg">
                 <h3 className="text-lg md:text-xl font-bold text-gray-800 border-b-2 border-orange-500 pb-2">💰 {t('createCargo.sections.commercialInfo')}</h3>
-                <div className={`grid gap-3 md:gap-4 ${formik.values.tipoTransporte === 'Marítimo' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1 md:grid-cols-2'}`}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 items-start">
                   <div className="grid gap-1">
                     <Label htmlFor="valor" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.value')}</Label>
                     <Input
@@ -748,8 +929,10 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                       onBlur={formik.handleBlur}
                     />
                     {formik.errors.valor && formik.touched.valor && (
-                      <div className="text-red-500">
-                        <ErrorMessage>{formik.errors.valor}</ErrorMessage>
+                      <div className="min-h-[20px]">
+                        <div className="text-red-500">
+                          <ErrorMessage>{formik.errors.valor}</ErrorMessage>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -774,30 +957,16 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                       </SelectContent>
                     </Select>
                     {formik.errors.moneda && formik.touched.moneda && (
-                      <div className="text-red-500">
-                        <ErrorMessage>{formik.errors.moneda}</ErrorMessage>
+                      <div className="min-h-[20px]">
+                        <div className="text-red-500">
+                          <ErrorMessage>{formik.errors.moneda}</ErrorMessage>
+                        </div>
                       </div>
                     )}
                   </div>
+                </div>
 
-                  <div className="grid gap-1">
-                    <Label htmlFor="fechaExpiracion" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.shipmentDate')}</Label>
-                    <DatePicker
-                      value={formik.values.fechaExpiracion}
-                      onChange={(date) => formik.setFieldValue('fechaExpiracion', date)}
-                      placeholder={t('extendCargo.selectDate')}
-                      minDate={new Date()} // No permitir fechas pasadas
-                      maxDate={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)} // Máximo 1 año en el futuro
-                    />
-                    {formik.errors.fechaExpiracion && formik.touched.fechaExpiracion && (
-                      <div className="text-red-500">
-                        <ErrorMessage>
-                          {formik.errors.fechaExpiracion}
-                        </ErrorMessage>
-                      </div>
-                    )}
-                  </div>
-
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 items-start">
                   <div className="grid gap-1">
                     <Label htmlFor="partidaArancelaria" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.labels.tariffItem')}</Label>
                     <Input
@@ -809,15 +978,17 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                       onBlur={formik.handleBlur}
                     />
                     {formik.errors.partidaArancelaria && formik.touched.partidaArancelaria && (
-                      <div className="text-red-500">
-                        <ErrorMessage>
-                          {formik.errors.partidaArancelaria}
-                        </ErrorMessage>
+                      <div className="min-h-[20px]">
+                        <div className="text-red-500">
+                          <ErrorMessage>
+                            {formik.errors.partidaArancelaria}
+                          </ErrorMessage>
+                        </div>
                       </div>
                     )}
                   </div>
 
-                  {(formik.values.tipoTransporte === 'Marítimo' || formik.values.tipoTransporte === 'Aéreo') && (
+                  {(formik.values.tipoTransporte === '1' || formik.values.tipoTransporte === '2') && (
                     <div className="grid gap-1">
                       <Label htmlFor="fechaEmbarque" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.shippingDate')}</Label>
                       <DatePicker
@@ -828,10 +999,12 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                         maxDate={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)} // Máximo 1 año en el futuro
                       />
                       {formik.errors.fechaEmbarque && formik.touched.fechaEmbarque && (
-                        <div className="text-red-500">
-                          <ErrorMessage>
-                            {formik.errors.fechaEmbarque}
-                          </ErrorMessage>
+                        <div className="min-h-[20px]">
+                          <div className="text-red-500">
+                            <ErrorMessage>
+                              {formik.errors.fechaEmbarque}
+                            </ErrorMessage>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -845,10 +1018,14 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                 <div className="grid gap-1">
                   <Label htmlFor="informacionAdicional" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.additionalInfo')}</Label>
                   <Textarea
+                    id="informacionAdicional"
                     placeholder={t('createCargo.enterAdditionalInfo')}
                     name="informacionAdicional"
-                    value={formik.values.informacionAdicional}
-                    onChange={formik.handleChange}
+                    value={formik.values.informacionAdicional || ''}
+                    onChange={(e) => {
+                      console.log('Información adicional onChange:', e.target.value)
+                      formik.handleChange(e)
+                    }}
                     onBlur={formik.handleBlur}
                     rows={4}
                     maxLength={250}
@@ -860,7 +1037,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                       )}
                     </span>
                     <span>
-                      {formik.values.informacionAdicional?.length || 0}/250
+                      {(formik.values.informacionAdicional || '').length}/250
                     </span>
                   </div>
                 </div>
@@ -900,11 +1077,11 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                     <div className="space-y-1">
                       <div className="flex justify-between">
                         <span className="text-gray-600">{t('createCargo.confirmation.fields.transportType')}:</span>
-                        <span className="font-medium">{pendingValues.tipoTransporte}</span>
+                        <span className="font-medium">{getTransportTypeName(pendingValues.tipoTransporte, t)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">{t('createCargo.confirmation.fields.comexType')}:</span>
-                        <span className="font-medium">{pendingValues.tipoComex}</span>
+                        <span className="font-medium">{getTypeShipmentName(pendingValues.tipoComex, t)}</span>
                       </div>
                     </div>
                   </div>
@@ -996,12 +1173,11 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                         <span className="text-gray-600">{t('createCargo.confirmation.fields.value')}:</span>
                         <span className="font-medium">{pendingValues.valor} {pendingValues.moneda}</span>
                       </div>
-                      {pendingValues.partidaArancelaria && (
+                   
                         <div className="flex justify-between">
                           <span className="text-gray-600">{t('createCargo.confirmation.fields.tariffItem')}:</span>
-                          <span className="font-medium">{pendingValues.partidaArancelaria}</span>
+                          <span className="font-medium">{pendingValues.partidaArancelaria || 'N/A'}</span>
                         </div>
-                      )}
                       <div className="flex justify-between">
                         <span className="text-gray-600">{t('createCargo.confirmation.fields.expirationDate')}:</span>
                         <span className="font-medium">{pendingValues.fechaExpiracion}</span>
@@ -1016,14 +1192,12 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                   </div>
 
                   {/* Información adicional */}
-                  {pendingValues.informacionAdicional && (
                     <div>
                       <h5 className="font-medium text-gray-800 mb-1">📝 {t('createCargo.confirmation.sections.additionalInfo')}</h5>
                       <div className="bg-white p-2 rounded border text-gray-700 text-xs">
-                        {pendingValues.informacionAdicional}
+                        {pendingValues.informacionAdicional || 'N/A'}
                       </div>
                     </div>
-                  )}
                 </div>
               </div>
             </div>

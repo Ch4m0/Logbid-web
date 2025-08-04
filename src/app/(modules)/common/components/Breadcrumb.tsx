@@ -4,6 +4,7 @@ import useAuthStore from '@/src/store/authStore'
 import { useTranslation } from '@/src/hooks/useTranslation'
 import { ChevronRight, MapPin } from 'lucide-react'
 import { Suspense } from 'react'
+import { getTransportTypeName } from '@/src/utils/translateTypeName'
 
 const BreadcrumbContent = () => {
   const { profile } = useAuthStore()
@@ -20,7 +21,7 @@ const BreadcrumbContent = () => {
   const marketName = currentMarket?.name || ''
 
   // Obtener el tipo de envío
-  const shippingType = searchParams.get('shipping_type') || 'Marítimo'
+  const shippingType = searchParams.get('shipping_type') || '1'
 
   // Determinar la sección actual basada en la ruta
   const getSectionName = () => {
@@ -69,7 +70,7 @@ const BreadcrumbContent = () => {
         <ChevronRight className="h-4 w-4" />
         <span className="text-gray-500">{getSectionName()}</span>
         <ChevronRight className="h-4 w-4" />
-        <span className="text-gray-700 font-medium">{shippingType}</span>
+        <span className="text-gray-700 font-medium">{getTransportTypeName(shippingType, t)}</span>
       </nav>
     </div>
   )

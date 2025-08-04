@@ -3,10 +3,10 @@ import { createSupabaseClient } from '@/src/utils/supabase/client'
 import useAuthStore from '@/src/store/authStore'
 
 interface CreateShipmentData {
-  tipoTransporte: string  // shipping_type: 'Marítimo' | 'Aéreo'
+  tipoTransporte: string  // shipping_type: '1' | '2' (1=Marítimo, 2=Aéreo)
   origen: string         // origin_id
   destino: string        // destination_id  
-  tipoComex: string      // comex_type: 'Importación' | 'Exportación'
+  tipoComex: string      // comex_type: '1' | '2' (1=Importación, 2=Exportación)
   tipoEnvio: string      // transportation: 'FCL' | 'LCL' | 'Carga suelta'
   valor: string          // value
   moneda: string         // currency
@@ -80,7 +80,7 @@ export const useCreateShipment = () => {
       // Obtener información de origen y destino según el tipo de transporte
       let originData, destinationData
 
-      if (data.tipoTransporte === 'Marítimo') {
+      if (data.tipoTransporte === '1') {
         // Obtener puertos marítimos
         const { data: originPort, error: originError } = await supabase
           .from('maritime_ports')
@@ -154,7 +154,7 @@ export const useCreateShipment = () => {
           data.fechaEmbarque.trim() !== '' 
           ? formatDateTimeToUTC(data.fechaEmbarque)
           : null,
-        additional_info: data.informacionAdicional || data.tipoMercancia || '',
+        additional_info: data.informacionAdicional || '',
       }
 
       console.log('🚀 Enviando datos a función RPC:', shipmentData)
