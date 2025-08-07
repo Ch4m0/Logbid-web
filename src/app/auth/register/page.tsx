@@ -502,7 +502,7 @@ export default function Register() {
                   <Label className="text-sm font-semibold text-gray-700 block mb-2">
                     Rol
                   </Label>
-                  <Select id="role-select" value={formData.role} onValueChange={(value) => handleInputChange('role', value)}>
+                  <Select value={formData.role} onValueChange={(value) => handleInputChange('role', value)}>
                     <SelectTrigger id="role-select-trigger" className="h-12 border-2 border-gray-200 focus:border-green-500">
                       <SelectValue placeholder="Selecciona tu rol" />
                     </SelectTrigger>
@@ -517,7 +517,7 @@ export default function Register() {
                   <Label className="text-sm font-semibold text-gray-700 block mb-2">
                     {t('auth.language')}
                   </Label>
-                  <Select id="language-select" value={formData.language} onValueChange={(value) => handleInputChange('language', value)}>
+                  <Select  value={formData.language} onValueChange={(value) => handleInputChange('language', value)}>
                     <SelectTrigger id="language-select-trigger" className="h-12 border-2 border-gray-200 focus:border-green-500">
                       <SelectValue placeholder={t('auth.selectLanguage')} />
                     </SelectTrigger>
@@ -562,7 +562,7 @@ export default function Register() {
                       <Label className="text-sm font-semibold text-gray-700 block mb-2">
                         Empresa Existente
                       </Label>
-                      <Select id="existing-company-select" value={formData.companyId} onValueChange={(value) => handleInputChange('companyId', value)}>
+                      <Select value={formData.companyId} onValueChange={(value) => handleInputChange('companyId', value)}>
                         <SelectTrigger id="existing-company-select-trigger" className="h-12 border-2 border-gray-200 focus:border-green-500">
                           <SelectValue placeholder="Selecciona una empresa" />
                         </SelectTrigger>

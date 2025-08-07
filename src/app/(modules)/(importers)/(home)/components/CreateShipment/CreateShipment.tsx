@@ -775,6 +775,24 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                     )}
                   </div>
 
+                  <div className="grid gap-1">
+                    <Label htmlFor="unidades" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.labels.units')}</Label>
+                    <Input
+                      id="unidades"
+                      name="unidades"
+                      type="number"
+                      placeholder={t('createCargo.placeholders.numberOfUnits')}
+                      value={formik.values.unidades}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                    />
+                    {formik.errors.unidades && formik.touched.unidades && (
+                      <div className="text-red-500">
+                        <ErrorMessage>{formik.errors.unidades}</ErrorMessage>
+                      </div>
+                    )}
+                  </div>
+
 
                 </div>
               </div>
@@ -782,7 +800,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
               {/* Sección 4: Medidas y Cantidades */}
               <div className="space-y-4 bg-purple-50 p-3 md:p-4 rounded-lg">
                 <h3 className="text-lg md:text-xl font-bold text-gray-800 border-b-2 border-purple-500 pb-2">⚖️ {t('createCargo.sections.measureQuantities')}</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-3 md:gap-4">
                   <div className="grid gap-1">
                     <Label htmlFor="pesoTotal" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.labels.totalWeight')}</Label>
                     <Input
@@ -844,23 +862,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                     )}
                   </div>
 
-                  <div className="grid gap-1">
-                    <Label htmlFor="unidades" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.labels.units')}</Label>
-                    <Input
-                      id="unidades"
-                      name="unidades"
-                      type="number"
-                      placeholder={t('createCargo.placeholders.numberOfUnits')}
-                      value={formik.values.unidades}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                    />
-                    {formik.errors.unidades && formik.touched.unidades && (
-                      <div className="text-red-500">
-                        <ErrorMessage>{formik.errors.unidades}</ErrorMessage>
-                      </div>
-                    )}
-                  </div>
+
 
                   <div className="grid gap-1">
                     <Label htmlFor="incoterm" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.labels.incoterm')}</Label>
