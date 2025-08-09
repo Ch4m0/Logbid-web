@@ -71,6 +71,7 @@ export const useGetShipment = ({ shipment_id }: Args) => {
 
       // Transformar los datos para mantener compatibilidad con el modelo existente
       const offers = offersData || []
+      console.log(shipmentData)
       
       const transformedData = {
         id: shipmentData.id,
@@ -90,6 +91,7 @@ export const useGetShipment = ({ shipment_id }: Args) => {
         value: shipmentData.value,
         additional_info: shipmentData.additional_info,
         agent_code: shipmentData.agent_code,
+        documents_url: shipmentData.documents_url,
         
         // Datos de shipment_details aplanados para compatibilidad
         total_weight: shipmentDetails?.total_weight,

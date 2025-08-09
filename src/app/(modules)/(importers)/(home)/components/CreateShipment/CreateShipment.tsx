@@ -44,9 +44,10 @@ import { useGetMaritimeList } from '@/src/app/hooks/useGetMaritimeList'
 import { useCreateShipment } from '@/src/app/hooks/useCreateShipment'
 import FilterableSelectMaritimePort from '@/src/app/(modules)/common/components/FilterableSelectMaritimePort'
 import { useTranslation } from '@/src/hooks/useTranslation'
-import { Plus, CheckCircle, AlertTriangle } from 'lucide-react'
+import { Plus, CheckCircle, AlertTriangle, Upload, FileText, X } from 'lucide-react'
 import { DatePicker } from '@/src/components/ui/date-picker'
 import { getTransportTypeName, getTypeShipmentName } from '@/src/utils/translateTypeName'
+import { supabase } from '@/src/utils/supabase/client'
 
 // Definir el tipo para los valores del formulario
 interface FormValues {
@@ -69,6 +70,7 @@ interface FormValues {
   fechaExpiracion: string
   fechaEmbarque: string
   informacionAdicional: string
+  listaEmpaque: File | null
 }
 
 interface CreateShipmentProps {
@@ -88,6 +90,8 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
   const [shippingType, setShippingType] = useState('1')
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [pendingValues, setPendingValues] = useState<FormValues | null>(null)
+  const [uploadingFile, setUploadingFile] = useState(false)
+  const [uploadedFileUrl, setUploadedFileUrl] = useState<string | null>(null)
 
   const profile = useAuthStore((state) => state.profile)
   const { data: containerList = [] } = useGetListContainer(shippingType)
@@ -223,6 +227,28 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
     partidaArancelaria: Yup.string(),
     informacionAdicional: Yup.string()
       .max(250, t('createCargo.validation.additionalInfoMaxLength')),
+    listaEmpaque: Yup.mixed()
+      .nullable()
+      .test(
+        'fileType',
+        t('createCargo.validation.fileTypeNotSupported'),
+        (value) => {
+          if (!value) return true // Campo opcional
+          const allowedTypes = [
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/vnd.ms-excel'
+          ]
+          return allowedTypes.includes((value as File).type)
+        }
+      )
+      .test(
+        'fileSize',
+        t('createCargo.validation.fileSizeExceeded'),
+        (value) => {
+          if (!value) return true // Campo opcional
+          return (value as File).size <= 10 * 1024 * 1024 // 10MB máximo
+        }
+      ),
   })
 
   const formik = useFormik<FormValues>({
@@ -246,6 +272,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
       fechaExpiracion: '',
       fechaEmbarque: '',
       informacionAdicional: '',
+      listaEmpaque: null,
     },
     validationSchema,
     onSubmit: (values) => {
@@ -295,12 +322,72 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
     return `${dateString} 23:59:59`
   }
 
+  // Función para subir archivo a Supabase Storage
+  const uploadFileToSupabase = async (file: File): Promise<string | null> => {
+    try {
+      setUploadingFile(true)
+      
+      // Generar nombre único para el archivo
+      const timestamp = new Date().getTime()
+      const fileExtension = file.name.split('.').pop()
+      const fileName = `lista-empaque-${timestamp}.${fileExtension}`
+      
+      // Subir archivo al bucket 'packaging-lists'
+      const { data, error } = await supabase.storage
+        .from('packaging-lists')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
+      
+      if (error) {
+        console.error('Error uploading file:', error)
+        toast({
+          title: 'Error al subir archivo',
+          description: error.message,
+          variant: 'destructive',
+        })
+        return null
+      }
+      
+      // Para buckets privados, guardamos el path del archivo
+      const filePath = data.path
+      const fileUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/packaging-lists/${filePath}`
+      
+      console.log('File uploaded successfully:', fileUrl)
+      setUploadedFileUrl(fileUrl)
+      return fileUrl
+      
+    } catch (error) {
+      console.error('Error in uploadFileToSupabase:', error)
+      toast({
+        title: 'Error al subir archivo',
+        description: 'Ocurrió un error inesperado al subir el archivo',
+        variant: 'destructive',
+      })
+      return null
+    } finally {
+      setUploadingFile(false)
+    }
+  }
+
   // Función para confirmar y crear el shipment
-  const handleConfirmShipment = () => {
+  const handleConfirmShipment = async () => {
     if (!pendingValues) return
 
     console.log('Iniciando creación de shipment...')
     console.log({ pendingValues })
+    
+    let documentUrl: string | null = null
+    
+    // Si hay un archivo, subirlo primero
+    if (pendingValues.listaEmpaque) {
+      documentUrl = await uploadFileToSupabase(pendingValues.listaEmpaque)
+      if (!documentUrl) {
+        // Si falla la subida del archivo, no continuar
+        return
+      }
+    }
 
     createShipment(
       {
@@ -325,6 +412,8 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
         incoterm: pendingValues.incoterm,
         cargaClasificacion: pendingValues.cargaClasificacion,
         partidaArancelaria: pendingValues.partidaArancelaria,
+        // URL del archivo de documentos
+        documents_url: documentUrl || undefined,
       },
       {
         onSuccess: (data) => {
@@ -500,7 +589,8 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
           moneda: t('createCargo.currency'),
           fechaExpiracion: t('createCargo.shipmentDate'),
           fechaEmbarque: t('createCargo.shippingDate'),
-          informacionAdicional: t('createCargo.additionalInfo')
+          informacionAdicional: t('createCargo.additionalInfo'),
+          listaEmpaque: t('createCargo.labels.documentsList')
         }
         return fieldLabels[field] || field
       })
@@ -512,6 +602,22 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
       })
     } else {
       console.log('Formulario válido, sin errores')
+    }
+  }
+
+  // Función para manejar la selección de archivo
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null
+    formik.setFieldValue('listaEmpaque', file)
+  }
+
+  // Función para remover archivo seleccionado
+  const handleRemoveFile = () => {
+    formik.setFieldValue('listaEmpaque', null)
+    // Reset input file
+    const fileInput = document.getElementById('listaEmpaque') as HTMLInputElement
+    if (fileInput) {
+      fileInput.value = ''
     }
   }
 
@@ -1014,7 +1120,63 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                 </div>
               </div>
 
-              {/* Sección 6: Información Adicional */}
+              {/* Sección 6: Documentos */}
+              <div className="space-y-4 bg-blue-50 p-3 md:p-4 rounded-lg">
+                <h3 className="text-lg md:text-xl font-bold text-gray-800 border-b-2 border-blue-500 pb-2">📦 {t('createCargo.sections.documents')}</h3>
+                <div className="grid gap-1">
+                  <Label htmlFor="listaEmpaque" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.labels.documentsList')}</Label>
+                  <div className="space-y-2">
+                    {!formik.values.listaEmpaque ? (
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                        <input
+                          id="listaEmpaque"
+                          name="listaEmpaque"
+                          type="file"
+                          accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+                          onChange={handleFileSelect}
+                          className="hidden"
+                        />
+                        <label htmlFor="listaEmpaque" className="cursor-pointer">
+                          <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                          <p className="text-sm text-gray-600 mb-1">{t('createCargo.placeholders.selectExcelFile')}</p>
+                          <p className="text-xs text-gray-500">Máximo 10MB</p>
+                        </label>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between p-3 bg-white border rounded-lg">
+                        <div className="flex items-center space-x-2">
+                          <FileText className="h-5 w-5 text-green-600" />
+                          <span className="text-sm font-medium text-gray-700">
+                            {formik.values.listaEmpaque.name}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            ({(formik.values.listaEmpaque.size / 1024 / 1024).toFixed(2)} MB)
+                          </span>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleRemoveFile}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                    {formik.errors.listaEmpaque && formik.touched.listaEmpaque && (
+                      <div className="text-red-500">
+                        <ErrorMessage>{formik.errors.listaEmpaque}</ErrorMessage>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Archivo opcional. Puedes subir una lista de empaque en formato Excel (.xlsx, .xls)
+                  </p>
+                </div>
+              </div>
+
+              {/* Sección 7: Información Adicional */}
               <div className="space-y-4 bg-teal-50 p-3 md:p-4 rounded-lg">
                 <h3 className="text-lg md:text-xl font-bold text-gray-800 border-b-2 border-teal-500 pb-2">📝 {t('createCargo.sections.additionalInfo')}</h3>
                 <div className="grid gap-1">
@@ -1192,6 +1354,20 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                       )}
                     </div>
                   </div>
+
+                  {/* Información de empaque */}
+                  {pendingValues.listaEmpaque && (
+                    <div className="border-b border-gray-200 pb-2">
+                      <h5 className="font-medium text-gray-800 mb-1">📦 {t('createCargo.sections.documents')}</h5>
+                      <div className="flex items-center space-x-2 bg-white p-2 rounded border">
+                        <FileText className="h-4 w-4 text-green-600" />
+                        <span className="text-xs text-gray-700">{pendingValues.listaEmpaque.name}</span>
+                        <span className="text-xs text-gray-500">
+                          ({(pendingValues.listaEmpaque.size / 1024 / 1024).toFixed(2)} MB)
+                        </span>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Información adicional */}
                     <div>

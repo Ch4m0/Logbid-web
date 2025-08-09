@@ -25,6 +25,7 @@ interface CreateShipmentData {
   incoterm?: string     // incoterms_id
   cargaClasificacion?: string // dangerous_merch classification
   partidaArancelaria?: string // tariff_item
+  documents_url?: string  // URL del archivo de documentos en Supabase Storage
 }
 
 // Función para convertir fecha y hora a UTC correctamente
@@ -155,6 +156,7 @@ export const useCreateShipment = () => {
           ? formatDateTimeToUTC(data.fechaEmbarque)
           : null,
         additional_info: data.informacionAdicional || '',
+        documents_url: data.documents_url || null,
       }
 
       console.log('🚀 Enviando datos a función RPC:', shipmentData)

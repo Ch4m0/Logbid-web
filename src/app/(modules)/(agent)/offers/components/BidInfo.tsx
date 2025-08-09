@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { convertToColombiaTime, formatShippingDate } from '@/src/lib/utils'
 import { useTranslation } from '@/src/hooks/useTranslation';
 import { getTransportTypeName, getTypeShipmentName } from '@/src/utils/translateTypeName';
+import { FileText, Eye } from 'lucide-react';
+import { Button } from '@/src/components/ui/button';
+import ExcelViewer from '@/src/components/ExcelViewer';
 
 const BidInfo = ({ bidDataForAgent }: any) => {
   const { t } = useTranslation();
+  const [showExcelViewer, setShowExcelViewer] = useState(false);
   
   // Función para obtener valor de mercancía de forma segura
   const getMerchandiseValue = (key: string) => {
@@ -238,6 +242,47 @@ const BidInfo = ({ bidDataForAgent }: any) => {
               <span className="text-sm sm:text-base">{bidDataForAgent.dangerous_march ? t('bidInfo.yes') : t('bidInfo.no')}</span>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Lista de empaque si está disponible */}
+      {bidDataForAgent.documents_url && (
+        <div className="bg-green-50 p-3 sm:p-4 rounded-md mb-4 sm:mb-6 overflow-hidden">
+          <h3 className="font-bold text-base sm:text-lg mb-3 text-green-700 flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            {t('bidInfo.packingList')}
+          </h3>
+          <div className="flex flex-col sm:flex-row items-start gap-3">
+            <div className="flex items-center gap-2 flex-1">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <FileText className="h-6 w-6 text-green-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm sm:text-base font-medium text-gray-900">
+                  {t('bidInfo.packingListAvailable')}
+                </p>
+                <p className="text-xs sm:text-sm text-gray-600">
+                  {t('bidInfo.excelFileDetail')}
+                </p>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowExcelViewer(true)}
+              className="flex items-center gap-2 border-green-200 text-green-700 hover:bg-green-50"
+            >
+              <Eye className="h-4 w-4" />
+              {t('bidInfo.viewContent')}
+            </Button>
+          </div>
+          
+          {/* Visor de Excel */}
+          <ExcelViewer
+            fileUrl={bidDataForAgent.documents_url}
+            isOpen={showExcelViewer}
+            onClose={() => setShowExcelViewer(false)}
+          />
         </div>
       )}
 

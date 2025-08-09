@@ -606,7 +606,9 @@
       "title": "Error de validación",
       "missingFields": "Campos faltantes",
       "validationErrors": "Campos con errores de validación",
-      "shippingDateRequired": "La fecha de embarque es requerida"
+      "shippingDateRequired": "La fecha de embarque es requerida",
+      "fileTypeNotSupported": "Tipo de archivo no soportado. Solo se permiten archivos Excel (.xlsx, .xls)",
+      "fileSizeExceeded": "El archivo es demasiado grande. Tamaño máximo permitido: 10MB"
     },
     "shipmentTypes": {
       "looseCargo": "Carga suelta",
@@ -626,7 +628,8 @@
       "shipmentDetails": "Detalles del Envío",
       "measureQuantities": "Medidas y Cantidades",
       "commercialInfo": "Información Comercial",
-      "additionalInfo": "Información Adicional"
+      "additionalInfo": "Información Adicional",
+      "documents": "Empaque"
     },
     "placeholders": {
       "selectContainer": "Selecciona contenedor",
@@ -638,7 +641,8 @@
       "cubicMeters": "Metros cúbicos",
       "numberOfUnits": "Número de unidades",
       "packagingExample": "Ej: Cajas de cartón, Pallets",
-      "tariffExample": "Ej: 8703.23.90"
+      "tariffExample": "Ej: 8703.23.90",
+      "selectExcelFile": "Selecciona archivo Excel (.xlsx, .xls)"
     },
     "labels": {
       "containerType": "Tipo de Contenedor",
@@ -649,7 +653,8 @@
       "units": "Unidades",
       "incoterm": "Incoterm",
       "cargoClassification": "Clasificación de Carga",
-      "tariffItem": "Partida Arancelaria"
+      "tariffItem": "Partida Arancelaria",
+      "documentsList": "Lista empaque"
     },
     "measures": {
       "kilograms": "Kilogramos (Kg)",
@@ -689,7 +694,8 @@
         "value": "Valor",
         "tariffItem": "Partida arancelaria",
         "expirationDate": "Fecha de expiración",
-        "shippingDate": "Fecha de embarque"
+        "shippingDate": "Fecha de embarque",
+        "documentsList": "Lista empaque"
       },
       "buttons": {
         "cancel": "Cancelar",
@@ -777,7 +783,11 @@
     "specialRequirements": "Requerimientos Especiales",
     "additionalInfo": "Información Adicional",
     "shipmentId": "ID de Envío",
-    "offersCount": "Número de Ofertas"
+    "offersCount": "Número de Ofertas",
+    "packingList": "Lista de Empaque",
+    "packingListAvailable": "Lista de empaque disponible",
+    "excelFileDetail": "Archivo Excel con el detalle del empaque",
+    "viewContent": "Ver contenido"
   },
   "offerCard": {
     "accepting": "Aceptando...",

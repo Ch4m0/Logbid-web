@@ -606,7 +606,9 @@
       "title": "Validation Error",
       "missingFields": "Missing fields",
       "validationErrors": "Fields with validation errors",
-      "shippingDateRequired": "Shipping date is required"
+      "shippingDateRequired": "Shipping date is required",
+      "fileTypeNotSupported": "File type not supported. Only Excel files (.xlsx, .xls) are allowed",
+      "fileSizeExceeded": "File is too large. Maximum allowed size: 10MB"
     },
     "shipmentTypes": {
       "looseCargo": "Loose Cargo",
@@ -626,7 +628,8 @@
       "shipmentDetails": "Shipment Details",
       "measureQuantities": "Measures and Quantities",
       "commercialInfo": "Commercial Information",
-      "additionalInfo": "Additional Information"
+      "additionalInfo": "Additional Information",
+      "documents": "Packaging"
     },
     "placeholders": {
       "selectContainer": "Select container",
@@ -638,7 +641,8 @@
       "cubicMeters": "Cubic meters",
       "numberOfUnits": "Number of units",
       "packagingExample": "Ex: Cardboard boxes, Pallets",
-      "tariffExample": "Ex: 8703.23.90"
+      "tariffExample": "Ex: 8703.23.90",
+      "selectExcelFile": "Select Excel file (.xlsx, .xls)"
     },
     "labels": {
       "containerType": "Container Type",
@@ -649,7 +653,8 @@
       "units": "Units",
       "incoterm": "Incoterm",
       "cargoClassification": "Cargo Classification",
-      "tariffItem": "HSN Code"
+      "tariffItem": "HSN Code",
+      "documentsList": "Packaging List"
     },
     "measures": {
       "kilograms": "Kilograms (Kg)",
@@ -689,7 +694,8 @@
         "value": "Value",
         "tariffItem": "HSN Code",
         "expirationDate": "Expiration date",
-        "shippingDate": "End Bidding"
+        "shippingDate": "End Bidding",
+        "documentsList": "Packaging List"
       },
       "buttons": {
         "cancel": "Cancel",
@@ -777,7 +783,11 @@
     "specialRequirements": "Special Requirements",
     "additionalInfo": "Additional Information",
     "shipmentId": "Shipment ID",
-    "offersCount": "Number of Offers"
+    "offersCount": "Number of Offers",
+    "packingList": "Packing List",
+    "packingListAvailable": "Packing list available",
+    "excelFileDetail": "Excel file with packing details",
+    "viewContent": "View content"
   },
   "offerCard": {
     "accepting": "Accepting...",

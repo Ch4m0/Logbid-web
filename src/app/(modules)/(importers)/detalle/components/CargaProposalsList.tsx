@@ -53,6 +53,8 @@ interface Shipment {
   dangerous_march: boolean
   tariff_item: string
   agent_code: string
+  documents_url?: string | null
+  additional_info?: string
 }
 
 export function CargaProposalsList() {
