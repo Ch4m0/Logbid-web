@@ -44,6 +44,9 @@ export const useGetBidListByMarket = (
         query = query.eq('status', status)
       }
 
+      // Siempre excluir shipments cancelados para los agentes
+      query = query.neq('status', 'Cancelled')
+
       // Filtrar por shipping_type
       if (shippingType) {
         query = query.eq('shipping_type', shippingType)

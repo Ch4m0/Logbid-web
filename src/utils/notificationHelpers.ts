@@ -188,6 +188,7 @@ export async function createShipmentStatusChangedNotification(
     switch (status) {
       case 'Active': return '🟢'
       case 'Closed': return '✅'
+      case 'Cancelled': return '🚫'
       case 'Offering': return '📋'
       default: return '🔄'
     }

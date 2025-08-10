@@ -46,7 +46,12 @@ export const useGetShipments = ({
 
       // Filtrar por status
       if (status) {
-        query = query.eq('status', status)
+        if (status === 'Closed') {
+          // Para el historial, incluir tanto 'Closed' como 'Cancelled'
+          query = query.in('status', ['Closed', 'Cancelled'])
+        } else {
+          query = query.eq('status', status)
+        }
       }
 
       // Filtrar por shipping_type - mapear valores descriptivos a numéricos
@@ -90,7 +95,10 @@ export const useGetShipments = ({
         last_price: shipment.offers?.length > 0 
           ? Math.min(...shipment.offers.map((offer: any) => parseFloat(offer.price)))
           : null,
-        offers_count: shipment.offers?.length || 0
+        offers_count: shipment.offers?.length || 0,
+        // Campos de cancelación
+        cancellation_reason: shipment.cancellation_reason,
+        cancelled_at: shipment.cancelled_at
       })) || []
     },
     enabled: !!user_id && !!market_id,

@@ -73,6 +73,9 @@
       "shipmentCreatedSuccess": "¡Shipment creado exitosamente!",
       "routeDescription": "Ruta: {{origin}} → {{destination}}",
       "shipmentCreationError": "Error al crear el shipment",
+      "shipmentCancelledSuccess": "¡Shipment cancelado exitosamente!",
+      "shipmentCancelledDescription": "El shipment ha sido cancelado y los agentes han sido notificados",
+      "shipmentCancellationError": "Error al cancelar el shipment",
       "unexpectedError": "Ocurrió un error inesperado"
     },
     "messages": {
@@ -522,6 +525,7 @@
   "cargoList": {
     "active": "Activo",
     "closed": "Cerrado",
+    "cancelled": "Cancelado",
     "offering": "Ofreciendo",
     "withOffers": "Ofertas",
     "withoutOffers": "Pendientes",
@@ -725,6 +729,23 @@
       "maritime": "Marítimo", 
       "land": "Terrestre",
       "warehouse": "Almacén"
+    }
+  },
+  "cancelShipment": {
+    "title": "Cancelar Shipment",
+    "confirmMessage": "¿Estás seguro de que deseas cancelar este shipment?",
+    "reasonLabel": "Motivo de cancelación",
+    "reasonPlaceholder": "Ingresa el motivo por el cual cancelas este shipment...",
+    "reasonRequired": "El motivo de cancelación es requerido",
+    "confirmButton": "Sí, cancelar shipment",
+    "cancelButton": "No, mantener activo",
+    "warning": "Esta acción no se puede deshacer",
+    "description": "Al cancelar este shipment:",
+    "consequences": {
+      "1": "Se notificará automáticamente a todos los agentes que hicieron ofertas",
+      "2": "El shipment ya no aparecerá en la lista de shipments disponibles",
+      "3": "Se mantendrá en el historial con estado 'Cancelado'",
+      "4": "No se podrán recibir más ofertas"
     }
   },
   "filters": {

@@ -51,6 +51,7 @@ export function CargaTransportListHistory() {
     inserted_at: '',
     expiration_date: '',
     value: '',
+    status: '',
   })
 
   const handleSort = (key: string) => {
@@ -212,6 +213,9 @@ export function CargaTransportListHistory() {
                 </span>
               </TableHead>
               <TableHead className="font-bold text-black">
+                Estado
+              </TableHead>
+              <TableHead className="font-bold text-black">
                 Código agente
               </TableHead>
               <TableHead className="font-bold text-black">
@@ -267,6 +271,13 @@ export function CargaTransportListHistory() {
                 />
               </TableCell>
 
+              <TableCell className="text-center">
+                <Input
+                  placeholder="Filtrar estado"
+                  onChange={(e) => handleFilterChange('status', e.target.value)}
+                />
+              </TableCell>
+
               <TableCell className="text-right">
                 <Input
                   placeholder="Filtrar co. agente"
@@ -298,6 +309,17 @@ export function CargaTransportListHistory() {
                 <TableCell>{item.inserted_at}</TableCell>
                 <TableCell>{item.expiration_date}</TableCell>
                 <TableCell>USD ${item.value}</TableCell>
+                <TableCell className="text-center">
+                  {item.status === 'Cancelled' ? (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">
+                      🚫 Cancelado
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                      ✅ Cerrado
+                    </span>
+                  )}
+                </TableCell>
                 <TableCell>-</TableCell>
                 <TableCell>-</TableCell>
                 <TableCell>-</TableCell>

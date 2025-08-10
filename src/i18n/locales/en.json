@@ -73,6 +73,9 @@
       "shipmentCreatedSuccess": "Shipment created successfully!",
       "routeDescription": "Route: {{origin}} → {{destination}}",
       "shipmentCreationError": "Error creating shipment",
+      "shipmentCancelledSuccess": "Shipment cancelled successfully!",
+      "shipmentCancelledDescription": "The shipment has been cancelled and agents have been notified",
+      "shipmentCancellationError": "Error cancelling shipment",
       "unexpectedError": "An unexpected error occurred"
     },
     "messages": {
@@ -522,6 +525,7 @@
   "cargoList": {
     "active": "Active",
     "closed": "Closed",
+    "cancelled": "Cancelled",
     "offering": "Offering",
     "withOffers": "Offers",
     "withoutOffers": "Pending",
@@ -720,11 +724,28 @@
       "shippingMustBeAfterClosing": "The End Bidding must be at least 1 day after the closing date",
       "closingMustBeBeforeShipping": "The closing date must be before the End Bidding"
     },
-    "shippingTypes": {
+        "shippingTypes": {
       "air": "Air",
-      "maritime": "Maritime",
-      "land": "Land", 
+      "maritime": "Maritime", 
+      "land": "Land",
       "warehouse": "Warehouse"
+    }
+  },
+  "cancelShipment": {
+    "title": "Cancel Shipment",
+    "confirmMessage": "Are you sure you want to cancel this shipment?",
+    "reasonLabel": "Cancellation reason",
+    "reasonPlaceholder": "Enter the reason why you are cancelling this shipment...",
+    "reasonRequired": "Cancellation reason is required",
+    "confirmButton": "Yes, cancel shipment",
+    "cancelButton": "No, keep active",
+    "warning": "This action cannot be undone",
+    "description": "By cancelling this shipment:",
+    "consequences": {
+      "1": "All agents who made offers will be automatically notified",
+      "2": "The shipment will no longer appear in the available shipments list",
+      "3": "It will remain in history with 'Cancelled' status",
+      "4": "No more offers can be received"
     }
   },
   "filters": {

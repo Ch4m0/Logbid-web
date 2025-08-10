@@ -32,6 +32,8 @@ import { Separator } from '@/src/components/ui/separator'
 import { ShippingType } from '@/src/models/common'
 import { convertToColombiaTime, formatDateUTCAsLocal, formatShippingDate } from '@/src/lib/utils'
 import { useTranslation } from '@/src/hooks/useTranslation'
+import CancelShipmentModal from './CancelShipmentModal'
+import { X } from 'lucide-react'
 
 interface ImporterShipmentCardsProps {
   filterType: 'withoutOffers' | 'withOffers' | 'closed'
@@ -94,6 +96,14 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
   const [sort, setSort] = useState({ key: 'inserted_at', order: 'desc' })
 
   const [showFilters, setShowFilters] = useState(false)
+  const [cancelModalOpen, setCancelModalOpen] = useState(false)
+  const [shipmentToCancel, setShipmentToCancel] = useState<{
+    uuid: string
+    origin: string
+    destination: string
+    value?: number
+    currency?: string
+  } | null>(null)
 
   // Filtros que el usuario está configurando (no aplicados aún)
   const [pendingFilters, setPendingFilters] = useState({
@@ -165,6 +175,23 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
         onRefetch: refetch
       },
     })
+  }
+
+  const handleCancelShipment = (
+    uuid: string,
+    origin: string,
+    destination: string,
+    value?: number,
+    currency?: string
+  ) => {
+    setShipmentToCancel({
+      uuid,
+      origin,
+      destination,
+      value,
+      currency
+    })
+    setCancelModalOpen(true)
   }
 
   const handleSort = (key: string) => {
@@ -288,7 +315,11 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
           {paginatedList?.map((bid) => (
             <Card
               key={bid.uuid}
-              className="w-full cursor-pointer hover:shadow-md transition-shadow border-l-4 border-l-primary bg-white"
+              className={`w-full cursor-pointer hover:shadow-md transition-shadow border-l-4 ${
+                bid.status === 'Cancelled' 
+                  ? 'border-l-red-500 bg-red-50/50' 
+                  : 'border-l-primary bg-white'
+              }`}
               onClick={() => goDetails(bid.uuid)}
             >
               <div className="flex flex-col md:grid md:grid-cols-12 gap-2 md:gap-4">
@@ -298,6 +329,14 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
                     <Badge variant="outline" className="w-full justify-center text-xs">
                       ID: {bid.uuid.substring(0, 15)}...
                     </Badge>
+
+                    {/* Badge de estado cancelado */}
+                    {bid.status === 'Cancelled' && (
+                      <Badge className="w-full justify-center text-xs bg-red-500 text-white hover:bg-red-600">
+                        <X className="h-3 w-3 mr-1" />
+                        {t('cargoList.cancelled')}
+                      </Badge>
+                    )}
 
                     {shouldShowStatusElements() && (
                       <Badge
@@ -404,9 +443,9 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
                   </div>
                 </div>
 
-                {/* Extend button section */}
-                {filterType !== 'closed' && (
-                  <div className="md:col-span-3 p-3 md:p-4 flex items-center justify-center border-t md:border-t-0 md:border-l">
+                {/* Actions buttons section */}
+                {filterType !== 'closed' && bid.status !== 'Cancelled' && (
+                  <div className="md:col-span-3 p-3 md:p-4 flex flex-col gap-2 items-center justify-center border-t md:border-t-0 md:border-l">
                     <Button
                       variant="outline"
                       size="sm"
@@ -424,6 +463,46 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
                     >
                       {t('common.extend')}
                     </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full text-xs md:text-sm border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleCancelShipment(
+                          bid.uuid,
+                          bid.origin,
+                          bid.destination,
+                          bid.value,
+                          bid.currency
+                        )
+                      }}
+                    >
+                      <X className="h-3 w-3 mr-1" />
+                      {t('common.cancel')}
+                    </Button>
+                  </div>
+                )}
+
+                {/* Información de cancelación */}
+                {bid.status === 'Cancelled' && (
+                  <div className="md:col-span-3 p-3 md:p-4 flex flex-col gap-2 items-center justify-center border-t md:border-t-0 md:border-l bg-red-50">
+                    <div className="flex items-center gap-2 text-red-700">
+                      <X className="h-4 w-4" />
+                      <span className="text-xs md:text-sm font-medium">
+                        {t('cargoList.cancelled')}
+                      </span>
+                    </div>
+                    {bid.cancelled_at && (
+                      <div className="text-xs text-red-600 text-center">
+                        {new Date(bid.cancelled_at).toLocaleDateString()}
+                      </div>
+                    )}
+                    {bid.cancellation_reason && (
+                      <div className="text-xs text-red-600 text-center italic">
+                        &ldquo;{bid.cancellation_reason}&rdquo;
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -450,6 +529,19 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
             />
           </Suspense>
         </div>
+
+        {/* Cancel Shipment Modal */}
+        <CancelShipmentModal
+          isOpen={cancelModalOpen}
+          onClose={() => {
+            setCancelModalOpen(false)
+            setShipmentToCancel(null)
+          }}
+          shipment={shipmentToCancel}
+          onSuccess={() => {
+            refetch()
+          }}
+        />
       </CardContent>
     </Card>
   )
