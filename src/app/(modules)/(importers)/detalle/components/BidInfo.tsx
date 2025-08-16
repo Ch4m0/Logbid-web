@@ -136,7 +136,7 @@ const BidInfo = ({ bidDataForAgent }: any) => {
             </div>
             <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
               <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.volume')}:</span>
-              <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">{getMerchandiseValue('volume')}</span>
+              <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">{getMerchandiseValue('volume')} m³</span>
             </div>
             {bidDataForAgent.tariff_item && (
               <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">

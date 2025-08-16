@@ -71,7 +71,7 @@ export const useCancelShipment = () => {
       // Crear notificaciones para todos los agentes que hicieron ofertas
       if (shipmentData.offers && shipmentData.offers.length > 0) {
         console.log('📧 Enviando notificaciones a agentes...')
-        
+        // @ts-ignore
         const agentIds = [...new Set(shipmentData.offers.map((offer: any) => offer.agent_id))]
         
         const notificationPromises = agentIds.map(async (agentId: string) => {
