@@ -98,7 +98,7 @@ export default function CancelShipmentModal({
           {/* Información del shipment */}
           <div className="bg-gray-50 p-4 rounded-lg">
             <h4 className="font-semibold mb-2 text-gray-800">
-              Información del Shipment
+              Información del Embarque
             </h4>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
