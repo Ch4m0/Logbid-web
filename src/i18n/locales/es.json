@@ -65,17 +65,17 @@
       "newOfferReceived": "¡Nueva oferta recibida!",
       "offerAccepted": "¡Oferta aceptada!",
       "offerRejected": "Oferta rechazada",
-      "shipmentExpiring": "Shipment próximo a expirar",
+      "shipmentExpiring": "Embarque próximo a expirar",
       "statusUpdated": "Estado actualizado",
       "deadlineExtended": "Fecha extendida",
       "deadlineExtendedForAgents": "¡Fecha límite extendida!",
-      "newShipmentAvailable": "¡Nuevo shipment disponible!",
-      "shipmentCreatedSuccess": "¡Shipment creado exitosamente!",
+      "newShipmentAvailable": "¡Nuevo embarque disponible!",
+      "shipmentCreatedSuccess": "Embarque creado exitosamente!",
       "routeDescription": "Ruta: {{origin}} → {{destination}}",
-      "shipmentCreationError": "Error al crear el shipment",
-      "shipmentCancelledSuccess": "¡Shipment cancelado exitosamente!",
-      "shipmentCancelledDescription": "El shipment ha sido cancelado y los agentes han sido notificados",
-      "shipmentCancellationError": "Error al cancelar el shipment",
+      "shipmentCreationError": "Error al crear el Embarque",
+      "shipmentCancelledSuccess": "Embarque cancelado exitosamente!",
+      "shipmentCancelledDescription": "El Embarque ha sido cancelado y los agentes han sido notificados",
+      "shipmentCancellationError": "Error al cancelar el embarque",
       "unexpectedError": "Ocurrió un error inesperado"
     },
     "messages": {
@@ -85,7 +85,7 @@
       "shipmentExpiring": "Tu envío {{origin}} → {{destination}} expira en {{hours}} horas. Considera extender la fecha límite.",
       "statusUpdated": "Tu envío {{origin}} → {{destination}} cambió de {{oldStatus}} a {{statusEmoji}} {{newStatus}}",
       "deadlineExtended": "La fecha límite de tu envío {{origin}} → {{destination}} se extendió exitosamente",
-      "deadlineExtendedForAgents": "El shipment {{origin}} → {{destination}} (${{value}} {{currency}}) extendió su fecha límite. ¡Tienes más tiempo para ofertar!",
+      "deadlineExtendedForAgents": "El embarque {{origin}} → {{destination}} (${{value}} {{currency}}) extendió su fecha límite. ¡Tienes más tiempo para ofertar!",
       "newShipmentAvailable": "Nuevo {{shippingType}} disponible en {{marketName}}: {{origin}} → {{destination}} (${{value}} {{currency}})"
     }
   },
@@ -732,18 +732,18 @@
     }
   },
   "cancelShipment": {
-    "title": "Cancelar Shipment",
-    "confirmMessage": "¿Estás seguro de que deseas cancelar este shipment?",
+    "title": "Cancelar Embarque",
+    "confirmMessage": "¿Estás seguro de que deseas cancelar este embarque?",
     "reasonLabel": "Motivo de cancelación",
-    "reasonPlaceholder": "Ingresa el motivo por el cual cancelas este shipment...",
+    "reasonPlaceholder": "Ingresa el motivo por el cual cancelas este embarque...",
     "reasonRequired": "El motivo de cancelación es requerido",
-    "confirmButton": "Sí, cancelar shipment",
+    "confirmButton": "Sí, cancelar embarque",
     "cancelButton": "No, mantener activo",
     "warning": "Esta acción no se puede deshacer",
-    "description": "Al cancelar este shipment:",
+    "description": "Al cancelar este embarque:",
     "consequences": {
       "1": "Se notificará automáticamente a todos los agentes que hicieron ofertas",
-      "2": "El shipment ya no aparecerá en la lista de shipments disponibles",
+      "2": "El embarque ya no aparecerá en la lista de embarques disponibles",
       "3": "Se mantendrá en el historial con estado 'Cancelado'",
       "4": "No se podrán recibir más ofertas"
     }
@@ -772,7 +772,7 @@
     "routeInformation": "Ruta",
     "origin": "Origen",
     "destination": "Destino",
-    "shipmentType": "Tipo de Envío",
+    "shipmentType": "Tipo de Embarque",
     "transport": "Transporte",
     "importantDates": "Fechas",
     "startDate": "Fecha inicio",
@@ -908,7 +908,7 @@
     "proposePrice": "Crear Cotización",
     "proposeNewPrice": "Crear Nueva Cotización",
     "myOffers": "Mis Ofertas",
-    "noOffersMessage": "No has realizado ofertas en ningún shipment activo",
+    "noOffersMessage": "No has realizado ofertas en ningún embarque activo",
     "shipmentClosed": "Envío Cerrado",
     "shipmentClosedMessage": "Este envío ha sido cerrado. Una oferta ha sido aceptada por el importador."
   },
@@ -1041,7 +1041,7 @@
   },
   "breadcrumb": {
     "dashboard": "Dashboard",
-    "shipments": "Shipments",
+    "shipments": "Embarques",
     "offers": "Ofertas",
     "history": "Historial",
     "offersHistory": "Historial de Ofertas"
