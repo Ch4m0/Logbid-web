@@ -36,7 +36,7 @@ export const useGetShipments = ({
 
       // Filtrar por market_id si se proporciona
       if (market_id) {
-        query = query.eq('market', market_id)
+        query = query.eq('market_id', market_id)
       }
 
       // Filtrar por profile_id (user_id) si se proporciona

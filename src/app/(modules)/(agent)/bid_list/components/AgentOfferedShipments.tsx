@@ -174,7 +174,7 @@ export function AgentOfferedShipments({ status }: AgentOfferedShipmentsProps) {
                           </span>
                         </TableCell>
                         <TableCell>
-                          <Link href={`/offers?shipment_id=${shipment.uuid}&market_id=${marketId}&shipping_type=${shippingType}`}>
+                          <Link href={`/offers?shipment_id=${shipment.uuid}&market=${marketId}&shipping_type=${shippingType}`}>
                             <Button 
                               variant="outline" 
                               size="sm"
@@ -262,7 +262,7 @@ export function AgentOfferedShipments({ status }: AgentOfferedShipmentsProps) {
 
                       {/* Action Button */}
                       <div className="pt-3 border-t border-gray-100">
-                        <Link href={`/offers?shipment_id=${shipment.uuid}&market_id=${marketId}&shipping_type=${shippingType}`}>
+                        <Link href={`/offers?shipment_id=${shipment.uuid}&market=${marketId}&shipping_type=${shippingType}`}>
                           <Button 
                             variant="outline" 
                             size="sm"

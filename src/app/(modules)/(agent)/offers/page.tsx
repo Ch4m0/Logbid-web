@@ -41,7 +41,7 @@ const OffersPageContent = () => {
       
       // Redirigir a la lista de ofertas después de un breve delay para que el usuario vea la notificación
       setTimeout(() => {
-        router.push(`/bid_list?market_id=${market_id}&status=WithoutOffers`)
+        router.push(`/bid_list?market=${market_id}&status=WithoutOffers`)
       }, 2000)
     }
   }, [bidDataForAgent?.status, router, t])

@@ -99,7 +99,7 @@ export function AgentShipmentList({ status }: CargoTransporListProps) {
   }
 
   const handleGetOffers = (uuid: string) => {
-    router.push(`/offers?shipment_id=${uuid}&market_id=${marketId}&shipping_type=${shippingType}`)
+    router.push(`/offers?shipment_id=${uuid}&market=${marketId}&shipping_type=${shippingType}`)
   }
 
   const handleSort = (key: string) => {

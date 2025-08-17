@@ -281,7 +281,7 @@ const MarketItem = ({
           {list[validRole].map((item: ListItem, index: number) => (
             <Link
               key={index}
-              href={`${item.url}?market_id=${market_id}`}
+              href={`${item.url}?market=${market_id}`}
               className="flex items-center gap-2 rounded-md px-3 py-2 text-sm sm:text-md font-bold hover:bg-purple hover:text-black text-white"
               prefetch={false}
               onClick={onLinkClick}

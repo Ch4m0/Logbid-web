@@ -20,10 +20,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useTranslation } from "@/src/hooks/useTranslation"
 import { useSendOfferAcceptedEmails } from "@/src/hooks/useSendOfferAcceptedEmails"
 
-interface OfferConfirmationProps {
-  offerData: any
-}
-
 export function OfferConfirmationDialog(offerData: any) {
   console.log('OfferData received:', offerData)
   console.log('OfferData stringified:', JSON.stringify(offerData, null, 2))
@@ -32,7 +28,6 @@ export function OfferConfirmationDialog(offerData: any) {
   const searchParams = useSearchParams()
   const market = searchParams.get('market')
   const [isConfirming, setIsConfirming] = useState(false)
-  const { setBidData } = useBidStore()
   const { mutate: closeBid } = useCloseBid()
   const { mutate: sendEmails } = useSendOfferAcceptedEmails()
 

@@ -7,7 +7,7 @@ export const fetchListBidByMarket = async (
   user_id: number | null,
   shippingType: ShippingType
 ) => {
-  let url = `/market/get_bids_by_market_id?market_id=${market}&status=${status}&shipping_type=${shippingType}`
+  let url = `/market/get_bids_by_market_id?market=${market}&status=${status}&shipping_type=${shippingType}`
   if (status === 'Offered') {
     url = url + `&user_id=${user_id}`
   }
@@ -50,7 +50,7 @@ export const fetchHistoricalBidsForAgent = async ({
   shipping_type: string
 }) => {
   const response = await apiClient.get(
-    `/agent/offers_history_by_agent_id_and_market_id?shipping_type=${shipping_type}&user_id=${user_id}&market_id=${market_id}`
+    `/agent/offers_history_by_agent_id_and_market_id?shipping_type=${shipping_type}&user_id=${user_id}&market=${market_id}`
   )
   return response.data.data.map((item: any) => {
     return {

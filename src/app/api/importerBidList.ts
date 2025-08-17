@@ -17,7 +17,7 @@ export const getBidList = async ({
   shipping_type,
 }: Args): Promise<BidListItem[]> => {
   const response = await apiClient.get(
-    `/importer/bid_list?shipping_type=${shipping_type}&user_id=${user_id}&market_id=${market_id}&status=${status}`
+    `/importer/bid_list?shipping_type=${shipping_type}&user_id=${user_id}&market=${market_id}&status=${status}`
   )
 
   // Mapea la respuesta para convertirla en una instancia de BidListItem
@@ -168,7 +168,7 @@ export const closeBid = async ({
   market_id: string
 ) => {
   const response = await axios.get(
-    `${API_BASE_URL}/importer/get_historical_bids?user_id=${user_id}&market_id=${market_id}&status=Closed`
+    `${API_BASE_URL}/importer/get_historical_bids?user_id=${user_id}&market=${market_id}&status=Closed`
   )
   return response.data.data
 }*/
@@ -178,7 +178,7 @@ export const fetchHistoricalBids = async (
   market_id: string
 ) => {
   const response = await apiClient.get(
-    `/importer/get_historical_bids?user_id=${user_id}&market_id=${market_id}&status=Closed`
+    `/importer/get_historical_bids?user_id=${user_id}&market=${market_id}&status=Closed`
   )
   return response.data.data
 }
