@@ -8,7 +8,7 @@ import {
   DialogTrigger,
 } from '@/src/components/ui/dialog'
 import { Button } from '@/src/components/ui/button'
-import { DollarSign, Plus } from 'lucide-react'
+import { DollarSign, Plus, AlertCircle } from 'lucide-react'
 import ProposalFormAir from './ProposalFormAir'
 import ProposalFormSea from './ProposalFormSea'
 import { useTranslation } from '@/src/hooks/useTranslation'
@@ -37,16 +37,48 @@ export default function ProposalModal({
   // Use the actual shipment type to determine which form to show
   const isMaritimo = bidDataShippingType === '1'
 
+  // Determinar por qué el botón está deshabilitado
+  const getDisabledReason = () => {
+    if (bidDataForAgent?.status === 'Closed') {
+      return t('agentOffers.shipmentClosedMessage')
+    }
+    if (bidDataForAgent?.status === 'Cancelled') {
+      return t('agentOffers.shipmentCancelledMessage')
+    }
+    if (bidDataForAgent?.expiration_date && new Date(bidDataForAgent.expiration_date) < new Date()) {
+      return t('agentOffers.shipmentExpiredMessage')
+    }
+    return ''
+  }
+
+  const isDisabled = bidDataForAgent?.status === 'Closed' || 
+                    bidDataForAgent?.status === 'Cancelled' ||
+                    (bidDataForAgent?.expiration_date && new Date(bidDataForAgent.expiration_date) < new Date())
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button 
-          className="bg-blue-500 hover:bg-blue-600 text-white transition-colors"
-          size="default"
-        >
-          <DollarSign className="w-4 h-4 mr-2" />
-          {t('agentOffers.proposePrice')}
-        </Button>
+        <div className="relative group">
+          <Button 
+            className="bg-blue-500 hover:bg-blue-600 text-white transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            size="default"
+            disabled={isDisabled}
+          >
+            <DollarSign className="w-4 h-4 mr-2" />
+            {t('agentOffers.proposePrice')}
+          </Button>
+          
+          {/* Tooltip cuando está deshabilitado */}
+          {isDisabled && (
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-800 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="h-4 w-4" />
+                {getDisabledReason()}
+              </div>
+              <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
+            </div>
+          )}
+        </div>
       </DialogTrigger>
       <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col p-0 [&>button]:z-20 [&>button]:bg-white [&>button]:shadow-md [&>button]:border">
         {/* Header fijo */}

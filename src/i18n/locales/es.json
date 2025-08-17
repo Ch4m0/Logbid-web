@@ -948,7 +948,13 @@
     "myOffers": "Mis Ofertas",
     "noOffersMessage": "No has realizado ofertas en ningún embarque activo",
     "shipmentClosed": "Envío Cerrado",
-    "shipmentClosedMessage": "Este envío ha sido cerrado. Una oferta ha sido aceptada por el importador."
+    "shipmentClosedMessage": "Este envío ha sido cerrado. Una oferta ha sido aceptada por el importador.",
+    "error": "Error",
+    "noBidData": "No hay datos del embarque disponibles",
+    "shipmentExpired": "Envío Expirado",
+    "shipmentExpiredMessage": "Este envío ha expirado y ya no acepta ofertas.",
+    "shipmentCancelled": "Envío Cancelado",
+    "shipmentCancelledMessage": "Este envío ha sido cancelado y ya no acepta ofertas."
   },
   "agentFilters": {
     "clearFilters": "Limpiar filtros",

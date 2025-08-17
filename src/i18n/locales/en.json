@@ -948,7 +948,13 @@
     "myOffers": "My Offers",
     "noOffersMessage": "You haven't made offers on any active shipments",
     "shipmentClosed": "Shipment Closed",
-    "shipmentClosedMessage": "This shipment has been closed. An offer has been accepted by the importer."
+    "shipmentClosedMessage": "This shipment has been closed. An offer has been accepted by the importer.",
+    "error": "Error",
+    "noBidData": "No shipment data available",
+    "shipmentExpired": "Shipment Expired",
+    "shipmentExpiredMessage": "This shipment has expired and no longer accepts offers.",
+    "shipmentCancelled": "Shipment Cancelled",
+    "shipmentCancelledMessage": "This shipment has been cancelled and no longer accepts offers."
   },
   "agentFilters": {
     "clearFilters": "Clear filters",

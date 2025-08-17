@@ -22,6 +22,37 @@ export const useCreateOffer = () => {
   
   return useMutation({
     mutationFn: async (data: CreateOfferData) => {
+      // Verificar el estado del shipment antes de crear la oferta
+      const { data: shipmentData, error: shipmentError } = await supabase
+        .from('shipments')
+        .select('status, expiration_date')
+        .eq('id', data.bid_id)
+        .single()
+
+      if (shipmentError) {
+        console.error('Error fetching shipment status:', shipmentError)
+        throw new Error('No se pudo verificar el estado del embarque')
+      }
+
+      if (!shipmentData) {
+        throw new Error('Embarque no encontrado')
+      }
+
+      // Verificar si el shipment está cerrado o cancelado
+      if (shipmentData.status === 'Closed' || shipmentData.status === 'Cancelled') {
+        throw new Error('Closed')
+      }
+
+      // Verificar si el shipment ha expirado
+      if (shipmentData.expiration_date) {
+        const expirationDate = new Date(shipmentData.expiration_date)
+        const now = new Date()
+        
+        if (expirationDate < now) {
+          throw new Error('No se puede crear una oferta en un embarque expirado')
+        }
+      }
+
       // Obtener el perfil del agente para generar agent_code si no existe
       let agentCode = data.agent_code
       if (!agentCode && data.agent_id) {

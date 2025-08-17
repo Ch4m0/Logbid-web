@@ -25,13 +25,13 @@ const OffersPageContent = () => {
   const market_id = searchParams.get('market')
 
   const { mutate: createOffer } = useCreateOffer()
-  const { data: bidDataForAgent, isPending: loading } = useGetShipment({ shipment_id })
+  const { data: bidDataForAgent, isPending: loading, refetch: refetchShipment } = useGetShipment({ shipment_id })
 
   // Use the actual shipping type from the shipment data, fallback to URL param
   const shippingType = bidDataForAgent?.shipping_type
 
   // Efecto para redirigir cuando el shipment sea aceptado (estado 'Closed')
-  useEffect(() => {
+  /*useEffect(() => {
     if (bidDataForAgent?.status === 'Closed') {
       toast({
         title: t('agentOffers.shipmentClosed'),
@@ -42,9 +42,9 @@ const OffersPageContent = () => {
       // Redirigir a la lista de ofertas después de un breve delay para que el usuario vea la notificación
       setTimeout(() => {
         router.push(`/bid_list?market=${market_id}&status=WithoutOffers`)
-      }, 2000)
-    }
-  }, [bidDataForAgent?.status, router, t])
+      }, 2000) 
+    } 
+  }, [bidDataForAgent?.status, router, t]) */
 
   const currentPage = Number(searchParams.get("page")) || 1
   const [sort, setSort] = useState({ key: "id", order: "asc" })
@@ -109,33 +109,117 @@ const OffersPageContent = () => {
   }
 
   // Enviar una nueva oferta
-  const sendOffer = (info: any) => {
+  const sendOffer = async (info: any) => {
     console.log(JSON.stringify(info), "info")
     
     if (!bidDataForAgent) {
       console.error('No bid data available')
+      toast({
+        title: t('agentOffers.error'),
+        description: t('agentOffers.noBidData'),
+        variant: "destructive",
+      })
       return
     }
+
+    // Hacer una petición en tiempo real para verificar el estado actual del shipment
+    console.log('🔍 Verificando estado actual del shipment antes de crear oferta...')
     
-    createOffer(
-      { ...info, bid_id: bidDataForAgent.id, agent_id: user?.id },
-      {
-        onSuccess: () => {
-          console.log("Oferta creada exitosamente")
-          modalService.closeModal()
+    try {
+      // Usar refetch del hook useGetShipment para obtener datos frescos
+      console.log('🔄 Refetching shipment data...')
+      const result = await refetchShipment()
+      
+      if (result.error) {
+        console.error('Error al verificar estado del shipment:', result.error)
+        toast({
+          title: t('agentOffers.error'),
+          description: 'No se pudo verificar el estado del embarque',
+          variant: "destructive",
+        })
+        return
+      }
+
+      const currentShipmentData = result.data
+      if (!currentShipmentData) {
+        console.error('Shipment no encontrado')
+        toast({
+          title: t('agentOffers.error'),
+          description: 'Embarque no encontrado',
+          variant: "destructive",
+        })
+        return
+      }
+
+      console.log('📊 Estado actual del shipment:', currentShipmentData)
+
+      // Verificar si el shipment está cerrado o cancelado
+      if (currentShipmentData.status === 'Closed' || currentShipmentData.status === 'Cancelled') {
+        console.error('Shipment is closed or cancelled:', currentShipmentData.status)
+        toast({
+          title: t('agentOffers.shipmentClosed'),
+          description: t('agentOffers.shipmentClosedMessage'),
+          variant: "destructive",
+        })
+        
+      }
+
+      // Verificar si el shipment ha expirado
+      if (currentShipmentData.expiration_date) {
+        const expirationDate = new Date(currentShipmentData.expiration_date)
+        const now = new Date()
+        
+        if (expirationDate < now) {
+          console.error('Shipment has expired:', currentShipmentData.expiration_date)
           toast({
-            title: t('agentOffers.offerSent'),
-          })
-        },
-        onError: (error) => {
-          console.log("Error al crear la oferta:", error)
-          toast({
-            title: t('agentOffers.offerSentError'),
+            title: t('agentOffers.shipmentExpired'),
+            description: t('agentOffers.shipmentExpiredMessage'),
             variant: "destructive",
           })
+          
+          return
+        }
+      }
+
+      console.log('✅ Validaciones pasadas, procediendo a crear oferta...')
+
+      // Si todas las validaciones pasan, crear la oferta
+      createOffer(
+        { ...info, bid_id: bidDataForAgent.id, agent_id: user?.id },
+        {
+          onSuccess: () => {
+            console.log("Oferta creada exitosamente")
+            modalService.closeModal()
+            toast({
+              title: t('agentOffers.offerSent'),
+            })
+          },
+          onError: (error) => {
+            if(error.message === 'Closed') {
+              toast({
+                title: t('agentOffers.shipmentClosed'),
+                description: t('agentOffers.shipmentClosedMessage'),
+                variant: "destructive",
+              })
+              return
+            }
+            console.log(error, "error")
+            console.log("Error al crear la oferta:", error)
+            toast({
+              title: t('agentOffers.offerSentError'),
+              variant: "destructive",
+            })
+          },
         },
-      },
-    )
+      )
+    } catch (error) {
+      console.error('Error durante la validación:', error)
+      toast({
+        title: t('agentOffers.error'),
+        description: 'Error al validar el estado del embarque',
+        variant: "destructive",
+      })
+    }
   }
 
   // Manejar ordenamiento de la tabla
@@ -244,7 +328,6 @@ const OffersPageContent = () => {
     return sortedOffers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   }, [sortedOffers, currentPage, itemsPerPage]);
 
-  // useGetShipment maneja automáticamente la carga de datos cuando cambia offer_id
 
   return (
     <>
@@ -272,6 +355,47 @@ const OffersPageContent = () => {
           <div className="grid gap-2 pb-6 mt-4">
             {bidDataForAgent && (<BidInfo bidDataForAgent={bidDataForAgent} />)}
           </div>
+
+          {/* Banner de advertencia para shipments cerrados o expirados */}
+          {bidDataForAgent && (
+            <>
+              {(bidDataForAgent.status === 'Closed' || bidDataForAgent.status === 'Cancelled') && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="h-8 w-8 bg-red-100 rounded-full flex items-center justify-center">
+                      <span className="text-red-600 text-sm">⚠️</span>
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-red-800">
+                        {t('agentOffers.shipmentClosed')}
+                      </h3>
+                      <p className="text-sm text-red-600 mt-1">
+                        {t('agentOffers.shipmentClosedMessage')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {bidDataForAgent.expiration_date && new Date(bidDataForAgent.expiration_date) < new Date() && (
+                <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="h-8 w-8 bg-orange-100 rounded-full flex items-center justify-center">
+                      <span className="text-orange-600 text-sm">⏰</span>
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-orange-800">
+                        {t('agentOffers.shipmentExpired')}
+                      </h3>
+                      <p className="text-sm text-orange-600 mt-1">
+                        {t('agentOffers.shipmentExpiredMessage')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
 
           <CardTitle className="text-black-500 font-bold text-xl">{t('agentOffers.proposals')}</CardTitle>
         </CardHeader>
