@@ -13,7 +13,7 @@ const BreadcrumbContent = () => {
   const { t } = useTranslation()
 
   // Obtener el mercado actual con fallback al primer mercado del usuario
-  const marketId = searchParams.get('market_id')
+  const marketId = searchParams.get('market')
   const currentMarket = marketId 
     ? profile?.all_markets?.find(market => market.id.toString() === marketId)
     : profile?.all_markets?.[0] // Fallback al primer mercado si no hay market_id

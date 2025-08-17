@@ -34,7 +34,7 @@ export const useRealtimeShipmentsWithPagination = (refetchCallback?: () => void)
   // Función de polling como respaldo
   const checkForNewShipments = async () => {
     try {
-      const marketId = searchParams.get('market_id') ?? user?.all_markets?.[0]?.id?.toString()
+      const marketId = searchParams.get('market') ?? user?.all_markets?.[0]?.id?.toString()
       if (!marketId) return
 
       // Verificación silenciosa de nuevos shipments
@@ -42,7 +42,7 @@ export const useRealtimeShipmentsWithPagination = (refetchCallback?: () => void)
       const { data: newShipments, error } = await supabase
         .from('shipments')
         .select('id, uuid, inserted_at, status, shipping_type')
-        .eq('market_id', marketId)
+        .eq('market', marketId)
         .eq('status', 'Active')
         .gte('inserted_at', lastCheckRef.current.toISOString())
         .order('inserted_at', { ascending: false })

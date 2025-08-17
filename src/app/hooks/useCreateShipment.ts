@@ -61,7 +61,6 @@ interface ShipmentDetailsInsert {
   tariff_item?: string
   container_id?: number
   incoterms_id?: number
-  special_requirements?: string
 }
 
 export const useCreateShipment = () => {
@@ -198,7 +197,6 @@ export const useCreateShipment = () => {
           tariff_item: data.partidaArancelaria || undefined,
           container_id: data.contenedor ? parseInt(data.contenedor) : undefined,
           incoterms_id: data.incoterm ? parseInt(data.incoterm) : undefined,
-          special_requirements: data.informacionAdicional || undefined
         }
 
         // Filtrar campos undefined/null

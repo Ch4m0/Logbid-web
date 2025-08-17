@@ -74,7 +74,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
   const status = getStatusFromFilterType(filterType)
   
   const marketId =
-    searchParams.get('market_id') ??
+    searchParams.get('market') ??
     profile?.all_markets?.[0]?.id?.toString() ??
     null
 

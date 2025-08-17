@@ -39,7 +39,7 @@ export function HistoricalListProposal() {
 
   const user = useAuthStore((state) => state.user)
   const marketId =
-    searchParams.get('market_id') ??
+    searchParams.get('market') ??
     user?.all_markets[0]?.id?.toString() ??
     null
 

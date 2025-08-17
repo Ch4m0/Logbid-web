@@ -15,7 +15,7 @@ import { CheckCircle, X, AlertCircle, Ship, Plane, MapPin, DollarSign, Package, 
 import { useBidStore } from "@/src/store/useBidStore"
 import { useCloseBid } from "@/src/app/hooks/useCloseBid"
 import { modalService } from "@/src/service/modalService"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { useTranslation } from "@/src/hooks/useTranslation"
 import { useSendOfferAcceptedEmails } from "@/src/hooks/useSendOfferAcceptedEmails"
@@ -29,6 +29,8 @@ export function OfferConfirmationDialog(offerData: any) {
   console.log('OfferData stringified:', JSON.stringify(offerData, null, 2))
   const { t } = useTranslation()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const market = searchParams.get('market')
   const [isConfirming, setIsConfirming] = useState(false)
   const { setBidData } = useBidStore()
   const { mutate: closeBid } = useCloseBid()
@@ -36,6 +38,7 @@ export function OfferConfirmationDialog(offerData: any) {
 
  
   const handleConfirm = () => {
+    console.log('offerData', offerData)
     setIsConfirming(true)
     console.log('Abriendo modal')
     closeBid(
@@ -58,10 +61,7 @@ export function OfferConfirmationDialog(offerData: any) {
             }
           )
 
-          setBidData({
-           ...offerData,
-          })
-          router.push('confirmation-bid')
+          router.push(`confirmation-bid?market=${market}&shipment=${offerData.shipment_uuid}&offer=${offerData.uuid}`)
           modalService.closeModal()
         },
         onError: () => {

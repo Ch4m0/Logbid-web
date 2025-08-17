@@ -35,7 +35,7 @@ export function AgentOfferedShipments({ status }: AgentOfferedShipmentsProps) {
   const profile = useAuthStore((state) => state.profile)
   const locale = getCurrentLanguage()
   
-  const marketId = searchParams.get('market_id') ?? 
+  const marketId = searchParams.get('market') ?? 
                    profile?.all_markets?.[0]?.id?.toString() ?? 
                    null
 

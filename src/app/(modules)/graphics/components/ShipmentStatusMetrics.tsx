@@ -61,7 +61,7 @@ export function ShipmentStatusMetrics({ filters }: ShipmentStatusMetricsProps) {
     
     // Agregar filtros existentes si están disponibles
     if (filters.marketId) {
-      searchParams.set('market_id', filters.marketId)
+      searchParams.set('market', filters.marketId)
     }
     if (filters.transportType) {
       searchParams.set('shipping_type', filters.transportType)

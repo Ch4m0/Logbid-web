@@ -73,14 +73,14 @@ const MenuHeaderContent: React.FC = () => {
     currentParams.set('shipping_type', transportToShippingType[type])
 
     // Get the market_id from current params or user's first market
-    const marketId = searchParams.get('market_id') || 
+    const marketId = searchParams.get('market') || 
                      searchParams.get('market') || 
                      (user?.all_markets?.[0]?.id?.toString()) || 
                      '1'
     
     const status = searchParams.get('status') || 'Active'
 
-    currentParams.set('market_id', marketId)
+    currentParams.set('market', marketId)
     currentParams.set('status', status)
 
     // Clean up any page parameter to start fresh

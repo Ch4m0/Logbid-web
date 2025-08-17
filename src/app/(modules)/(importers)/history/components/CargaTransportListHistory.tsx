@@ -26,7 +26,7 @@ export function CargaTransportListHistory() {
   const user = useAuthStore((state) => state.user)
   const profile = useAuthStore((state) => state.profile)
   const marketId =
-    searchParams.get('market_id') ??
+    searchParams.get('market') ??
     profile?.all_markets?.[0]?.id?.toString() ??
     null
 

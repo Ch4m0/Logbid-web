@@ -104,7 +104,6 @@ export const useGetShipment = ({ shipment_id }: Args) => {
         container_id: shipmentDetails?.container_id,
         incoterms_id: shipmentDetails?.incoterms_id,
         dimensions: shipmentDetails?.dimensions,
-        special_requirements: shipmentDetails?.special_requirements,
         
         // Referencias a las tablas relacionadas
         container_name: containerInfo?.name,

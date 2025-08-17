@@ -97,7 +97,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
   const { data: containerList = [] } = useGetListContainer(shippingType)
 
   // Obtener el market_id del perfil del usuario
-  const marketId = searchParams.get('market_id') ?? 
+  const marketId = searchParams.get('market') ?? 
                   profile?.all_markets?.[0]?.id?.toString() ?? 
                   '1' // Fallback al mercado Norte
 

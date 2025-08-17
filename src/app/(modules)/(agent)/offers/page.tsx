@@ -22,7 +22,7 @@ const OffersPageContent = () => {
   const router = useRouter()
 
   const shipment_id = searchParams.get('shipment_id')
-  const market_id = searchParams.get('market_id')
+  const market_id = searchParams.get('market')
 
   const { mutate: createOffer } = useCreateOffer()
   const { data: bidDataForAgent, isPending: loading } = useGetShipment({ shipment_id })
