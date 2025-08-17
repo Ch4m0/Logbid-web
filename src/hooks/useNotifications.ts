@@ -38,6 +38,7 @@ export interface NotificationData {
   // Para notificaciones de cambio de estado
   oldStatus?: string
   newStatus?: string
+  offer_uuid?: string
 }
 
 // Hook principal para gestionar notificaciones

@@ -42,7 +42,7 @@ export const useRealtimeShipmentsWithPagination = (refetchCallback?: () => void)
       const { data: newShipments, error } = await supabase
         .from('shipments')
         .select('id, uuid, inserted_at, status, shipping_type')
-        .eq('market', marketId)
+        .eq('market_id', marketId)
         .eq('status', 'Active')
         .gte('inserted_at', lastCheckRef.current.toISOString())
         .order('inserted_at', { ascending: false })

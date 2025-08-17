@@ -80,7 +80,7 @@ const MenuHeaderContent: React.FC = () => {
     
     const status = searchParams.get('status') || 'Active'
 
-    currentParams.set('market', marketId)
+    currentParams.set('market_id', marketId)
     currentParams.set('status', status)
 
     // Clean up any page parameter to start fresh

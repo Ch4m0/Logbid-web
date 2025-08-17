@@ -80,16 +80,34 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
 
   const shippingType = searchParams.get('shipping_type') || '1'
 
-  const { data: shipmentList, refetch } = useGetShipments({
+  const { data: shipmentList, refetch, isLoading, error } = useGetShipments({
     user_id: profile?.id ? Number(profile.id) : null,
     market_id: marketId,
     status,
     shipping_type: shippingType as ShippingType,
   })
 
+  // Logging para debuggear
   useEffect(() => {
-    refetch()
-  }, [shippingType, refetch])
+    console.log('🔍 ImporterShipmentCards - Estado:', {
+      profileId: profile?.id,
+      marketId,
+      status,
+      shippingType,
+      hasProfile: !!profile,
+      hasMarket: !!marketId,
+      canFetch: !!profile?.id && !!marketId
+    })
+  }, [profile?.id, marketId, status, shippingType])
+
+  useEffect(() => {
+    if (profile?.id && marketId) {
+      console.log('🔄 Refetching shipments...')
+      refetch()
+    } else {
+      console.log('⏸️ Skipping refetch - missing profile or market')
+    }
+  }, [shippingType, profile?.id, marketId, refetch])
 
   const currentPage = Number(searchParams.get('page')) || 1
 
@@ -208,6 +226,68 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
   const goDetails = (id: string) => {
     setMarketData(marketId)
     router.push(`/detalle/?bidId=${id}&market=${marketId}`)
+  }
+
+  // Manejo de estados de carga y error
+  if (!profile?.id) {
+    return (
+      <Card className="w-full bg-gray-50">
+        <CardContent className="flex items-center justify-center py-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Cargando perfil de usuario...</p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (!marketId) {
+    return (
+      <Card className="w-full bg-gray-50">
+        <CardContent className="flex items-center justify-center py-8">
+          <div className="text-center">
+            <div className="h-8 w-8 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-yellow-600 text-sm">⚠️</span>
+            </div>
+            <p className="text-muted-foreground">No se ha seleccionado un mercado</p>
+            <p className="text-sm text-muted-foreground mt-2">Por favor, selecciona un mercado para ver los envíos</p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <Card className="w-full bg-gray-50">
+        <CardContent className="flex items-center justify-center py-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Cargando envíos...</p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (error) {
+    return (
+      <Card className="w-full bg-gray-50">
+        <CardContent className="flex items-center justify-center py-8">
+          <div className="text-center">
+            <div className="h-8 w-8 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-red-600 text-sm">❌</span>
+            </div>
+            <p className="text-muted-foreground">Error al cargar los envíos</p>
+            <p className="text-sm text-muted-foreground mt-2">Por favor, intenta de nuevo</p>
+            <Button onClick={() => refetch()} className="mt-4" variant="outline">
+              Reintentar
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
   const filteredList = shipmentList

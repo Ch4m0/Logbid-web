@@ -15,9 +15,11 @@ export const useGetShipments = ({
   status,
   shipping_type,
 }: Args) => {
+
   return useQuery({
     queryKey: ['shipments', user_id, market_id, status, shipping_type],
     queryFn: async () => {
+      
       let query = supabase
         .from('shipments')
         .select(`
@@ -101,6 +103,6 @@ export const useGetShipments = ({
         cancelled_at: shipment.cancelled_at
       })) || []
     },
-    enabled: !!user_id && !!market_id,
+   // 10 minutos
   })
 } 

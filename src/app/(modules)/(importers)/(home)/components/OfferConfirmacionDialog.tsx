@@ -1,18 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/src/components/ui/dialog"
 import { Button } from "@/src/components/ui/button"
 import { Badge } from "@/src/components/ui/badge"
 import { CheckCircle, X, AlertCircle, Ship, Plane, MapPin, DollarSign, Package, Calendar } from "lucide-react"
-import { useBidStore } from "@/src/store/useBidStore"
 import { useCloseBid } from "@/src/app/hooks/useCloseBid"
 import { modalService } from "@/src/service/modalService"
 import { useRouter, useSearchParams } from "next/navigation"

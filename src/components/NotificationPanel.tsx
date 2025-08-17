@@ -32,6 +32,7 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
     interpolateNotificationMessage,
     interpolateNotificationTitle
   } = useNotifications()
+  console.log('notifications', notifications)
   const { t, getCurrentLanguage } = useTranslation()
   const router = useRouter()
 
@@ -65,6 +66,8 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
 
     // Navegar según el tipo de notificación
     if (notification.shipment_id) {
+      console.log('notification', notification)
+      console.log('notification.data', notification.data)
       const shipmentData = notification.data
       const profile = useAuthStore.getState().profile
       const userRole = profile?.role
@@ -78,6 +81,12 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
           // Para agentes: navegar a offers con offer_id
           const market_id = shipmentData.market_id || profile?.all_markets?.[0]?.id || '4'
           const shipping_type = shipmentData.shipping_type || '1'
+          console.log('shipmentData', shipmentData)
+          console.log('shipmentData.offer_id', shipmentData.offer_id)
+          if(notification.type === 'offer_accepted') {
+            router.push(`/confirmation-bid?market=${market_id}&shipment=${shipmentData.shipment_uuid}&offer=${shipmentData.offer_uuid}`)
+            return
+          }
           router.push(`/offers?shipment_id=${shipmentData.shipment_uuid}&market=${market_id}&shipping_type=${shipping_type}`)
         } else {
           // Fallback por defecto

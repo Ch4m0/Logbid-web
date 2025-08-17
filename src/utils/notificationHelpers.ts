@@ -9,6 +9,8 @@ export interface CreateNotificationParams {
   data?: NotificationData
   shipment_id?: number
   offer_id?: number
+  market_id?: number
+  offer_uuid?: string
 }
 
 // Función principal para crear notificaciones
@@ -27,6 +29,7 @@ export async function createNotification(params: CreateNotificationParams) {
         data: params.data || null,
         shipment_id: params.shipment_id || null,
         offer_id: params.offer_id || null,
+        market_id: params.market_id || null,
         read: false
       })
       .select()
@@ -87,18 +90,22 @@ export async function createOfferAcceptedNotification(
     destination: string
   },
   offerData: {
+    uuid: string
     id: number
     price: string
     currency: string
     agent_code: string
-  }
+  },
+  marketId?: number
 ) {
+  console.log('offerData', offerData)
   return createNotification({
     user_id: agentUserId,
     type: 'offer_accepted',
     title: '🎉 ¡Tu oferta fue aceptada!',
     message: `¡Felicidades! Tu oferta de $${offerData.price} ${offerData.currency} fue aceptada para el envío ${shipmentData.origin} → ${shipmentData.destination}`,
     data: {
+      offer_uuid: offerData.uuid,
       shipment_uuid: shipmentData.uuid,
       agent_code: offerData.agent_code,
       price: offerData.price,
@@ -107,7 +114,8 @@ export async function createOfferAcceptedNotification(
       destination: shipmentData.destination
     },
     shipment_id: parseInt(shipmentData.uuid.split('-')[0]) || undefined,
-    offer_id: offerData.id
+    offer_id: offerData.id,
+    market_id: marketId
   })
 }
 
@@ -125,7 +133,8 @@ export async function createOfferRejectedNotification(
     currency: string
     agent_code: string
   },
-  winningPrice: string
+  winningPrice: string,
+  marketId?: number
 ) {
   return createNotification({
     user_id: agentUserId,
@@ -142,7 +151,8 @@ export async function createOfferRejectedNotification(
       winningPrice: winningPrice
     },
     shipment_id: parseInt(shipmentData.uuid.split('-')[0]) || undefined,
-    offer_id: offerData.id
+    offer_id: offerData.id,
+    market_id: marketId
   })
 }
 
@@ -330,10 +340,22 @@ export async function notifyAgentsAboutBidClosure(
 ) {
   try {
 
+    // Obtener información del shipment incluyendo market_id
+    const { data: shipmentInfo, error: shipmentError } = await supabase
+      .from('shipments')
+      .select('market_id')
+      .eq('id', bidId)
+      .single()
+
+    if (shipmentError) {
+      console.error('Error obteniendo market_id del shipment:', shipmentError)
+      return
+    }
+
     // Obtener todas las ofertas del shipment agrupadas por agente
     const { data: offers, error } = await supabase
       .from('offers')
-      .select('id, agent_id, price, agent_code')
+      .select('id, agent_id, price, agent_code, uuid')
       .eq('shipment_id', bidId)
       .order('price', { ascending: true })
 
@@ -374,8 +396,10 @@ export async function notifyAgentsAboutBidClosure(
             id: acceptedOffer.id,
             price: acceptedOffer.price.toString(),
             currency: 'USD',
-            agent_code: acceptedOffer.agent_code
-          }
+            agent_code: acceptedOffer.agent_code,
+            uuid: acceptedOffer.uuid
+          },
+          shipmentInfo.market_id
         )
       } else {
         // Notificar que sus ofertas fueron rechazadas (una sola notificación por agente)
@@ -392,7 +416,8 @@ export async function notifyAgentsAboutBidClosure(
             currency: 'USD',
             agent_code: bestOfferFromAgent.agent_code
           },
-          acceptedOffer.price.toString()
+          acceptedOffer.price.toString(),
+          shipmentInfo.market_id
         )
       }
     }

@@ -34,7 +34,7 @@ export const useGetBidListByMarket = (
 
       // Filtrar por market_id si se proporciona
       if (marketId) {
-        query = query.eq('market', marketId)
+        query = query.eq('market_id', marketId)
       }
 
       // Filtrar por status (para los nuevos valores de filtrado por ofertas, usar 'Active')
