@@ -24,9 +24,8 @@ const Page = () => {
         <Suspense fallback={<LoadingFallback />}>
           <CargoTransportTabs
             children1={<AgentShipmentList status={'WithoutOffers'} />}
-            children2={<AgentShipmentList status={'WithOffers'} />}
+            children2={<MyOffersWrapper status={'MyOffers'} />}
             children3={<AgentShipmentList status={'Closed'} />}
-            children4={<MyOffersWrapper status={'MyOffers'} />}
           ></CargoTransportTabs>
         </Suspense>
       </div>

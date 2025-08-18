@@ -25,7 +25,7 @@ export const useCreateOffer = () => {
       // Verificar el estado del shipment antes de crear la oferta
       const { data: shipmentData, error: shipmentError } = await supabase
         .from('shipments')
-        .select('status, expiration_date')
+        .select('status, expiration_date, market_id')
         .eq('id', data.bid_id)
         .single()
 
@@ -84,10 +84,11 @@ export const useCreateOffer = () => {
         price: parseFloat(price.toString()),
         currency: 'USD', // Por ahora hardcodeado a USD
         shipping_type: shipping_type,
-        agent_code: agentCode || 'AGENT001',
+        agent_code: agentCode,
         additional_info: JSON.stringify({
           details: detailsObject
-        })
+        }),
+        market_id: shipmentData.market_id
       }
 
       console.log('📦 Datos de la oferta a enviar:', offerData)

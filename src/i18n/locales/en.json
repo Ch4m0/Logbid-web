@@ -522,6 +522,11 @@
     "land": "Land",
     "warehouse": "Warehouse"
   },
+  "agentShipmentList": {
+    "pending": "Pending - Available for bidding",
+    "myOffers": "My Offers - Shipments where you have bid",
+    "history": "History - Closed shipments"
+  },
   "cargoList": {
     "active": "Active",
     "closed": "Closed",

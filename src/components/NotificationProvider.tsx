@@ -1,5 +1,5 @@
 'use client'
-import React, { createContext, useContext, useEffect } from 'react'
+import React, { createContext, useContext } from 'react'
 import { useRealtimeNotifications } from '@/src/hooks/useNotifications'
 import { useRealtimeShipments } from '@/src/hooks/useRealtimeShipments'
 import useAuthStore from '@/src/store/authStore'

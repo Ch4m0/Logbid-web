@@ -79,7 +79,7 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
         
         if (userRole === 'agent') {
           // Para agentes: navegar a offers con offer_id
-          const market_id = shipmentData.market_id || profile?.all_markets?.[0]?.id || '4'
+          const market_id = shipmentData.market_id || profile?.all_markets?.[0]?.id 
           const shipping_type = shipmentData.shipping_type || '1'
           console.log('shipmentData', shipmentData)
           console.log('shipmentData.offer_id', shipmentData.offer_id)

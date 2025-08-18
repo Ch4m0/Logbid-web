@@ -39,6 +39,7 @@ interface ShipmentData {
   last_price?: number | null
   value?: number | null
   status?: string
+  offers?: any[] // Array de ofertas para verificar si el agente logueado ya ofertó
 }
 
 interface AgentShipmentListProps {
@@ -89,6 +90,7 @@ export function AgentShipmentList({ status }: AgentShipmentListProps) {
     user?.id || null,
     shippingType as ShippingType
   )
+  console.log(shipmentList, "shipmentList")
   
   // Hook híbrido - detecta nuevos shipments automáticamente (Realtime + Polling fallback)
   useRealtimeShipmentsWithPagination(refetch)
@@ -150,11 +152,16 @@ export function AgentShipmentList({ status }: AgentShipmentListProps) {
 
   const filteredList = shipmentList
     ?.filter((shipment: ShipmentData) => {
-      if (status === 'WithoutOffers' && shipment.offers_count > 0) {
-        return false
+      // Verificar si el agente logueado ya ofertó en este shipment
+      const hasCurrentAgentOffer = shipment.offers?.some((offer: any) => offer.agent_id === user?.id)
+      
+      if (status === 'WithoutOffers') {
+        // Mostrar shipments que NO tienen ofertas del agente logueado
+        return !hasCurrentAgentOffer
       }
-      if (status === 'WithOffers' && shipment.offers_count === 0) {
-        return false
+      if (status === 'WithOffers') {
+        // Mostrar shipments que SÍ tienen ofertas del agente logueado
+        return hasCurrentAgentOffer
       }
       
       const filterChecks = {
@@ -253,10 +260,27 @@ export function AgentShipmentList({ status }: AgentShipmentListProps) {
 
   // Debug: Detectar eventos de realtime removido
 
+  // Función para obtener el subtítulo basado en el status
+  const getSubtitle = () => {
+    switch (status) {
+      case 'WithoutOffers':
+        return t('agentShipmentList.pending')
+      case 'WithOffers':
+        return t('agentShipmentList.myOffers')
+      case 'Closed':
+        return t('agentShipmentList.history')
+      default:
+        return ''
+    }
+  }
+
   return (
     <Card className="w-full bg-gray-50">
       <CardHeader className="flex justify-between flex-row w-full">
-        <CardTitle className="font-bold">{t(`transport.${normalizeShippingType(shippingType)}`)}</CardTitle>
+        <div>
+          <CardTitle className="font-bold">{t(`transport.${normalizeShippingType(shippingType)}`)}</CardTitle>
+          <p className="text-sm text-muted-foreground mt-1">{getSubtitle()}</p>
+        </div>
         <Button
           variant="outline"
           size="sm"

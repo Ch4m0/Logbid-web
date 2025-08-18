@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { supabase } from '@/src/utils/supabase/client'
-import { notifyAgentsAboutBidClosure } from '@/src/utils/notificationHelpers'
+// Notifications for bid closure are now handled via RPC with SECURITY DEFINER
 
 interface CloseBidArgs {
   bid_id: number
@@ -55,28 +55,17 @@ const closeBidWithSupabase = async ({ bid_id, offer_id }: CloseBidArgs) => {
 
   // 🔔 Crear notificaciones para agentes sobre el resultado del bid
   try {
-    // Obtener información del shipment para notificaciones
-    const { data: shipmentData, error: shipmentInfoError } = await supabase
-      .from('shipments')
-      .select('uuid, origin_name, origin_country, destination_name, destination_country, profile_id')
-      .eq('id', bid_id)
-      .single()
-
-    if (shipmentInfoError) {
-      console.error('Error obteniendo datos del shipment para notificación:', shipmentInfoError)
-    } else if (shipmentData) {
-      // Notificar a todos los agentes sobre el resultado del bid
-      await notifyAgentsAboutBidClosure(
+    // Delegar notificaciones a la función RPC con SECURITY DEFINER (bypass RLS)
+    const { data: rpcResult, error: rpcError } = await supabase
+      .rpc('notify_agents_about_bid_closure', {
         bid_id,
-        offer_id,
-        {
-          uuid: shipmentData.uuid,
-          origin: `${shipmentData.origin_country} - ${shipmentData.origin_name}`,
-          destination: `${shipmentData.destination_country} - ${shipmentData.destination_name}`
-        }
-      )
-      console.log('✅ Notificaciones enviadas a todos los agentes sobre el resultado del bid')
+        accepted_offer_id: offer_id
+      })
 
+    if (rpcError) {
+      console.error('❌ Error en RPC notify_agents_about_bid_closure:', rpcError)
+    } else {
+      console.log('✅ RPC notify_agents_about_bid_closure ejecutada:', rpcResult)
       // 🔕 NO notificar al importador - él es quien acepta la oferta
       console.log('🔕 Importador no recibe notificación - él es quien acepta la oferta')
     }

@@ -34,6 +34,7 @@ import { convertToColombiaTime, formatDateUTCAsLocal, formatShippingDate } from 
 import { useTranslation } from '@/src/hooks/useTranslation'
 import CancelShipmentModal from './CancelShipmentModal'
 import { X } from 'lucide-react'
+import { useRealtimeShipmentsWithPagination } from '@/src/hooks/useRealtimeShipmentsWithPagination'
 
 interface ImporterShipmentCardsProps {
   filterType: 'withoutOffers' | 'withOffers' | 'closed'
@@ -87,18 +88,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
     shipping_type: shippingType as ShippingType,
   })
 
-  // Logging para debuggear
-  useEffect(() => {
-    console.log('🔍 ImporterShipmentCards - Estado:', {
-      profileId: profile?.id,
-      marketId,
-      status,
-      shippingType,
-      hasProfile: !!profile,
-      hasMarket: !!marketId,
-      canFetch: !!profile?.id && !!marketId
-    })
-  }, [profile?.id, marketId, status, shippingType])
+  useRealtimeShipmentsWithPagination(refetch)
 
   useEffect(() => {
     if (profile?.id && marketId) {

@@ -70,6 +70,8 @@ export const useGetShipments = ({
         throw error
       }
 
+      console.log(data, "data")
+
       // Transformar los datos para mantener compatibilidad con el modelo existente
       return data?.map((shipment) => ({
         id: shipment.id,

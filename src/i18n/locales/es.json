@@ -522,6 +522,11 @@
     "land": "Terrestre",
     "warehouse": "Almacén"
   },
+  "agentShipmentList": {
+    "pending": "Pendiente - Disponible para ofertar",
+    "myOffers": "Mis Ofertas - Embarques donde has ofertado",
+    "history": "Historial - Embarques cerrados"
+  },
   "cargoList": {
     "active": "Activo",
     "closed": "Cerrado",

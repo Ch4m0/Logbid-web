@@ -93,9 +93,12 @@ export function AgentOfferedShipments({ status }: AgentOfferedShipmentsProps) {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="font-bold">
-          {t('agentOffers.myOffers')} ({shipmentsWithMyOffers.length})
-        </CardTitle>
+        <div>
+          <CardTitle className="font-bold">
+            {t('agentOffers.myOffers')} ({shipmentsWithMyOffers.length})
+          </CardTitle>
+          <p className="text-sm text-muted-foreground mt-1">{t('agentShipmentList.myOffers')}</p>
+        </div>
         {shipmentsWithMyOffers.length > itemsPerPage && (
           <div className="text-sm text-gray-500">
             {t('pagination.showing')} {startIndex + 1}-{Math.min(endIndex, shipmentsWithMyOffers.length)} {t('pagination.of')} {shipmentsWithMyOffers.length}
