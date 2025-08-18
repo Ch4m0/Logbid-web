@@ -43,11 +43,11 @@ const createFormSchema = (expiration_date: string, shipping_date?: string | null
     required_error: t?.('extendCargo.validation.dateRequired') || "A date is required.",
   })
 }).refine((data) => {
-  // dob_cierre debe ser mayor a la fecha de cierre actual
+  // dob_cierre debe ser mayor o igual a la fecha de cierre actual
   const cierreActual = parseDateSimple(expiration_date)
-  return data.dob_cierre > cierreActual
+  return data.dob_cierre >= cierreActual
 }, {
-  message: t?.('extendCargo.validation.dateMustBeAfterCurrentClosing') || "The new closing date must be after the current one",
+  message: t?.('extendCargo.validation.dateMustBeAfterCurrentClosing') || "The new closing date must be after or equal to the current one",
   path: ['dob_cierre']
 }).refine((data) => {
   // dob_embarque debe ser al menos 1 día después de dob_cierre
@@ -232,7 +232,7 @@ export function ExtendShipmentDeadline({
                         defaultMonth={field.value || expirationDate}
                         locale={getCurrentLocale()}
                         disabled={(date) => {
-                          // No permitir fechas antes de expirationDatePlusOne
+                          // No permitir fechas antes de la fecha de expiración actual
                           if (date < expirationDate) return true
                           // No permitir fechas igual o después de la fecha de embarque seleccionada
                           const embarque = form.getValues('dob_embarque')
