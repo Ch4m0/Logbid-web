@@ -235,7 +235,7 @@ export function AgentShipmentList({ status }: AgentShipmentListProps) {
   const paginatedList = sortedList?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
-  )
+  ) ?? []
 
   const STATUS = ['Offered', 'Closed']
 
@@ -281,15 +281,17 @@ export function AgentShipmentList({ status }: AgentShipmentListProps) {
           <CardTitle className="font-bold">{t(`transport.${normalizeShippingType(shippingType)}`)}</CardTitle>
           <p className="text-sm text-muted-foreground mt-1">{getSubtitle()}</p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center space-x-2"
-        >
-          <Filter className="h-4 w-4" />
-          <span>{showFilters ? t('common.hideFilters') : t('common.showFilters')}</span>
-        </Button>
+        {
+          paginatedList?.length > 0 ? (<Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center space-x-2"
+          >
+            <Filter className="h-4 w-4" />
+            <span>{showFilters ? t('common.hideFilters') : t('common.showFilters')}</span>
+          </Button>) : null
+        }
       </CardHeader>
       <CardContent>
         {showFilters && (

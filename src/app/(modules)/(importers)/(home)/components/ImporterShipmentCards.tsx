@@ -349,22 +349,26 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
   const paginatedList = filteredList?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
-  )
+  ) ?? []
 
   return (
     <Card className="w-full bg-gray-50">
       <CardHeader className="flex flex-col md:flex-row justify-start md:justify-between w-full space-y-3 md:space-y-0">
         <CardTitle className="font-bold">{t(`transport.${normalizeShippingType(shippingType)}`)}</CardTitle>
         <div className="flex items-center justify-between md:justify-start md:space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center space-x-2"
-          >
-            <Filter className="h-4 w-4" />
-            <span className="hidden md:inline">{showFilters ? t('common.hideFilters') : t('common.showFilters')}</span>
-          </Button>
+          {
+            paginatedList?.length > 0 ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center space-x-2"
+              >
+                <Filter className="h-4 w-4" />
+                <span className="hidden md:inline">{showFilters ? t('common.hideFilters') : t('common.showFilters')}</span>
+              </Button>
+            ) : null
+          }
         <CreateShipment onRefetch={refetch} />
         </div>
       </CardHeader>
