@@ -527,6 +527,11 @@
     "myOffers": "Mis Ofertas - Embarques donde has ofertado",
     "history": "Historial - Embarques cerrados"
   },
+  "importerShipmentCards": {
+    "withoutOffers": "Listado de embarques sin ofertas aún",
+    "withOffers": "Listado de embarques con ofertas",
+    "closed": "Listado de embarques cerrados"
+  },
   "cargoList": {
     "active": "Activo",
     "closed": "Cerrado",

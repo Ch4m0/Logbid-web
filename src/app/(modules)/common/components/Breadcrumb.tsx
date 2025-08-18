@@ -5,13 +5,14 @@ import { useTranslation } from '@/src/hooks/useTranslation'
 import { ChevronRight, MapPin } from 'lucide-react'
 import { Suspense } from 'react'
 import { getTransportTypeName } from '@/src/utils/translateTypeName'
+import { useRouter } from 'next/navigation'
 
 const BreadcrumbContent = () => {
   const { profile } = useAuthStore()
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const { t } = useTranslation()
-
+  const router = useRouter()
   // Obtener el mercado actual con fallback al primer mercado del usuario
   const marketId = searchParams.get('market')
   const currentMarket = marketId 
@@ -22,6 +23,9 @@ const BreadcrumbContent = () => {
 
   // Obtener el tipo de envío
   const shippingType = searchParams.get('shipping_type') || '1'
+
+  const goToShipmentList = () => router.push(`/?market=${marketId}`)
+  
 
   // Determinar la sección actual basada en la ruta
   const getSectionName = () => {
@@ -66,9 +70,9 @@ const BreadcrumbContent = () => {
     <div className="bg-gray-50 border-b px-6 py-3">
       <nav className="flex items-center space-x-2 text-sm text-gray-600">
         <MapPin className="h-4 w-4 text-purple-600" />
-        <span className="font-medium text-purple-700">{marketName}</span>
+        <span className="font-medium text-purple-700" onClick={goToShipmentList}>{marketName}</span>
         <ChevronRight className="h-4 w-4" />
-        <span className="text-gray-500">{getSectionName()}</span>
+        <span className="text-gray-500" onClick={goToShipmentList}>{getSectionName()}</span>
         <ChevronRight className="h-4 w-4" />
         <span className="text-gray-700 font-medium">{getTransportTypeName(shippingType, t)}</span>
       </nav>

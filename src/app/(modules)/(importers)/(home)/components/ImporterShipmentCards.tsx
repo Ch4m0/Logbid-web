@@ -351,10 +351,26 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
     currentPage * itemsPerPage
   ) ?? []
 
+  const getSubtitle = () => {
+    switch (filterType) {
+      case 'withoutOffers':
+        return t('importerShipmentCards.withoutOffers')
+      case 'withOffers':
+        return t('importerShipmentCards.withOffers')
+      case 'closed':
+        return t('importerShipmentCards.closed')
+      default:
+        return ''
+    }
+  }
+
   return (
     <Card className="w-full bg-gray-50">
       <CardHeader className="flex flex-col md:flex-row justify-start md:justify-between w-full space-y-3 md:space-y-0">
+        <div>
         <CardTitle className="font-bold">{t(`transport.${normalizeShippingType(shippingType)}`)}</CardTitle>
+        <p className="text-sm text-muted-foreground mt-1">{getSubtitle()}</p>
+        </div>
         <div className="flex items-center justify-between md:justify-start md:space-x-2">
           {
             paginatedList?.length > 0 ? (

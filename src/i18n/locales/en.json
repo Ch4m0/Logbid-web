@@ -527,6 +527,11 @@
     "myOffers": "My Offers - Shipments where you have bid",
     "history": "History - Closed shipments"
   },
+  "importerShipmentCards": {
+    "withoutOffers": "List of shipments without offers yet",
+    "withOffers": "List of shipments with offers",
+    "closed": "List of closed shipments"
+  },
   "cargoList": {
     "active": "Active",
     "closed": "Closed",
