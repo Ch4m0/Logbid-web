@@ -26,7 +26,7 @@ const translations = {
       customer: {
         title: "Como Importador/Exportador, podrás:",
         benefits: [
-          "🚢 Publicar tus shipments y recibir ofertas competitivas",
+          "🚢 Publicar tus embarques y recibir ofertas competitivas",
           "🌐 Acceder a una red global de agentes logísticos verificados",
           "📊 Comparar precios y servicios de múltiples proveedores",
           "📱 Gestionar todos tus envíos desde un panel centralizado",
@@ -39,7 +39,7 @@ const translations = {
         benefits: [
           "🎯 Acceder a oportunidades de negocio en tiempo real",
           "💼 Ampliar tu cartera de clientes internacionales",
-          "📈 Aumentar tus ingresos con shipments rentables",
+          "📈 Aumentar tus ingresos con embarques rentables",
           "🏆 Competir de manera justa y transparente",
           "📊 Analizar el mercado y optimizar tus ofertas",
           "🤝 Construir relaciones comerciales duraderas"

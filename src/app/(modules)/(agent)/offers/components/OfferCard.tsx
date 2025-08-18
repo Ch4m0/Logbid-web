@@ -45,7 +45,7 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
   }
 
   return (
-      <Card className="w-full border-l-4 border-l-primary overflow-hidden relative">
+      <Card className="w-full border-l-4 border-l-primary overflow-hidden relative mb-4">
         {/* Solo mostrar el botón "Aceptar Oferta" si se proporciona la función acceptOffer */}
         {acceptOffer && (
           <div className="absolute top-2 right-2 z-10">

@@ -123,16 +123,12 @@ const BidInfo = ({ bidDataForAgent }: any) => {
               </span>
             </div>
             <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.measureType')}:</span>
-              <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">{getMerchandiseValue('measure_type')}</span>
-            </div>
-            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
               <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.units')}:</span>
               <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">{getMerchandiseValue('units')}</span>
             </div>
             <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
               <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.totalWeight')}:</span>
-              <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">{getMerchandiseValue('total_weight')}</span>
+              <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">{getMerchandiseValue('total_weight')} {getMerchandiseValue('measure_type')}</span>
             </div>
             <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
               <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.volume')}:</span>
