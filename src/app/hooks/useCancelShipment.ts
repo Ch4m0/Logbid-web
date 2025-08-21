@@ -82,7 +82,7 @@ export const useCancelShipment = () => {
                 user_id: agentId,
                 type: 'shipment_cancelled',
                 title: '🚫 Shipment Cancelado',
-                message: `El shipment ${shipmentData.uuid} ha sido cancelado por el importador. No requiere más acciones.`,
+                message: `El embarque ${shipmentData.uuid} ha sido cancelado por el importador. No requiere más acciones.`,
                 data: {
                   shipment_uuid: shipmentData.uuid,
                   origin: `${shipmentData.origin_country} - ${shipmentData.origin_name}`,

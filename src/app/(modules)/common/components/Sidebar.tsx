@@ -13,6 +13,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { logout } from '@/src/actions/auth'
 import { Button } from '@/src/components/ui/button'
+import Image from 'next/image'
 
 interface SidebarProps {
   isOpen?: boolean
@@ -63,9 +64,10 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
     <>
       {/* Sidebar for desktop */}
       <div className={`
-        fixed left-0 top-0 w-[18rem] h-screen bg-primary border-r z-40
+        fixed left-0 top-0 w-[18rem] h-screen border-r border-blue-200 z-40
         hidden lg:block
-      `}>
+      `}
+      style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
         <SidebarContent 
           user={user}
           profile={profile}
@@ -79,24 +81,25 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
 
       {/* Sidebar for mobile/tablet */}
       <div className={`
-        fixed left-0 top-0 w-[280px] sm:w-[320px] bg-primary border-r z-40
+        fixed left-0 top-0 w-[280px] sm:w-[320px] border-r border-blue-200 z-40
         lg:hidden transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
-        <div className="flex items-center justify-between h-16 px-4">
+      `}
+      style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+        <div className="flex items-center justify-center h-20 px-4 pb-4">
           <Link href="#" className="flex items-center gap-3" prefetch={false}>
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2">
-              <Package className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
-            </div>
-            <span className="font-bold text-white text-2xl sm:text-3xl tracking-tight">
-              Log<span className="text-yellow-300">Bid</span>
+            <Package className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+            <span className="font-bold text-slate-800 text-2xl sm:text-3xl tracking-tight">
+              Log<span className="text-primary">Bid</span>
             </span>
           </Link>
+        </div>
+        <div className="flex justify-end px-4 pb-2">
           <Button
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="text-white hover:bg-white/10 p-2"
+            className="text-slate-700 hover:bg-slate-100 p-2"
           >
             <X className="h-5 w-5" />
           </Button>
@@ -143,14 +146,9 @@ const SidebarContent = ({
   return (
     <div className="flex flex-col h-full">
       {!isMobile && (
-        <div className="flex items-center justify-between h-16 px-4">
-          <Link href="#" className="flex items-center gap-3" prefetch={false}>
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2">
-              <Package className="h-8 w-8 text-white" />
-            </div>
-            <span className="font-bold text-white text-3xl tracking-tight">
-              Log<span className="text-yellow-300">Bid</span>
-            </span>
+        <div className="flex items-center justify-center h-25 px-4 pb-5 pt-10">
+          <Link href="https://logbid.co" className="flex items-center gap-3" prefetch={false} >
+            <Image src="/logbid_logo.png" alt="Logo" width={80} height={80} />
           </Link>
         </div>
       )}
@@ -163,7 +161,7 @@ const SidebarContent = ({
             {/* Dashboard Global - Fuera de mercados */}
             <Link
               href="/graphics"
-              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm sm:text-md font-bold hover:bg-purple hover:text-black text-white mb-4"
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm sm:text-md font-bold hover:bg-white/20 hover:text-white text-white mb-4"
               prefetch={false}
               onClick={handleLinkClick}
             >
@@ -282,7 +280,7 @@ const MarketItem = ({
             <Link
               key={index}
               href={`${item.url}?market=${market_id}`}
-              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm sm:text-md font-bold hover:bg-purple hover:text-black text-white"
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm sm:text-md font-bold hover:bg-white/20 hover:text-white text-white"
               prefetch={false}
               onClick={onLinkClick}
             >

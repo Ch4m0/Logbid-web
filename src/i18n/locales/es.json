@@ -728,6 +728,8 @@
     "selectDate": "Selecciona una fecha",
     "selectShippingDate": "Selecciona fecha de embarque",
     "selectDateAfter": "Selecciona una fecha posterior a",
+    "checkingOffers": "Verificando...",
+    "penaltyWarning": "Este envío ya tiene ofertas. Extender el plazo generará una penalización de ${{amount}} USD.",
     "validation": {
       "dateRequired": "Una fecha es requerida",
       "dateMustBeAfterCurrentClosing": "Nuevo cierre de subasta debe ser posterior a la actual",
@@ -756,7 +758,9 @@
       "2": "El embarque ya no aparecerá en la lista de embarques disponibles",
       "3": "Se mantendrá en el historial con estado 'Cancelado'",
       "4": "No se podrán recibir más ofertas"
-    }
+    },
+    "penaltyIfOffers": "Este envío tiene ofertas. Cancelar puede generar una penalización de ${{amount}} USD.",
+    "checkingOffers": "Verificando..."
   },
   "filters": {
     "filterCreationDate": "Filtrar fecha creación",

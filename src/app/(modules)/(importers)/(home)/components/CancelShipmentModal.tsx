@@ -27,13 +27,15 @@ interface CancelShipmentModalProps {
     currency?: string
   } | null
   onSuccess?: () => void
+  hasOffers?: boolean
 }
 
 export default function CancelShipmentModal({
   isOpen,
   onClose,
   shipment,
-  onSuccess
+  onSuccess,
+  hasOffers = false
 }: CancelShipmentModalProps) {
   const { t } = useTranslation()
   const [cancellationReason, setCancellationReason] = useState('')
@@ -95,6 +97,23 @@ export default function CancelShipmentModal({
         </DialogHeader>
 
         <div className="space-y-6">
+          {hasOffers && (
+            <div className="rounded-md border border-red-300 bg-red-50 p-4 shadow-sm">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5">
+                  <AlertTriangle className="h-5 w-5 text-red-600" />
+                </div>
+                <div>
+                  <p className="font-semibold text-red-800">
+                    {t('cancelShipment.penaltyIfOffers', { amount: 20 })}
+                  </p>
+                  <p className="text-xs text-red-700 mt-1">
+                    {t('cancelShipment.warning')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
           {/* Información del shipment */}
           <div className="bg-gray-50 p-4 rounded-lg">
             <h4 className="font-semibold mb-2 text-gray-800">
@@ -147,6 +166,12 @@ export default function CancelShipmentModal({
                 <span className="font-bold">•</span>
                 {t('cancelShipment.consequences.4')}
               </li>
+              {hasOffers && (
+                <li className="flex items-start gap-2">
+                  <span className="font-bold">•</span>
+                  {t('cancelShipment.penaltyIfOffers', { amount: 20 })}
+                </li>
+              )}
             </ul>
           </div>
 

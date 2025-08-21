@@ -728,6 +728,8 @@
     "selectDate": "Select a date",
     "selectShippingDate": "Select End Bidding",
     "selectDateAfter": "Select a date after",
+    "checkingOffers": "Checking...",
+    "penaltyWarning": "This shipment already has offers. Extending the deadline will incur a ${{amount}} USD penalty.",
     "validation": {
       "dateRequired": "A date is required",
       "dateMustBeAfterCurrentClosing": "The new closing date must be after the current one",
@@ -756,7 +758,9 @@
       "2": "The shipment will no longer appear in the available shipments list",
       "3": "It will remain in history with 'Cancelled' status",
       "4": "No more offers can be received"
-    }
+    },
+    "penaltyIfOffers": "This shipment has offers. Cancelling may incur a ${{amount}} USD penalty.",
+    "checkingOffers": "Checking..."
   },
   "filters": {
     "filterCreationDate": "Filter creation date",

@@ -170,7 +170,7 @@ export async function createShipmentExpiringNotification(
   return createNotification({
     user_id: importerUserId,
     type: 'shipment_expiring',
-    title: '⏰ Shipment próximo a expirar',
+    title: '⏰ Embarque próximo a expirar',
     message: `Tu envío ${shipmentData.origin} → ${shipmentData.destination} expira en ${hoursUntilExpiration} horas. Considera extender la fecha límite.`,
     data: {
       shipment_uuid: shipmentData.uuid,
@@ -275,7 +275,7 @@ export async function createDeadlineExtendedForAgentsNotification(
     user_id: agentUserId,
     type: 'deadline_extended_for_agents',
     title: '⏰ Fecha límite extendida',
-    message: `El shipment ${shipmentData.origin} → ${shipmentData.destination} ($${shipmentData.value.toLocaleString()} ${shipmentData.currency}) extendió su fecha límite hasta ${formatDate(newExpirationDate)}. ¡Tienes más tiempo para ofertar!`,
+    message: `El Embarque ${shipmentData.origin} → ${shipmentData.destination} ($${shipmentData.value.toLocaleString()} ${shipmentData.currency}) extendió su fecha límite hasta ${formatDate(newExpirationDate)}. ¡Tienes más tiempo para ofertar!`,
     data: {
       shipment_uuid: shipmentData.uuid,
       market_name: marketData.name,
@@ -447,7 +447,7 @@ export async function createNewShipmentNotification(
   return createNotification({
     user_id: agentUserId,
     type: 'new_shipment' as any, // Nuevo tipo de notificación
-    title: '🚢 ¡Nuevo shipment disponible!',
+    title: '🚢 ¡Nuevo embarque disponible!',
     message: `Nuevo ${shipmentData.shipping_type.toLowerCase()} disponible en ${marketData.name}: ${shipmentData.origin} → ${shipmentData.destination} ($${shipmentData.value.toLocaleString()} ${shipmentData.currency})`,
     data: {
       shipment_uuid: shipmentData.uuid,

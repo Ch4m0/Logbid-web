@@ -34,6 +34,8 @@ import { convertToColombiaTime, formatDateUTCAsLocal, formatShippingDate } from 
 import { useTranslation } from '@/src/hooks/useTranslation'
 import CancelShipmentModal from './CancelShipmentModal'
 import { X } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
+import { supabase } from '@/src/utils/supabase/client'
 import { useRealtimeShipmentsWithPagination } from '@/src/hooks/useRealtimeShipmentsWithPagination'
 
 interface ImporterShipmentCardsProps {
@@ -112,6 +114,8 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
     value?: number
     currency?: string
   } | null>(null)
+  const [hasOffersForCancel, setHasOffersForCancel] = useState<boolean>(false)
+  const [checkingCancelId, setCheckingCancelId] = useState<string | null>(null)
 
   // Filtros que el usuario está configurando (no aplicados aún)
   const [pendingFilters, setPendingFilters] = useState({
@@ -172,8 +176,8 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
     shipping_date?: string | null
   ) => {
     modalService.showModal({
-        component: ExtendShipmentDeadline,
-        props: {
+      component: ExtendShipmentDeadline,
+      props: {
         expiration_date: expiration_date,
         origin: origin,
         destination: destination,
@@ -185,21 +189,34 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
     })
   }
 
-  const handleCancelShipment = (
-    uuid: string,
-    origin: string,
-    destination: string,
-    value?: number,
-    currency?: string
+  const handleCancelShipment = async (
+    bid: any
   ) => {
-    setShipmentToCancel({
-      uuid,
-      origin,
-      destination,
-      value,
-      currency
-    })
-    setCancelModalOpen(true)
+    setCheckingCancelId(bid.id.toString())
+    try {
+      // Consultar si existen ofertas para este shipment
+      const { count, error } = await supabase
+        .from('offers')
+        .select('id', { count: 'exact', head: true })
+        .eq('shipment_id', bid.id)
+
+      if (error) {
+        console.error('Error checking offers (cancel):', error)
+      }
+      const hasOffers = (count || 0) > 0
+      setHasOffersForCancel(hasOffers)
+
+      setShipmentToCancel({
+        uuid: bid.uuid,
+        origin: bid.origin,
+        destination: bid.destination,
+        value: bid.value,
+        currency: bid.currency
+      })
+      setCancelModalOpen(true)
+    } finally {
+      setCheckingCancelId(null)
+    }
   }
 
   const handleSort = (key: string) => {
@@ -557,19 +574,23 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
                       variant="outline"
                       size="sm"
                       className="w-full text-xs md:text-sm border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
-                      onClick={(e) => {
+                      disabled={checkingCancelId === bid.id.toString()}
+                      onClick={async (e) => {
                         e.stopPropagation()
-                        handleCancelShipment(
-                          bid.uuid,
-                          bid.origin,
-                          bid.destination,
-                          bid.value,
-                          bid.currency
-                        )
+                        await handleCancelShipment(bid)
                       }}
                     >
-                      <X className="h-3 w-3 mr-1" />
-                      {t('common.cancel')}
+                      {checkingCancelId === bid.id.toString() ? (
+                        <span className="inline-flex items-center gap-2">
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                          {t('cancelShipment.checkingOffers')}
+                        </span>
+                      ) : (
+                        <>
+                          <X className="h-3 w-3 mr-1" />
+                          {t('common.cancel')}
+                        </>
+                      )}
                     </Button>
                   </div>
                 )}
@@ -628,6 +649,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
             setShipmentToCancel(null)
           }}
           shipment={shipmentToCancel}
+          hasOffers={hasOffersForCancel}
           onSuccess={() => {
             refetch()
           }}
