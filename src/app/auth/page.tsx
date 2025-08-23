@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Ship, Package, ArrowRight, Shield, Globe, Users, Mail, ArrowLeft } from 'lucide-react'
 import { createSupabaseClient } from '@/src/utils/supabase/client'
 import { getUserProfileClient } from '@/src/utils/auth-client'
+import Image from 'next/image'
 
   const CUSTOMER = 2
 const AGENT = 3
@@ -166,9 +167,7 @@ export default function Auth() {
           <div className="max-w-md">
             {/* Logo */}
             <div className="flex items-center space-x-3 mb-8">
-              <div className="flex items-center justify-center w-12 h-12 bg-white/20 rounded-xl backdrop-blur-sm">
-                <Ship className="w-6 h-6 text-white" />
-              </div>
+
               <h1 className="text-3xl font-bold">LogBid</h1>
             </div>
             
@@ -208,10 +207,9 @@ export default function Auth() {
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4">
-              <Ship className="w-8 h-8 text-white" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4">
+              <Image src="/logbid_logo.png" alt="LogBid" width={150} height={150} />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">LogBid</h1>
           </div>
 
           <Card className="border-0 shadow-xl bg-white">

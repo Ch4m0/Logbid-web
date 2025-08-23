@@ -13,7 +13,7 @@ import {
 import { Separator } from '@/src/components/ui/separator'
 import { useTranslation } from '@/src/hooks/useTranslation'
 import { useFormik } from 'formik'
-import { memo, useEffect, useState } from 'react'
+import { memo, useEffect, useState, useRef } from 'react'
 import * as Yup from 'yup'
 
 interface ProposalFormProps {
@@ -172,7 +172,7 @@ export default function ProposalFormSea({
     other: 0,
     total: 0,
   })
-  console.log({ bidDataForAgent })
+  const containerInitialized = useRef(false)
 
   // Opciones para los campos Select
   const containerTypes = [
@@ -200,9 +200,13 @@ export default function ProposalFormSea({
 
   const validationSchema = Yup.object().shape({
     shipping_type: Yup.string().required(t('proposalForm.shippingTypeRequired')),
+    basic_service: Yup.object().shape({
+      cancellation_fee: Yup.number().required(t('proposalForm.cancellationFeeRequired')).min(0),
+      free_days: Yup.number().required(t('proposalForm.freeDaysRequired')).min(0),
+    }),
     freight_fees: Yup.object().shape({
       value: Yup.number().required(t('proposalForm.valueRequired')).min(0),
-      container: Yup.string().required(t('proposalForm.containerRequired')),
+      container: Yup.string().notRequired(),
     }),
     origin_fees: Yup.object().shape({
       security_manifest: Yup.number()
@@ -238,46 +242,48 @@ export default function ProposalFormSea({
       shipping_type: '1',
       price: 0,
       basic_service: {
-        cancellation_fee: 100,
-        free_days: 30,
+        cancellation_fee: 0,
+        free_days: 0,
       },
       freight_fees: {
-        value: 5000,
-        container: bidDataForAgent?.container_name,
+        value: 0,
+        container: '',
       },
       origin_fees: {
-        security_manifest: 100,
-        handling: 50,
+        security_manifest: 0,
+        handling: 0,
       },
       destination_fees: {
-        handling: 65,
+        handling: 0,
         bl_emission: 0,
-        agency: 50,
+        agency: 0,
         collect_fee: '',
       },
       other_fees: {
-        pre_shipment_inspection: 125,
-        carbon: 35.0,
-        security_facility: 45,
-        low_sulfur: 68,
-        cancellation: 100,
-        security_manifest: 45,
-        other: 100,
+        pre_shipment_inspection: 0,
+        carbon: 0,
+        security_facility: 0,
+        low_sulfur: 0,
+        cancellation: 0,
+        security_manifest: 0,
+        other: 0,
       },
     },
     validationSchema,
     onSubmit: async (values) => {
       try {
-    
-
+        
         if (onSubmit) {
-          onSubmit({
+          const finalValues = {
             ...values,
             price: subtotals.total
-          })
+          }
+          onSubmit(finalValues)
+        } else {
+          console.log('⚠️ No external onSubmit function provided')
         }
       } catch (error) {
-        console.error('Error:', error)
+        console.error('❌ Error in form submission:', error)
       }
     },
   })
@@ -312,14 +318,59 @@ export default function ProposalFormSea({
     })
   }, [formik.values])
 
+  // Actualiza el container cuando se recibe bidDataForAgent
+  useEffect(() => {
+    if (bidDataForAgent?.container_name && !containerInitialized.current) {
+   
+      formik.setFieldValue('freight_fees.container', bidDataForAgent.container_name)
+      containerInitialized.current = true
+    }
+  }, [bidDataForAgent]) // Removed formik dependency to prevent infinite loop
+
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault()
+    
+    // Check if form has validation errors
+    if (!formik.isValid) {
+      formik.setTouched({}, true) // Mark all fields as touched to show errors
+      return
+    }
+    
     formik.handleSubmit()
   }
 
   return (
     <div className="space-y-6">
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Sección 1: Servicio Básico */}
+        <div className="space-y-4 bg-gray-50 p-6 rounded-lg border border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-800 border-b border-gray-300 pb-3">
+            ⚙️ {t('proposalForm.basicService')}
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              label={t('proposalForm.cancellationFee')}
+              id="basic_service.cancellation_fee"
+              type="number"
+              placeholder="0"
+              formik={formik}
+              error={formik.errors.basic_service?.cancellation_fee as string}
+              touched={formik.touched.basic_service?.cancellation_fee as boolean}
+            />
+            <FormField
+              label={t('proposalForm.freeDays')}
+              id="basic_service.free_days"
+              type="number"
+              placeholder="0"
+              formik={formik}
+              error={formik.errors.basic_service?.free_days as string}
+              touched={formik.touched.basic_service?.free_days as boolean}
+            />
+          </div>
+        </div>
+
+        <Separator className="my-6" />
+
         {/* Sección 2: Cargos de Flete */}
         <div className="space-y-4 bg-gray-50 p-6 rounded-lg border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-800 border-b border-gray-300 pb-3">
@@ -330,7 +381,7 @@ export default function ProposalFormSea({
               label={t('proposalForm.value')}
               id="freight_fees.value"
               type="number"
-              placeholder="5000"
+              placeholder="0"
               formik={formik}
               error={formik.errors.freight_fees?.value as string}
               touched={formik.touched.freight_fees?.value as boolean}
@@ -338,8 +389,10 @@ export default function ProposalFormSea({
             
               <div>
                 <Label>{t('proposalForm.container')}</Label>
-                <div className="mt-1  rounded-md">
-                  <span className="text-sm text-gray-500 ml-2">{bidDataForAgent?.container_name}</span>
+                <div className="mt-1 p-1 bg-gray-100 rounded-md ">
+                  <span className="text-sm text-gray-700 font-medium">
+                    {bidDataForAgent?.container_name || t('common.notSpecified')}
+                  </span>
                 </div>
               </div>
           </div>
@@ -535,6 +588,7 @@ export default function ProposalFormSea({
               type="submit" 
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-semibold"
               size="lg"
+              onClick={() => console.log('🔘 Button clicked!')}
             >
               {t('proposalForm.saveQuote')}
             </Button>
