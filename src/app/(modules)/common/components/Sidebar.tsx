@@ -67,7 +67,7 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
         fixed left-0 top-0 w-[18rem] h-screen border-r border-blue-200 z-40
         hidden lg:block
       `}
-      style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+      style={{ background: 'linear-gradient(90deg, #4916A2 50%, #4A57D9 100%)' }}>
         <SidebarContent 
           user={user}
           profile={profile}
@@ -84,14 +84,14 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
         fixed left-0 top-0 w-[280px] sm:w-[320px] border-r border-blue-200 z-40
         lg:hidden transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        flex flex-col h-screen
       `}
-      style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+      style={{ background: 'linear-gradient(90deg, #4916A2 50%, #4A57D9 100%)' }}>
         <div className="flex items-center justify-center h-20 px-4 pb-4">
-          <Link href="#" className="flex items-center gap-3" prefetch={false}>
-            <Package className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-            <span className="font-bold text-slate-800 text-2xl sm:text-3xl tracking-tight">
-              Log<span className="text-primary">Bid</span>
-            </span>
+        <Link href="https://logbid.co" className="flex items-center gap-3" prefetch={false} >
+            <div className="flex items-center">
+              <span className="text-2xl font-black transition-colors text-white">LogBid</span>
+            </div>
           </Link>
         </div>
         <div className="flex justify-end px-4 pb-2">
@@ -99,24 +99,22 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="text-slate-700 hover:bg-slate-100 p-2"
+            className="text-white hover:bg-white/10 p-2"
           >
             <X className="h-5 w-5" />
           </Button>
         </div>
         
-        <div className="flex-1 overflow-auto" style={{ height: 'calc(100vh - 4rem)' }}>
-          <SidebarContent 
-            user={user}
-            profile={profile}
-            userMarkets={userMarkets}
-            userRole={userRole}
-            handleLogout={handleLogout}
-            handleLinkClick={handleLinkClick}
-            t={t}
-            isMobile={true}
-          />
-        </div>
+        <SidebarContent 
+          user={user}
+          profile={profile}
+          userMarkets={userMarkets}
+          userRole={userRole}
+          handleLogout={handleLogout}
+          handleLinkClick={handleLinkClick}
+          t={t}
+          isMobile={true}
+        />
       </div>
     </>
   )
@@ -146,9 +144,11 @@ const SidebarContent = ({
   return (
     <div className="flex flex-col h-full">
       {!isMobile && (
-        <div className="flex items-center justify-center h-25 px-4 pb-5 pt-10">
+        <div className="flex items-center justify-center h-25 px-4 pb-5 pt-10 mb-8">
           <Link href="https://logbid.co" className="flex items-center gap-3" prefetch={false} >
-            <Image src="/logbid_logo.png" alt="Logo" width={80} height={80} />
+            <div className="flex items-center">
+              <span className="text-2xl font-black transition-colors text-white">LogBid</span>
+            </div>
           </Link>
         </div>
       )}
@@ -161,7 +161,7 @@ const SidebarContent = ({
             {/* Dashboard Global - Fuera de mercados */}
             <Link
               href="/graphics"
-              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm sm:text-md font-bold hover:bg-white/20 hover:text-white text-white mb-4"
+              className="flex items-center gap-2 rounded-md px-3 py-2 text-sm sm:text-md font-bold hover:bg-white/20 hover:text-white text-white mb-2"
               prefetch={false}
               onClick={handleLinkClick}
             >

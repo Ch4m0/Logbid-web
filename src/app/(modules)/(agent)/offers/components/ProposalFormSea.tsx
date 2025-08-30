@@ -1,5 +1,11 @@
 'use client'
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/src/components/ui/accordion'
 import { Button } from '@/src/components/ui/button'
 import { Input } from '@/src/components/ui/input'
 import { Label } from '@/src/components/ui/label'
@@ -10,10 +16,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/src/components/ui/select'
-import { Separator } from '@/src/components/ui/separator'
 import { useTranslation } from '@/src/hooks/useTranslation'
 import { useFormik } from 'formik'
-import { memo, useEffect, useState, useRef } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 import * as Yup from 'yup'
 
 interface ProposalFormProps {
@@ -66,12 +71,27 @@ export const SubtotalDisplay = memo(
     <div className="flex justify-between items-center py-2 px-4 mt-4 bg-gray-100">
       <span className="font-medium">{label}</span>
       <span className="text-right text-blue-600 font-medium">
-        ${amount.toFixed(2)}
+        ${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </span>
     </div>
   )
 )
 SubtotalDisplay.displayName = 'SubtotalDisplay'
+
+// Componente para el header del accordion con total
+export const AccordionSectionHeader = memo(
+  ({ title, amount }: { title: string; amount: number }) => (
+    <div className="flex justify-between items-center w-full">
+      <span className="text-base font-semibold text-gray-800">
+        {title}
+      </span>
+      <span className="text-base font-bold text-blue-600">
+        ${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+      </span>
+    </div>
+  )
+)
+AccordionSectionHeader.displayName = 'AccordionSectionHeader'
 
 // Componente para cada campo del formulario
 export const FormField = ({
@@ -340,12 +360,226 @@ export default function ProposalFormSea({
   }
 
   return (
-    <div className="space-y-6">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Sección 1: Servicio Básico */}
+    <div className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
+
+        {/* Sección 2: Cargos de Flete */}
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="freight" className="border border-gray-200 rounded-lg">
+            <AccordionTrigger className="px-6 py-2 hover:no-underline bg-gray-50 rounded-t-lg">
+              <AccordionSectionHeader 
+                title={t('proposalForm.freightCharges')} 
+                amount={subtotals.freight} 
+              />
+            </AccordionTrigger>
+            <AccordionContent className="px-6 py-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  label={t('proposalForm.value')}
+                  id="freight_fees.value"
+                  type="number"
+                  placeholder="0"
+                  formik={formik}
+                  error={formik.errors.freight_fees?.value as string}
+                  touched={formik.touched.freight_fees?.value as boolean}
+                />
+                
+                <div>
+                  <Label>{t('proposalForm.container')}</Label>
+                  <div className="mt-1 p-2 bg-gray-100 rounded-md ">
+                    <span className="text-sm text-gray-700 font-medium">
+                      {bidDataForAgent?.container_name || t('common.notSpecified')}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+
+        {/* Sección 3: Cargos de Origen */}
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="origin" className="border border-gray-200 rounded-lg">
+            <AccordionTrigger className="px-6 py-2 hover:no-underline bg-gray-50 rounded-t-lg">
+              <AccordionSectionHeader 
+                title={t('proposalForm.originCharges')} 
+                amount={subtotals.origin} 
+              />
+            </AccordionTrigger>
+            <AccordionContent className="px-6 py-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  label={t('proposalForm.securityManifest')}
+                  id="origin_fees.security_manifest"
+                  type="number"
+                  placeholder="100"
+                  formik={formik}
+                  error={formik.errors.origin_fees?.security_manifest as string}
+                  touched={
+                    formik.touched.origin_fees?.security_manifest as boolean
+                  }
+                />
+                <FormField
+                  label={t('proposalForm.handling')}
+                  id="origin_fees.handling"
+                  type="number"
+                  placeholder="50"
+                  formik={formik}
+                  error={formik.errors.origin_fees?.handling as string}
+                  touched={formik.touched.origin_fees?.handling as boolean}
+                />
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+
+        {/* Sección 4: Cargos de Destino */}
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="destination" className="border border-gray-200 rounded-lg">
+            <AccordionTrigger className="px-6 py-2 hover:no-underline bg-gray-50 rounded-t-lg">
+              <AccordionSectionHeader 
+                title={t('proposalForm.destinationCharges')} 
+                amount={subtotals.destination} 
+              />
+            </AccordionTrigger>
+            <AccordionContent className="px-6 py-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  label={t('proposalForm.handling')}
+                  id="destination_fees.handling"
+                  type="number"
+                  placeholder="65"
+                  formik={formik}
+                  error={formik.errors.destination_fees?.handling as string}
+                  touched={formik.touched.destination_fees?.handling as boolean}
+                />
+                <FormField
+                  label={t('proposalForm.blEmission')}
+                  id="destination_fees.bl_emission"
+                  type="number"
+                  placeholder="0"
+                  formik={formik}
+                  error={formik.errors.destination_fees?.bl_emission as string}
+                  touched={
+                    formik.touched.destination_fees?.bl_emission as boolean
+                  }
+                />
+                <FormField
+                  label={t('proposalForm.agency')}
+                  id="destination_fees.agency"
+                  type="number"
+                  placeholder="50"
+                  formik={formik}
+                  error={formik.errors.destination_fees?.agency as string}
+                  touched={formik.touched.destination_fees?.agency as boolean}
+                />
+                <SelectField
+                  label={t('proposalForm.collectFee')}
+                  id="destination_fees.collect_fee"
+                  formik={formik}
+                  options={collectFeeOptions}
+                  placeholder={t('proposalForm.selectCollectFee') || '2%'}
+                  error={formik.errors.destination_fees?.collect_fee as string}
+                  touched={
+                    formik.touched.destination_fees?.collect_fee as boolean
+                  }
+                />
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+
+        {/* Sección 5: Otros Cargos */}
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="other" className="border border-gray-200 rounded-lg">
+            <AccordionTrigger className="px-6 py-2 hover:no-underline bg-gray-50 rounded-t-lg">
+              <AccordionSectionHeader 
+                title={t('proposalForm.otherCharges')} 
+                amount={subtotals.other} 
+              />
+            </AccordionTrigger>
+            <AccordionContent className="px-6 py-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  label={t('proposalForm.preShipmentInspection')}
+                  id="other_fees.pre_shipment_inspection"
+                  type="number"
+                  placeholder="125"
+                  formik={formik}
+                  error={
+                    formik.errors.other_fees?.pre_shipment_inspection as string
+                  }
+                  touched={
+                    formik.touched.other_fees?.pre_shipment_inspection as boolean
+                  }
+                />
+                <FormField
+                  label={t('proposalForm.carbon')}
+                  id="other_fees.carbon"
+                  type="number"
+                  placeholder="35"
+                  formik={formik}
+                  error={formik.errors.other_fees?.carbon as string}
+                  touched={formik.touched.other_fees?.carbon as boolean}
+                />
+                <FormField
+                  label={t('proposalForm.securityFacility')}
+                  id="other_fees.security_facility"
+                  type="number"
+                  placeholder="45"
+                  formik={formik}
+                  error={formik.errors.other_fees?.security_facility as string}
+                  touched={
+                    formik.touched.other_fees?.security_facility as boolean
+                  }
+                />
+                <FormField
+                  label={t('proposalForm.lowSulfur')}
+                  id="other_fees.low_sulfur"
+                  type="number"
+                  placeholder="68"
+                  formik={formik}
+                  error={formik.errors.other_fees?.low_sulfur as string}
+                  touched={formik.touched.other_fees?.low_sulfur as boolean}
+                />
+                <FormField
+                  label={t('proposalForm.cancellation')}
+                  id="other_fees.cancellation"
+                  type="number"
+                  placeholder="100"
+                  formik={formik}
+                  error={formik.errors.other_fees?.cancellation as string}
+                  touched={formik.touched.other_fees?.cancellation as boolean}
+                />
+                <FormField
+                  label={t('proposalForm.securityManifest')}
+                  id="other_fees.security_manifest"
+                  type="number"
+                  placeholder="45"
+                  formik={formik}
+                  error={formik.errors.other_fees?.security_manifest as string}
+                  touched={
+                    formik.touched.other_fees?.security_manifest as boolean
+                  }
+                />
+                <FormField
+                  label={t('proposalForm.others')}
+                  id="other_fees.other"
+                  type="number"
+                  placeholder="100"
+                  formik={formik}
+                  error={formik.errors.other_fees?.other as string}
+                  touched={formik.touched.other_fees?.other as boolean}
+                />
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+
+        {/* Sección 1: Información adicional */}
         <div className="space-y-4 bg-gray-50 p-6 rounded-lg border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-800 border-b border-gray-300 pb-3">
-            ⚙️ {t('proposalForm.basicService')}
+             {t('proposalForm.basicService')}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
@@ -369,225 +603,22 @@ export default function ProposalFormSea({
           </div>
         </div>
 
-        <Separator className="my-6" />
-
-        {/* Sección 2: Cargos de Flete */}
-        <div className="space-y-4 bg-gray-50 p-6 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800 border-b border-gray-300 pb-3">
-            📦 {t('proposalForm.freightCharges')}
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              label={t('proposalForm.value')}
-              id="freight_fees.value"
-              type="number"
-              placeholder="0"
-              formik={formik}
-              error={formik.errors.freight_fees?.value as string}
-              touched={formik.touched.freight_fees?.value as boolean}
-            />
-            
-              <div>
-                <Label>{t('proposalForm.container')}</Label>
-                <div className="mt-1 p-1 bg-gray-100 rounded-md ">
-                  <span className="text-sm text-gray-700 font-medium">
-                    {bidDataForAgent?.container_name || t('common.notSpecified')}
-                  </span>
-                </div>
-              </div>
-          </div>
-          <SubtotalDisplay label={t('proposalForm.freightSubtotal')} amount={subtotals.freight} />
-        </div>
-
-        <Separator className="my-6" />
-
-        {/* Sección 3: Cargos de Origen */}
-        <div className="space-y-4 bg-gray-50 p-6 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800 border-b border-gray-300 pb-3">
-            🏁 {t('proposalForm.originCharges')}
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              label={t('proposalForm.securityManifest')}
-              id="origin_fees.security_manifest"
-              type="number"
-              placeholder="100"
-              formik={formik}
-              error={formik.errors.origin_fees?.security_manifest as string}
-              touched={
-                formik.touched.origin_fees?.security_manifest as boolean
-              }
-            />
-            <FormField
-              label={t('proposalForm.handling')}
-              id="origin_fees.handling"
-              type="number"
-              placeholder="50"
-              formik={formik}
-              error={formik.errors.origin_fees?.handling as string}
-              touched={formik.touched.origin_fees?.handling as boolean}
-            />
-          </div>
-          <SubtotalDisplay label={t('proposalForm.originSubtotal')} amount={subtotals.origin} />
-        </div>
-
-        <Separator className="my-6" />
-
-        {/* Sección 4: Cargos de Destino */}
-        <div className="space-y-4 bg-gray-50 p-6 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800 border-b border-gray-300 pb-3">
-            🎯 {t('proposalForm.destinationCharges')}
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              label={t('proposalForm.handling')}
-              id="destination_fees.handling"
-              type="number"
-              placeholder="65"
-              formik={formik}
-              error={formik.errors.destination_fees?.handling as string}
-              touched={formik.touched.destination_fees?.handling as boolean}
-            />
-            <FormField
-              label={t('proposalForm.blEmission')}
-              id="destination_fees.bl_emission"
-              type="number"
-              placeholder="0"
-              formik={formik}
-              error={formik.errors.destination_fees?.bl_emission as string}
-              touched={
-                formik.touched.destination_fees?.bl_emission as boolean
-              }
-            />
-            <FormField
-              label={t('proposalForm.agency')}
-              id="destination_fees.agency"
-              type="number"
-              placeholder="50"
-              formik={formik}
-              error={formik.errors.destination_fees?.agency as string}
-              touched={formik.touched.destination_fees?.agency as boolean}
-            />
-            <SelectField
-              label={t('proposalForm.collectFee')}
-              id="destination_fees.collect_fee"
-              formik={formik}
-              options={collectFeeOptions}
-              placeholder={t('proposalForm.selectCollectFee') || '2%'}
-              error={formik.errors.destination_fees?.collect_fee as string}
-              touched={
-                formik.touched.destination_fees?.collect_fee as boolean
-              }
-            />
-          </div>
-          <SubtotalDisplay
-            label={t('proposalForm.destinationSubtotal')}
-            amount={subtotals.destination}
-          />
-        </div>
-
-        <Separator className="my-6" />
-
-        {/* Sección 5: Otros Cargos */}
-        <div className="space-y-4 bg-gray-50 p-6 rounded-lg border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800 border-b border-gray-300 pb-3">
-            📋 {t('proposalForm.otherCharges')}
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              label={t('proposalForm.preShipmentInspection')}
-              id="other_fees.pre_shipment_inspection"
-              type="number"
-              placeholder="125"
-              formik={formik}
-              error={
-                formik.errors.other_fees?.pre_shipment_inspection as string
-              }
-              touched={
-                formik.touched.other_fees?.pre_shipment_inspection as boolean
-              }
-            />
-            <FormField
-              label={t('proposalForm.carbon')}
-              id="other_fees.carbon"
-              type="number"
-              placeholder="35"
-              formik={formik}
-              error={formik.errors.other_fees?.carbon as string}
-              touched={formik.touched.other_fees?.carbon as boolean}
-            />
-            <FormField
-              label={t('proposalForm.securityFacility')}
-              id="other_fees.security_facility"
-              type="number"
-              placeholder="45"
-              formik={formik}
-              error={formik.errors.other_fees?.security_facility as string}
-              touched={
-                formik.touched.other_fees?.security_facility as boolean
-              }
-            />
-            <FormField
-              label={t('proposalForm.lowSulfur')}
-              id="other_fees.low_sulfur"
-              type="number"
-              placeholder="68"
-              formik={formik}
-              error={formik.errors.other_fees?.low_sulfur as string}
-              touched={formik.touched.other_fees?.low_sulfur as boolean}
-            />
-            <FormField
-              label={t('proposalForm.cancellation')}
-              id="other_fees.cancellation"
-              type="number"
-              placeholder="100"
-              formik={formik}
-              error={formik.errors.other_fees?.cancellation as string}
-              touched={formik.touched.other_fees?.cancellation as boolean}
-            />
-            <FormField
-              label={t('proposalForm.securityManifest')}
-              id="other_fees.security_manifest"
-              type="number"
-              placeholder="45"
-              formik={formik}
-              error={formik.errors.other_fees?.security_manifest as string}
-              touched={
-                formik.touched.other_fees?.security_manifest as boolean
-              }
-            />
-            <FormField
-              label={t('proposalForm.others')}
-              id="other_fees.other"
-              type="number"
-              placeholder="100"
-              formik={formik}
-              error={formik.errors.other_fees?.other as string}
-              touched={formik.touched.other_fees?.other as boolean}
-            />
-          </div>
-          <SubtotalDisplay label={t('proposalForm.otherSubtotal')} amount={subtotals.other} />
-        </div>
-
         {/* Sección 6: Total y Acciones */}
-        <div className="space-y-4 bg-white p-6 rounded-lg border-2 border-blue-200 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-800 border-b border-gray-300 pb-3">
-            💎 {t('proposalForm.totalCost')}
-          </h3>
-          <div className="bg-blue-50 rounded-lg p-6">
-            <div className="flex justify-between items-center text-2xl font-bold">
+        <div className="space-y-3 bg-white p-4 rounded-lg border border-blue-200 shadow-sm">
+          <div className="bg-blue-50 rounded-lg p-3">
+            <div className="flex justify-between items-center text-lg font-bold">
               <span className="text-gray-700">{t('proposalForm.totalCost')}:</span>
               <span className="text-blue-600">
-                USD ${subtotals.total.toFixed(2)}
+                ${subtotals.total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} USD 
               </span>
             </div>
           </div>
           
-          <div className="flex justify-end pt-4">
+          <div className="flex justify-end">
             <Button 
               type="submit" 
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg font-semibold"
-              size="lg"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
+              size="default"
               onClick={() => console.log('🔘 Button clicked!')}
             >
               {t('proposalForm.saveQuote')}

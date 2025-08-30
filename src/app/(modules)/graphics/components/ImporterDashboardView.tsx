@@ -30,14 +30,12 @@ export function ImporterDashboardView({ profile }: ImporterDashboardViewProps) {
   
   // Obtener el primer mercado del usuario como default
   const hasMultipleMarkets = profile?.all_markets?.length > 1
-  const defaultMarketId = hasMultipleMarkets 
-    ? 'all' 
-    : (profile?.all_markets?.[0]?.id?.toString() || '')
+  const defaultMarketId = profile?.all_markets?.[0]?.id?.toString() || ''
   
   const [filters, setFilters] = useState<CostFilters>({
     marketId: defaultMarketId,
     dateRange: '30d',
-    transportType: 'all',
+    transportType: '1', // Marítimo preseleccionado
     userId: profile?.id?.toString() || '',
     enabled: !!profile?.id
   })
@@ -199,17 +197,19 @@ export function ImporterDashboardView({ profile }: ImporterDashboardViewProps) {
         </CardContent>
       </Card>
 
+            {/* Métricas de Estado de Envíos */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold">📦 {t('dashboard.customer.shipmentStatus.title')}</h2>
+        <ShipmentStatusMetrics filters={shipmentFilters} />
+      </div>
+
+
       {/* Métricas de Costo Total y Ahorro */}
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">💰 {t('dashboard.customer.costMetrics.title')}</h2>
         <CostMetricsCard filters={filters} />
       </div>
 
-      {/* Métricas de Estado de Envíos */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold">📦 {t('dashboard.customer.shipmentStatus.title')}</h2>
-        <ShipmentStatusMetrics filters={shipmentFilters} />
-      </div>
 
       {/* Métricas de Tiempo de Respuesta */}
       <div className="space-y-4">

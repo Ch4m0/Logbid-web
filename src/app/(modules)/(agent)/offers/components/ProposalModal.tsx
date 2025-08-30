@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import { Button } from '@/src/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -7,11 +7,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/src/components/ui/dialog'
-import { Button } from '@/src/components/ui/button'
-import { DollarSign, Plus, AlertCircle } from 'lucide-react'
+import { useTranslation } from '@/src/hooks/useTranslation'
+import { AlertCircle, DollarSign } from 'lucide-react'
+import React from 'react'
 import ProposalFormAir from './ProposalFormAir'
 import ProposalFormSea from './ProposalFormSea'
-import { useTranslation } from '@/src/hooks/useTranslation'
 
 interface ProposalModalProps {
   shippingType: string
@@ -56,13 +56,20 @@ export default function ProposalModal({
                     (bidDataForAgent?.expiration_date && new Date(bidDataForAgent.expiration_date) < new Date())
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+    <Dialog open={open} onOpenChange={isDisabled ? () => {} : setOpen}>
+      <DialogTrigger asChild disabled={isDisabled}>
         <div className="relative group">
           <Button 
-            className="bg-blue-500 hover:bg-blue-600 text-white transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="bg-blue-500 hover:bg-blue-600 text-white transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:bg-gray-400"
             size="default"
             disabled={isDisabled}
+            onClick={(e) => {
+              if (isDisabled) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+              }
+            }}
           >
             <DollarSign className="w-4 h-4 mr-2" />
             {t('agentOffers.proposePrice')}
@@ -80,7 +87,7 @@ export default function ProposalModal({
           )}
         </div>
       </DialogTrigger>
-      <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col p-0 [&>button]:z-20 [&>button]:bg-white [&>button]:shadow-md [&>button]:border">
+      <DialogContent className="w-1/2 max-h-[90vh] flex flex-col p-0 [&>button]:z-20 [&>button]:bg-white [&>button]:shadow-md [&>button]:border">
         {/* Header fijo */}
         <DialogHeader className="sticky top-0 z-10 bg-white border-b px-6 py-4 shadow-sm">
           <DialogTitle className="flex items-center gap-2 text-xl">

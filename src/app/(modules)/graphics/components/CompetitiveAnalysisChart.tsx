@@ -424,7 +424,7 @@ export const CompetitiveAnalysisChart: React.FC<CompetitiveAnalysisChartProps> =
                   strokeWidth={2}
                 />
                 <Tooltip 
-                  formatter={(value: number) => [`${value.toFixed(1)}%`, t('dashboard.agent.competitive.percentile')]}
+                  formatter={(value: number) => [`${(value || 0).toFixed(1)}%`, t('dashboard.agent.competitive.percentile')]}
                 />
               </RadarChart>
             </ResponsiveContainer>
@@ -473,9 +473,9 @@ export const CompetitiveAnalysisChart: React.FC<CompetitiveAnalysisChartProps> =
                   </div>
                 </div>
                 <div className="flex justify-between text-xs mt-2">
-                  <span>{data.responseTimeComparison.marketStats.q1ResponseHours.toFixed(1)}h</span>
-                  <span>{data.responseTimeComparison.marketStats.medianResponseHours.toFixed(1)}h</span>
-                  <span>{data.responseTimeComparison.marketStats.q3ResponseHours.toFixed(1)}h</span>
+                  <span>{(data.responseTimeComparison?.marketStats?.q1ResponseHours || 0).toFixed(1)}h</span>
+                  <span>{(data.responseTimeComparison?.marketStats?.medianResponseHours || 0).toFixed(1)}h</span>
+                  <span>{(data.responseTimeComparison?.marketStats?.q3ResponseHours || 0).toFixed(1)}h</span>
                 </div>
               </div>
 
@@ -483,13 +483,13 @@ export const CompetitiveAnalysisChart: React.FC<CompetitiveAnalysisChartProps> =
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-3 bg-blue-50 rounded-lg">
                   <div className="text-2xl font-bold text-blue-600">
-                    {data.responseTimeComparison.agentStats.avgResponseHours.toFixed(1)}h
+                    {(data.responseTimeComparison?.agentStats?.avgResponseHours || 0).toFixed(1)}h
                   </div>
                   <div className="text-xs text-gray-600">{t('dashboard.agent.competitive.yourAverage')}</div>
                 </div>
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
                   <div className="text-2xl font-bold text-gray-600">
-                    {data.responseTimeComparison.marketStats.avgResponseHours.toFixed(1)}h
+                    {(data.responseTimeComparison?.marketStats?.avgResponseHours || 0).toFixed(1)}h
                   </div>
                   <div className="text-xs text-gray-600">{t('dashboard.agent.competitive.marketAverage')}</div>
                 </div>
@@ -514,7 +514,7 @@ export const CompetitiveAnalysisChart: React.FC<CompetitiveAnalysisChartProps> =
                   ) : (
                     <TrendingUp className="w-3 h-3 mr-1" />
                   )}
-                  {Math.abs(data.responseTimeComparison.comparison.vsMarketAvg).toFixed(1)}% {t('dashboard.agent.competitive.vsMarket')}
+                  {Math.abs(data.responseTimeComparison?.comparison?.vsMarketAvg || 0).toFixed(1)}% {t('dashboard.agent.competitive.vsMarket')}
                 </Badge>
               </div>
             </div>
@@ -548,7 +548,7 @@ export const CompetitiveAnalysisChart: React.FC<CompetitiveAnalysisChartProps> =
                           <p className="text-blue-600">{t('dashboard.agent.competitive.yourPrice')}: ${data.agentPrice.toLocaleString()}</p>
                           <p className="text-gray-600">{t('dashboard.agent.competitive.market')}: ${data.marketAvg.toLocaleString()}</p>
                           <p className="text-gray-500">{t('dashboard.agent.competitive.range')}: ${data.marketMin.toLocaleString()} - ${data.marketMax.toLocaleString()}</p>
-                          <p className="text-sm">{t('dashboard.agent.competitive.percentile')}: {data.percentile.toFixed(1)}% ({data.position})</p>
+                          <p className="text-sm">{t('dashboard.agent.competitive.percentile')}: {(data.percentile || 0).toFixed(1)}% ({data.position})</p>
                         </div>
                       )
                     }
@@ -617,7 +617,7 @@ export const CompetitiveAnalysisChart: React.FC<CompetitiveAnalysisChartProps> =
                           <p className="font-semibold">{label.replace('\n', ' → ')}</p>
                           <p className="text-blue-600">{t('dashboard.agent.competitive.yourWins')}: {data.agentWins}</p>
                           <p className="text-gray-600">{t('dashboard.agent.competitive.totalMarket')}: {data.marketWins}</p>
-                          <p className="text-green-600">{t('dashboard.agent.performance.successRate')}: {data.successRate.toFixed(1)}%</p>
+                          <p className="text-green-600">{t('dashboard.agent.performance.successRate')}: {(data.successRate || 0).toFixed(1)}%</p>
                           <p className="text-gray-500">{t('dashboard.agent.competitive.competitors')}: {data.competitors}</p>
                           <p className="text-gray-500">{t('dashboard.agent.competitive.ranking')}: #{data.ranking}</p>
                         </div>

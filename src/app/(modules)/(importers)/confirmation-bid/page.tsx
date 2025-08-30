@@ -1,19 +1,34 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Button } from "@/src/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/src/components/ui/card"
-import { Separator } from "@/src/components/ui/separator"
-import { toast } from "@/src/components/ui/use-toast"
-import IconPrinter from "@/src/icons/PrintIcon"
-import { HomeIcon, Copy, CheckCircle, MapPin, DollarSign, Tag, Calendar, Ship, Package, FileText, User, Weight, Ruler, AlertTriangle, Clock, Download, Building, Globe } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { Badge } from "@/src/components/ui/badge"
-import { useBidStore } from "@/src/store/useBidStore"
-import { useTranslation } from "@/src/hooks/useTranslation"
-import { useGetShipment } from "@/src/app/hooks/useGetShipment"
 import { useGetOfferById } from "@/src/app/hooks/useGetOfferById"
+import { useGetShipment } from "@/src/app/hooks/useGetShipment"
+import { Badge } from "@/src/components/ui/badge"
+import { Button } from "@/src/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card"
+import { Separator } from "@/src/components/ui/separator"
+import { useTranslation } from "@/src/hooks/useTranslation"
+import IconPrinter from "@/src/icons/PrintIcon"
 import { copyProposalDetails } from "@/src/utils/clipboardUtils"
+import { supabase } from "@/src/utils/supabase/client"
+import { AlertTriangle,
+  Building,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Copy,
+  DollarSign,
+  Download,
+  FileText,
+  Globe,
+  HomeIcon,
+  MapPin,
+  Package,
+  Ship,
+  User,
+  Weight,
+} from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 
 const ConfirmationPage = () => {
   const { t } = useTranslation()
@@ -162,6 +177,42 @@ const ConfirmationPage = () => {
 
   const handlePrint = () => {
     window.print()
+  }
+
+  const handleDownloadDocument = async () => {
+    if (!combinedData.documents_url) return
+
+    try {
+      // Extraer el path del archivo de la URL
+      const url = new URL(combinedData.documents_url)
+      const pathParts = url.pathname.split('/object/packaging-lists/')
+      if (pathParts.length < 2) {
+        console.error('URL de archivo inválida')
+        return
+      }
+      
+      const pathWithoutBucket = pathParts[1]
+      
+      // Obtener URL firmada de Supabase
+      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+        .from('packaging-lists')
+        .createSignedUrl(pathWithoutBucket, 300) // URL válida por 5 minutos
+      
+      if (signedUrlError || !signedUrlData) {
+        console.error('Error al obtener acceso al archivo:', signedUrlError)
+        return
+      }
+      
+      // Descargar usando la URL firmada
+      const link = document.createElement('a')
+      link.href = signedUrlData.signedUrl
+      link.download = pathWithoutBucket.split('/').pop() || 'documento.xlsx'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    } catch (err) {
+      console.error('Error downloading file:', err)
+    }
   }
 
   console.log(offerData, 'OfferData')
@@ -443,15 +494,13 @@ const ConfirmationPage = () => {
                       </p>
                     </div>
                   </div>
-                  <a 
-                    href={combinedData.documents_url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
+                  <button 
+                    onClick={handleDownloadDocument}
                     className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                   >
                     <Download className="h-4 w-4" />
                     {t('confirmationBid.downloadDocument')}
-                  </a>
+                  </button>
                 </div>
               </div>
             ) : (

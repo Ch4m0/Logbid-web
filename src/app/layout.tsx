@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   title: 'LogBid',
   description: 'International logistics platform',
   icons: {
-    icon: '/favicon.ico',
+    icon: '/logbid_logo.ico',
   },
 }
 

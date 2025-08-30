@@ -1,18 +1,18 @@
 'use client'
+import { Button } from '@/src/components/ui/button'
+import { Card, CardContent } from '@/src/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/src/components/ui/dialog'
 import { Input } from '@/src/components/ui/input'
 import { Label } from '@/src/components/ui/label'
 import { useTranslation } from '@/src/hooks/useTranslation'
 import useAuthStore from '@/src/store/authStore'
+import { getUserProfileClient } from '@/src/utils/auth-client'
+import { createSupabaseClient } from '@/src/utils/supabase/client'
+import { ArrowLeft, ArrowRight, Globe, Mail, Package, Shield, Users } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Button } from '@/src/components/ui/button'
-import { Card, CardContent } from '@/src/components/ui/card'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/src/components/ui/dialog'
-import { Ship, Package, ArrowRight, Shield, Globe, Users, Mail, ArrowLeft } from 'lucide-react'
-import { createSupabaseClient } from '@/src/utils/supabase/client'
-import { getUserProfileClient } from '@/src/utils/auth-client'
-import Image from 'next/image'
 
   const CUSTOMER = 2
 const AGENT = 3
@@ -161,7 +161,7 @@ export default function Auth() {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden" style={{ background: 'linear-gradient(90deg, #4916A2 50%, #4A57D9 100%)' }}>
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="relative z-10 flex flex-col justify-center px-12 text-white">
           <div className="max-w-md">
@@ -208,7 +208,7 @@ export default function Auth() {
           {/* Mobile Logo */}
           <div className="lg:hidden text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4">
-              <Image src="/logbid_logo.png" alt="LogBid" width={150} height={150} />
+              <Image src="/logbid_logo_auth.png" alt="LogBid" width={150} height={150} />
             </div>
           </div>
 
@@ -216,22 +216,22 @@ export default function Auth() {
             <CardContent className="p-8">
               <div className="mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  {t('auth.login')}
+                  Login
                 </h2>
                 <p className="text-gray-600">
-                  {t('auth.enterEmail')}
+                  Enter your credentials to access your account
                 </p>
               </div>
 
               <form id="login-form" onSubmit={handleLogin} action="#" method="post" className="space-y-6">
                 <div>
                   <Label htmlFor="email" className="text-sm font-semibold text-gray-700 block mb-2">
-                    {t('auth.email')}
+                    Email
                   </Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder={t('auth.emailPlaceholder')}
+                    placeholder="Enter your email"
                     autoComplete="email"
                     required
                     value={email}
@@ -242,12 +242,12 @@ export default function Auth() {
 
                 <div>
                   <Label htmlFor="password" className="text-sm font-semibold text-gray-700 block mb-2">
-                    {t('auth.password')}
+                    Password
                   </Label>
                   <Input
                     id="password"
                     type="password"
-                    placeholder={t('auth.passwordPlaceholder')}
+                    placeholder="Enter your password"
                     required
                     autoComplete="current-password"
                     value={password}
@@ -259,17 +259,18 @@ export default function Auth() {
                 <Button
                   id="login-submit-btn"
                   type="submit"
-                  className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-base rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="w-full h-12 text-white font-semibold text-base rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+                  style={{ background: 'linear-gradient(90deg, #4916A2 50%, #4A57D9 100%)' }}
                   disabled={isLoading}
                 >
                   {isLoading ? (
                     <div className="flex items-center justify-center space-x-2">
                       <Package className="w-4 h-4 animate-spin" />
-                      <span>{t('auth.loggingIn')}</span>
+                      <span>Logging in...</span>
                     </div>
                   ) : (
                     <div className="flex items-center justify-center space-x-2">
-                      <span>{t('auth.login')}</span>
+                      <span>Login</span>
                       <ArrowRight className="w-4 h-4" />
                     </div>
                   )}
@@ -283,6 +284,33 @@ export default function Auth() {
                   </div>
                 )}
 
+                {/* Registration Buttons */}
+                <div className="space-y-3 pt-4">
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600 mb-3">Don&apos;t have an account?</p>
+                  </div>
+                  
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full h-12 border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 text-gray-700 font-semibold text-base rounded-lg transition-all duration-200"
+                    onClick={() => router.push('https://logbid.co/register-importer')}
+                  >
+                    <Users className="w-4 h-4 mr-2" />
+                    Register as Customer
+                  </Button>
+                  
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full h-12 border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 text-gray-700 font-semibold text-base rounded-lg transition-all duration-200"
+                    onClick={() => router.push('https://logbid.co/register-agent')}
+                  >
+                    <Package className="w-4 h-4 mr-2" />
+                    Register as Agent
+                  </Button>
+                </div>
+
                 <div className="text-center pt-2 space-y-2">
                   <Dialog open={showResetDialog} onOpenChange={setShowResetDialog}>
                     <DialogTrigger asChild>
@@ -291,25 +319,25 @@ export default function Auth() {
                         type="button"
                         className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors block w-full cursor-pointer"
                       >
-                        {t('auth.forgotPassword')}
+                        Forgot password?
                       </button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-md">
                       <DialogHeader>
                         <DialogTitle className="text-xl font-semibold text-gray-900">
-                          Recuperar contraseña
+                          Reset Password
                         </DialogTitle>
                       </DialogHeader>
                       
                       {!resetSuccess ? (
                         <form id="reset-password-form" onSubmit={handlePasswordReset} className="space-y-4">
                           <div className="text-sm text-gray-600 mb-4">
-                            Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.
+                            Enter your email and we&apos;ll send you a link to reset your password.
                           </div>
                           
                           <div>
                             <Label htmlFor="reset-email" className="text-sm font-medium text-gray-700">
-                              Correo electrónico
+                              Email
                             </Label>
                             <Input
                               id="reset-email"
@@ -339,7 +367,7 @@ export default function Auth() {
                               disabled={isResetLoading}
                             >
                               <ArrowLeft className="w-4 h-4 mr-2" />
-                              Cancelar
+                              Cancel
                             </Button>
                             <Button
                               id="reset-submit-btn"
@@ -352,7 +380,7 @@ export default function Auth() {
                               ) : (
                                 <Mail className="w-4 h-4 mr-2" />
                               )}
-                              {isResetLoading ? 'Enviando...' : 'Enviar enlace'}
+                              {isResetLoading ? 'Sending...' : 'Send link'}
                             </Button>
                           </div>
                         </form>
@@ -362,32 +390,23 @@ export default function Auth() {
                             <Mail className="w-8 h-8 text-green-600" />
                           </div>
                           <h3 className="text-lg font-medium text-gray-900 mb-2">
-                            ¡Email enviado!
+                            Email sent!
                           </h3>
                           <p className="text-sm text-gray-600 mb-6">
-                            Te hemos enviado un enlace para restablecer tu contraseña a <strong>{resetEmail}</strong>.
-                            Revisa tu bandeja de entrada y sigue las instrucciones.
+                            We&apos;ve sent you a link to reset your password to <strong>{resetEmail}</strong>.
+                            Check your inbox and follow the instructions.
                           </p>
                           <Button 
                             id="reset-success-btn"
                             onClick={handleResetDialogClose}
                             className="w-full bg-blue-600 hover:bg-blue-700"
                           >
-                            Entendido
+                            Got it
                           </Button>
                         </div>
                       )}
                     </DialogContent>
                   </Dialog>
-                  
-                  <Link
-                    id="register-link"
-                    href="/auth/register"
-                    className="text-sm text-green-600 hover:text-green-800 font-medium transition-colors block"
-                    prefetch={false}
-                  >
-                    ¿No tienes cuenta? Regístrate
-                  </Link>
                 </div>
               </form>
             </CardContent>
