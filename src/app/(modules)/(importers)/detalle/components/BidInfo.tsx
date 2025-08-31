@@ -149,10 +149,10 @@ const BidInfo = ({ bidDataForAgent }: any) => {
           <h3 className="font-bold text-base sm:text-lg mb-3 text-blue-700">{t('bidInfo.priceInformation')}</h3>
           <div className="space-y-2 sm:space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.lastPrice')}:</span>
+              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.lowestPrice')}:</span>
               <span className="text-sm sm:text-base font-semibold text-green-600 break-words w-full sm:flex-1 min-w-0">
-                {bidDataForAgent.currency && bidDataForAgent.last_price 
-                  ? `${bidDataForAgent.currency} ${bidDataForAgent.last_price}` 
+                {bidDataForAgent.currency && bidDataForAgent.lowestPrice 
+                  ? `${bidDataForAgent.currency} ${bidDataForAgent.lowestPrice}` 
                   : t('common.notSpecified')}
               </span>
             </div>

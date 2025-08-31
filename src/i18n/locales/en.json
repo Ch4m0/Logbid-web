@@ -551,7 +551,7 @@
     "transactionId": "Transaction ID",
     "origin": "Origin",
     "destination": "Destination",
-    "lastPrice": "Last Price",
+    "lastPrice": "Lowest Price",
     "offersCount": "Offers Count",
     "creation": "Bid Starts",
     "finalization": "Bid Ends",
