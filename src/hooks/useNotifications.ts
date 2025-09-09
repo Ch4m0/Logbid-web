@@ -9,7 +9,7 @@ import { useTranslation } from '@/src/hooks/useTranslation'
 export interface Notification {
   id: number
   user_id: string
-  type: 'new_offer' | 'offer_accepted' | 'offer_rejected' | 'shipment_expiring' | 'shipment_status_changed' | 'deadline_extended' | 'deadline_extended_for_agents' | 'new_shipment'
+  type: 'new_offer' | 'offer_accepted' | 'offer_rejected' | 'shipment_expiring' | 'shipment_status_changed' | 'deadline_extended' | 'deadline_extended_for_agents' | 'new_shipment' | 'shipment_cancelled'
   title: string
   message: string
   data?: any
@@ -278,6 +278,13 @@ export const useNotifications = () => {
             currency: data?.currency || 'USD'
           });
 
+        case 'shipment_cancelled':
+          return interpolateTemplate(t('notifications.messages.shipmentCancelled'), {
+            origin: data?.origin || '',
+            destination: data?.destination || '',
+            cancellationReason: data?.cancellation_reason || ''
+          });
+
         default:
           return notification.message;
       }
@@ -285,7 +292,7 @@ export const useNotifications = () => {
       console.error('Error interpolating notification message:', error);
       return notification.message; // Fallback al mensaje original
     }
-  }, []);
+  }, [t]);
 
   // Función para mostrar toast basado en el tipo de notificación
   const showNotificationToast = useCallback((notification: Notification) => {
@@ -361,7 +368,7 @@ export const useNotifications = () => {
 
     const config = getToastConfig(notification.type)
     toast(config)
-  }, [t, interpolateNotificationTitle, interpolateNotificationMessage])
+  }, [interpolateNotificationTitle, interpolateNotificationMessage])
 
   return {
     notifications,
@@ -385,91 +392,152 @@ export const useNotifications = () => {
 export const useRealtimeNotifications = () => {
   const profile = useAuthStore((state) => state.profile)
   const queryClient = useQueryClient()
-  const { showNotificationToast } = useNotifications()
+  const { t } = useTranslation()
   const [isConnected, setIsConnected] = useState(false)
-  const [retryCount, setRetryCount] = useState(0)
-  const maxRetries = 3
 
-  useEffect(() => {
-    if (!profile?.auth_id) {
-      return
-    }
-
-
-    const setupChannel = () => {
-      const channel = supabase
-        .channel(`notifications-${profile.auth_id}`)
-        .on(
-          'postgres_changes',
-          {
-            event: 'INSERT',
-            schema: 'public',
-            table: 'notifications',
-            filter: `user_id=eq.${profile.auth_id}`
-          },
-          async (payload) => {
-            
-            const newNotification = payload.new as Notification
-            // Mostrar toast inmediatamente
-            try {
-              showNotificationToast(newNotification)
-            } catch (error) {
-              console.error('❌ REALTIME: Error mostrando toast:', error)
-            }
-            
-            // Actualizar la cache de React Query INMEDIATAMENTE
-            queryClient.setQueryData(
-              ['notifications', profile.auth_id],
-              (oldData: Notification[] | undefined) => {
-                if (!oldData) return [newNotification]
-                // Verificar si la notificación ya existe para evitar duplicados
-                const exists = oldData.some(n => n.id === newNotification.id)
-                if (exists) return oldData
-                const newData = [newNotification, ...oldData]
-                return newData
-              }
-            )
-            
-            // Forzar refetch inmediato
-            await queryClient.refetchQueries({ queryKey: ['notifications', profile.auth_id] })
+  // Función para mostrar toast simplificada
+  const showNotificationToast = useCallback((notification: Notification) => {
+    const getToastConfig = (type: string) => {
+      console.log('type', type)
+      switch (type) {
+        case 'new_offer':
+          return {
+            title: `🎉 ${t('notifications.toasts.newOfferReceived')}`,
+            description: notification.message,
+            variant: 'default' as const,
+            duration: 5000
           }
-        )
-        .subscribe((status) => {
-          
-          if (status === 'SUBSCRIBED') {
-            setIsConnected(true)
-            setRetryCount(0)
-          } else if (status === 'CHANNEL_ERROR') {
-            handleReconnect()
-          } else if (status === 'TIMED_OUT') {
-            handleReconnect()
+        case 'offer_accepted':
+          return {
+            title: `✅ ${t('notifications.toasts.offerAccepted')}`,
+            description: notification.message,
+            variant: 'default' as const,
+            duration: 5000
           }
-        })
-
-      return channel
-    }
-
-    const handleReconnect = () => {
-      if (retryCount < maxRetries) {
-        setRetryCount(prev => prev + 1)
-        const timeoutId = setTimeout(() => {
-          channel = setupChannel()
-        }, 2000 * Math.pow(2, retryCount)) // Backoff exponencial
-        return () => clearTimeout(timeoutId)
-      } else {
-        setIsConnected(false)
+        case 'offer_rejected':
+          return {
+            title: `❌ ${t('notifications.toasts.offerRejected')}`,
+            description: notification.message,
+            variant: 'destructive' as const,
+            duration: 4000
+          }
+        case 'shipment_expiring':
+          return {
+            title: `⏰ ${t('notifications.toasts.shipmentExpiring')}`,
+            description: notification.message,
+            variant: 'destructive' as const,
+            duration: 6000
+          }
+        case 'shipment_status_changed':
+          return {
+            title: `🔄 ${t('notifications.toasts.statusUpdated')}`,
+            description: notification.message,
+            variant: 'default' as const,
+            duration: 4000
+          }
+        case 'deadline_extended':
+          return {
+            title: `📅 ${t('notifications.toasts.deadlineExtended')}`,
+            description: notification.message,
+            variant: 'default' as const,
+            duration: 4000
+          }
+        case 'deadline_extended_for_agents':
+          return {
+            title: `⏰ ${t('notifications.toasts.deadlineExtendedForAgents')}`,
+            description: notification.message,
+            variant: 'default' as const,
+            duration: 5000
+          }
+        case 'new_shipment':
+          return {
+            title: `🚢 ${t('notifications.toasts.newShipmentAvailable')}`,
+            description: notification.message,
+            variant: 'default' as const,
+            duration: 5000
+          }
+        case 'shipment_cancelled':
+          return {
+            title: `🚫 ${t('notifications.toasts.shipmentCancelled')}`,
+            description: notification.message,
+            variant: 'warning' as const,
+            duration: 6000
+          }
+        default:
+          return {
+            title: notification.title,
+            description: notification.message,
+            variant: 'default' as const,
+            duration: 4000
+          }
       }
     }
 
-    let channel = setupChannel()
+    const config = getToastConfig(notification.type)
+    toast(config as any)
+  }, [t])
 
-    // Cleanup
-    return () => {
-      supabase.removeChannel(channel)
-      setIsConnected(false)
-      setRetryCount(0)
+  useEffect(() => {
+    if (!profile?.auth_id) {
+      console.log('❌ REALTIME: No hay profile.auth_id, no se puede configurar canal')
+      return
     }
-  }, [profile?.auth_id, queryClient, showNotificationToast, retryCount])
+
+    console.log('🚀 REALTIME: Configurando canal para notificaciones del usuario:', profile.auth_id)
+    
+    const channel = supabase
+      .channel(`notifications-${profile.auth_id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${profile.auth_id}`
+        },
+        async (payload) => {
+          console.log('🔔 PAYLOAD RECIBIDO:', payload)
+          const newNotification = payload.new as Notification
+          console.log('🔔 NUEVA NOTIFICACIÓN:', newNotification)
+          
+          // Mostrar toast inmediatamente
+          try {
+            showNotificationToast(newNotification)
+          } catch (error) {
+            console.error('❌ REALTIME: Error mostrando toast:', error)
+          }
+          
+          // Actualizar la cache de React Query
+          queryClient.setQueryData(
+            ['notifications', profile.auth_id],
+            (oldData: Notification[] | undefined) => {
+              if (!oldData) return [newNotification]
+              // Verificar si la notificación ya existe para evitar duplicados
+              const exists = oldData.some(n => n.id === newNotification.id)
+              if (exists) return oldData
+              const newData = [newNotification, ...oldData]
+              return newData
+            }
+          )
+          
+          // Invalidar queries para refrescar datos
+          queryClient.invalidateQueries({ queryKey: ['notifications', profile.auth_id] })
+        }
+      )
+      .subscribe((status) => {
+        console.log('📡 Canal notificaciones:', status)
+        setIsConnected(status === 'SUBSCRIBED')
+        
+        if (status !== 'SUBSCRIBED') {
+          console.error('❌ Error canal notificaciones:', status)
+        }
+      })
+
+    return () => {
+      console.log('🧹 Limpiando canal notificaciones')
+      channel.unsubscribe()
+    }
+  }, [profile?.auth_id, queryClient, showNotificationToast])
 
   return { isConnected }
 }

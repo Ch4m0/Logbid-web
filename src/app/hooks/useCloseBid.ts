@@ -3,20 +3,31 @@ import { supabase } from '@/src/utils/supabase/client'
 // Notifications for bid closure are now handled via RPC with SECURITY DEFINER
 
 interface CloseBidArgs {
-  bid_id: number
-  offer_id: number
+  bid_id: string
+  offer_id: string
 }
 
 const closeBidWithSupabase = async ({ bid_id, offer_id }: CloseBidArgs) => {
-  // Primero obtener la información de la oferta aceptada para extraer el agent_code
+  // Primero obtener la información de la oferta aceptada para extraer el agent_code y shipment_id
   const { data: acceptedOffer, error: fetchError } = await supabase
     .from('offers')
-    .select('agent_code')
-    .eq('id', offer_id)
+    .select('agent_code, shipment_id, id')
+    .eq('uuid', offer_id)
     .single()
 
   if (fetchError) {
     throw new Error(`Error fetching offer: ${fetchError.message}`)
+  }
+
+  // Obtener información del shipment para conseguir el ID numérico
+  const { data: shipmentData, error: shipmentFetchError } = await supabase
+    .from('shipments')
+    .select('id')
+    .eq('uuid', bid_id)
+    .single()
+
+  if (shipmentFetchError) {
+    throw new Error(`Error fetching shipment: ${shipmentFetchError.message}`)
   }
 
   // 1. Actualizar el status del shipment a 'Closed' y guardar el agent_code del ganador
@@ -26,7 +37,7 @@ const closeBidWithSupabase = async ({ bid_id, offer_id }: CloseBidArgs) => {
       status: 'Closed',
       agent_code: acceptedOffer.agent_code
     })
-    .eq('id', bid_id)
+    .eq('uuid', bid_id)
 
   if (shipmentError) {
     throw new Error(`Error updating shipment: ${shipmentError.message}`)
@@ -36,7 +47,7 @@ const closeBidWithSupabase = async ({ bid_id, offer_id }: CloseBidArgs) => {
   const { error: offerError } = await supabase
     .from('offers')
     .update({ status: 'accepted' })
-    .eq('id', offer_id)
+    .eq('uuid', offer_id)
 
   if (offerError) {
     throw new Error(`Error updating offer: ${offerError.message}`)
@@ -46,8 +57,8 @@ const closeBidWithSupabase = async ({ bid_id, offer_id }: CloseBidArgs) => {
   const { error: rejectError } = await supabase
     .from('offers')
     .update({ status: 'rejected' })
-    .eq('shipment_id', bid_id)
-    .neq('id', offer_id)
+    .eq('shipment_id', acceptedOffer.shipment_id)
+    .neq('uuid', offer_id)
 
   if (rejectError) {
     throw new Error(`Error rejecting other offers: ${rejectError.message}`)
@@ -58,8 +69,8 @@ const closeBidWithSupabase = async ({ bid_id, offer_id }: CloseBidArgs) => {
     // Delegar notificaciones a la función RPC con SECURITY DEFINER (bypass RLS)
     const { data: rpcResult, error: rpcError } = await supabase
       .rpc('notify_agents_about_bid_closure', {
-        bid_id,
-        accepted_offer_id: offer_id
+        bid_id: shipmentData.id,
+        accepted_offer_id: acceptedOffer.id
       })
 
     if (rpcError) {

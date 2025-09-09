@@ -9,7 +9,7 @@ import './globals.css'
 import ReactQueryProvider from '@/src/ReactQueryProvider'
 import { Toaster } from '@/src/components/ui/toaster'
 import { ChatProvider } from '@/src/context/ChatContext'
-import { NotificationProvider } from '@/src/components/NotificationProvider'
+
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -40,7 +40,6 @@ export default function RootLayout({
         <I18nProvider>
           <ChatProvider>
             <ReactQueryProvider>
-              <NotificationProvider>
                 <ThemeProvider
                   attribute="class"
                   defaultTheme="light"
@@ -52,7 +51,6 @@ export default function RootLayout({
                 <CustomDrawer />
                 <CustomDialog />
                 <Toaster />
-              </NotificationProvider>
             </ReactQueryProvider>
           </ChatProvider>
         </I18nProvider>

@@ -38,11 +38,7 @@ export const useGetShipment = ({ shipment_id }: Args) => {
         }
       }
 
-      // Consultar offers
-      const { data: offersData } = await supabase
-        .from('offers')
-        .select('*')
-        .eq('shipment_id', shipmentData.id)
+      // ✅ Offers movidos a hook separado useGetOffersByShipment
 
       // Obtener información adicional de containers e incoterms si existen
       let containerInfo = null
@@ -69,9 +65,7 @@ export const useGetShipment = ({ shipment_id }: Args) => {
         incotermInfo = incoterm
       }
 
-      // Transformar los datos para mantener compatibilidad con el modelo existente
-      const offers = offersData || []
-      console.log(shipmentData)
+      // Transformar solo los datos del shipment (sin offers)
       
       const transformedData = {
         id: shipmentData.id,
@@ -92,14 +86,16 @@ export const useGetShipment = ({ shipment_id }: Args) => {
         additional_info: shipmentData.additional_info,
         agent_code: shipmentData.agent_code,
         documents_url: shipmentData.documents_url,
+        market_id: shipmentData.market_id,
+        profile_id: shipmentData.profile_id,
         
-        // Datos de shipment_details aplanados para compatibilidad
+        // Datos de shipment_details aplanados
         total_weight: shipmentDetails?.total_weight,
         measure_type: shipmentDetails?.measure_type,
         volume: shipmentDetails?.volume,
         units: shipmentDetails?.units,
         merchandise_type: shipmentDetails?.merchandise_type,
-        dangerous_march: shipmentDetails?.dangerous_merch, // Nota: el nombre cambia para mantener compatibilidad
+        dangerous_march: shipmentDetails?.dangerous_merch,
         tariff_item: shipmentDetails?.tariff_item,
         container_id: shipmentDetails?.container_id,
         incoterms_id: shipmentDetails?.incoterms_id,
@@ -107,16 +103,7 @@ export const useGetShipment = ({ shipment_id }: Args) => {
         
         // Referencias a las tablas relacionadas
         container_name: containerInfo?.name,
-        incoterm_name: incotermInfo?.name,
-        
-        // Ofertas y precios
-        offers: offers,
-        lowestPrice: offers.length > 0 
-          ? Math.min(...offers.map((offer: any) => parseFloat(offer.price))).toString()
-          : '0',
-        last_price: offers.length > 0 
-          ? offers[offers.length - 1].price
-          : '0'
+        incoterm_name: incotermInfo?.name
       }
 
       return transformedData

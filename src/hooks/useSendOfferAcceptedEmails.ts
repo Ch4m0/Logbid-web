@@ -2,8 +2,8 @@ import { useMutation } from '@tanstack/react-query'
 import { createSupabaseClient } from '../utils/supabase/client'
 
 interface SendEmailParams {
-  bid_id: number
-  offer_id: number
+  bid_id: string
+  offer_id: string
 }
 
 interface EmailResponse {

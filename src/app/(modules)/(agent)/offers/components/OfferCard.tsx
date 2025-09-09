@@ -159,7 +159,7 @@ const OfferCard = ({ offer, toggleOfferDetails, expandedOffers, acceptOffer }: O
                 </>
               ) : (
                 <>
-                  {t('offerCard.showDetails')} <ChevronDown className="ml-2 h-4 w-4" />
+                  {t('common.showDetails')} <ChevronDown className="ml-2 h-4 w-4" />
                 </>
               )}
             </Button>

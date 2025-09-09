@@ -2,7 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
 import { es, enUS } from "date-fns/locale"
-import { CalendarIcon, TruckIcon, PlaneIcon, ShipIcon, WarehouseIcon, Loader2 } from "lucide-react"
+import { CalendarIcon, Loader2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -26,6 +26,7 @@ import { useExtendExpirationDate } from "@/src/app/hooks/useExtendExpirationDate
 import { Badge } from "@/src/components/ui/badge"
 import { useTranslation } from "@/src/hooks/useTranslation"
 import { differenceInCalendarDays, addDays, parseISO, startOfDay } from 'date-fns'
+import { ShippingIcon, getShippingTypeKey } from "@/src/components/ShippingIcon"
 
 // Función helper para parsear fechas de forma simple
 const parseDateSimple = (dateString: string): Date => {
@@ -118,31 +119,7 @@ export function ExtendShipmentDeadline({
     },
   })
 
-  // Función para mapear tipos de shipping a claves de traducción
-  const getShippingTypeKey = (type: string) => {
-    const typeMap: { [key: string]: string } = {
-      '2': 'air',
-      '1': 'maritime', 
-      'Terrestre': 'land',
-      'Almacén': 'warehouse'
-    }
-    return typeMap[type] || 'warehouse'
-  }
 
-  const getShippingIcon = () => {
-    const typeKey = getShippingTypeKey(shippingType)
-    switch (typeKey) {
-      case "air":
-        return <PlaneIcon className="h-5 w-5 text-muted-foreground" />
-      case "maritime":
-        return <ShipIcon className="h-5 w-5 text-muted-foreground" />
-      case "land":
-        return <TruckIcon className="h-5 w-5 text-muted-foreground" />
-      case "warehouse":
-      default:
-        return <WarehouseIcon className="h-5 w-5 text-muted-foreground" />
-    }
-  }
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     const newClosing = format(new Date(data.dob_cierre), "yyyy-MM-dd")
@@ -183,7 +160,7 @@ export function ExtendShipmentDeadline({
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="flex items-center justify-center my-4">
               <div className="flex items-center gap-2 bg-muted p-3 rounded-lg w-full">
-                {getShippingIcon()}
+                <ShippingIcon shippingType={shippingType} />
                 <Badge variant="outline" className="font-medium bg-background">
                   {origin}
                 </Badge>

@@ -25,6 +25,10 @@ export class BidListItem {
     public bid_details_id: number,
     public inserted_at: string,
     public last_price: number,
-    public offers_count: number = 0
+    public offers_count: number = 0,
+    public origin_flag?: string,
+    public destination_flag?: string,
+    public cancellation_reason?: string,
+    public cancelled_at?: string
   ) {}
 }

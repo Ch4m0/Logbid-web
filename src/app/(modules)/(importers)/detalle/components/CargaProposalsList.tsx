@@ -11,13 +11,16 @@ import { DollarSign } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useState } from 'react'
 import AdvancedFilters from '../../../(agent)/offers/components/AdvancedFilters'
-import OfferCard from '../../../(agent)/offers/components/OfferCard'
+
 import Pagination from '../../../common/components/pagination/Pagination'
-import BidInfo from './BidInfo'
+import ListItem from './ListItem'
+
 import { OfferConfirmationDialog } from '../../(home)/components/OfferConfirmacionDialog'
 import { FiltersOffer } from '@/src/models/FiltersOffer'
 import useAuthStore from '@/src/store/authStore'
 import { useTranslation } from '@/src/hooks/useTranslation'
+import { useGetOffersByShipment } from '@/src/app/hooks/useGetOffersByShipment'
+import { useRealtimeOffers } from '@/src/hooks/useRealtimeOffers'
 
 interface Offer {
   id: number
@@ -67,11 +70,15 @@ export function CargaProposalsList() {
   const shipmentId = params.get('bidId') || '' // Mantenemos el nombre del param para compatibilidad
   const marketId = params.get('market') || ''
 
-  const { data: shipment, isPending: loading } = useGetShipment({ shipment_id: shipmentId })
+  const { data: offersData, isPending: loading } = useGetOffersByShipment({ shipment_id: shipmentId })
+  const { offers = [], lowestPrice = '0', lastPrice = '0', offersCount = 0 } = offersData || {}
+  const { data: shipment, isPending: loadingShipment } = useGetShipment({ shipment_id: shipmentId })
   const [itemsPerPage] = useState(20)
 
-  const [expandedOffers, setExpandedOffers] = useState<Record<string, boolean>>({})
-  const [shipmentDataForAgent, setShipmentDataForAgent] = useState<any>({})
+  // Hook de tiempo real para ofertas (con fallback a auto-refresh)
+  const { isConnected } = useRealtimeOffers(shipmentId)
+
+
 
   const [filters, setFilters] = useState<FiltersOffer>({
     inserted_at: '',
@@ -97,21 +104,19 @@ export function CargaProposalsList() {
     });
   }
 
-  useEffect(() => {
-    if (shipment && shipment.status === 'Closed') {
-      window.location.href = '/?market=' + marketId
-    }
-  }, [shipment, marketId])
 
-  const toggleOfferDetails = (offerId: string) => {
-    setExpandedOffers((prev) => ({
-      ...prev,
-      [offerId]: !prev[offerId],
-    }))
+  const handleViewOfferDetail = (offerId: string) => {
+    router.push(`/detalle/offer/${offerId}?market=${marketId}`)
   }
+
+
 
   if (!params) {
     return <h1>{t('proposals.errorLoading')}</h1>
+  }
+
+  if (loading || loadingShipment) {
+    return <h1>{t('common.loading')}</h1>
   }
 
   const handleSort = (key: string) => {
@@ -150,8 +155,6 @@ export function CargaProposalsList() {
       bidId: shipment?.id,
     }
     
-    console.log('Modal data being passed:', modalData)
-    
     modalService.showModal({
       component: OfferConfirmationDialog,
       props: modalData,
@@ -170,8 +173,7 @@ export function CargaProposalsList() {
   }
 
   // Filtrado y ordenamiento aplicado a la lista de ofertas
-  const filteredOffers = shipment?.offers
-    ?.filter((offer: any) => {
+  const filteredOffers = offers?.filter((offer: any) => {
       // Si no hay filtros aplicados, mostrar todas las ofertas
       const hasActiveFilters = Object.values(filters).some(value => value && value.trim() !== '');
       if (!hasActiveFilters) return true;
@@ -224,16 +226,12 @@ export function CargaProposalsList() {
         : Number(bValue) - Number(aValue)
     })
 
-  console.log(shipment, 'shipment')
-
   const paginatedList = filteredOffers?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   )
 
-  if (loading) {
-    return <h1>{t('common.loading')}</h1>
-  }
+
 
   return (
     <>
@@ -260,16 +258,12 @@ export function CargaProposalsList() {
               </svg>
               {t('common.back')}
             </button>
-            <h2 className="text-2xl font-bold mt-4 text-blue-500">
-              {t('proposals.tripDetail')}
-            </h2>
-            <div className="grid gap-2 pb-6">
-              {shipment && <BidInfo bidDataForAgent={shipment} />}
-            </div>
 
-            <CardTitle className="text-blue-500 font-bold text-xl">
-              {t('proposals.title')}
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-blue-500 font-bold text-xl">
+                {t('proposals.title')}
+              </CardTitle>
+            </div>
           </CardHeader>
           <CardContent>
        
@@ -278,7 +272,7 @@ export function CargaProposalsList() {
             handleFilterChange={handleFilterChange} 
             handleSort={handleSort} 
             resetFilters={resetFilters}
-            bidDataForAgent={shipmentDataForAgent}
+            bidDataForAgent={shipment || {}}
           />
 
           {/* Estado de carga */}
@@ -291,15 +285,18 @@ export function CargaProposalsList() {
 
 
 
-          {paginatedList?.map((offer: any, idx: number) => (
-              <OfferCard 
-                key={idx} 
-                offer={offer} 
-                toggleOfferDetails={toggleOfferDetails} 
-                expandedOffers={expandedOffers} 
-                acceptOffer={openModal}
+          <div className="space-y-4">
+            {paginatedList?.map((offer: any, idx: number) => (
+              <ListItem
+                key={idx}
+                offer={offer}
+                currency={shipment?.currency}
+                onAcceptOffer={openModal}
+                handleViewOfferDetail={handleViewOfferDetail}
               />
-          ))}
+            ))}
+            
+          </div>
 
 
           {(!paginatedList || paginatedList.length === 0) && (

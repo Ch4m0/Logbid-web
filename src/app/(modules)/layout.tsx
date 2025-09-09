@@ -31,7 +31,7 @@ const LogBiddLayout = ({ children }: { children: React.ReactNode }) => {
       
       <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
       
-      <div className="lg:ml-[18rem] flex flex-col h-screen transition-all duration-300">
+      <div className="lg:ml-[16rem] flex flex-col h-screen transition-all duration-300">
         <Header onToggleSidebar={toggleSidebar} />
         <Breadcrumb />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">

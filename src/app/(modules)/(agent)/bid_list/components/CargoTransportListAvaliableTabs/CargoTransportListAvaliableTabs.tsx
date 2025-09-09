@@ -51,6 +51,8 @@ export default function CargoTransportListAvaliableTabs({
     const url = new URL(window.location.href)
 
     url.searchParams.set('status', value)
+    // Reset pagination when changing tabs
+    url.searchParams.delete('page')
 
     window.history.pushState({}, '', url.toString())
   }

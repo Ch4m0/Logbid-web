@@ -81,7 +81,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
   const shippingType = searchParams.get('shipping_type') || '1'
 
   const { data: shipmentList, refetch } = useGetShipments({
-    user_id: profile?.id ? Number(profile.id) : null,
+    user_id: profile?.id || null,
     market_id: marketId,
     status,
     shipping_type: shippingType as ShippingType,

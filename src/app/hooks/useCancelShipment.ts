@@ -91,7 +91,7 @@ export const useCancelShipment = () => {
                   cancelled_at: new Date().toISOString()
                 },
                 shipment_id: shipmentData.id,
-                is_read: false,
+                read: false,
                 created_at: new Date().toISOString()
               })
 

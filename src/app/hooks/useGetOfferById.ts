@@ -6,6 +6,7 @@ interface Args {
 }
 
 export const useGetOfferById = ({ offer_id }: Args) => {
+  console.log('offer_id', offer_id)
   return useQuery({
     queryKey: ['offer', offer_id],
     queryFn: async () => {
@@ -24,7 +25,7 @@ export const useGetOfferById = ({ offer_id }: Args) => {
         throw offerError
       }
 
-      // Consultar solo el perfil del agente si existe
+      // Consultar el perfil del agente si existe
       let agentProfile = null
       if (offerData.agent_id) {
         const { data: profile, error: profileError } = await supabase
@@ -35,6 +36,20 @@ export const useGetOfferById = ({ offer_id }: Args) => {
         
         if (!profileError && profile) {
           agentProfile = profile
+        }
+      }
+
+      // Consultar información del shipment si existe
+      let shipmentData = null
+      if (offerData.shipment_id) {
+        const { data: shipment, error: shipmentError } = await supabase
+          .from('shipments')
+          .select('id, uuid, origin_country, origin_name, destination_country, destination_name, transportation, shipping_type')
+          .eq('id', offerData.shipment_id)
+          .single()
+        
+        if (!shipmentError && shipment) {
+          shipmentData = shipment
         }
       }
 
@@ -56,6 +71,14 @@ export const useGetOfferById = ({ offer_id }: Args) => {
         agent_name: agentProfile?.full_name || null,
         agent_company: agentProfile?.company_name || null,
         agent_role: agentProfile?.role || null,
+        
+        // Información del shipment
+        shipment_uuid: shipmentData?.uuid || null,
+        origin_country: shipmentData?.origin_country || null,
+        origin_name: shipmentData?.origin_name || null,
+        destination_country: shipmentData?.destination_country || null,
+        destination_name: shipmentData?.destination_name || null,
+        transportation: shipmentData?.transportation || null,
         
         // Campos de compatibilidad para mantener la estructura existente
         originBid: null, // No se incluye información del shipment

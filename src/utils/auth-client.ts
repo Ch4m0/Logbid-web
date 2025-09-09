@@ -93,8 +93,6 @@ export async function getUserProfileClient(userId: string) {
 // Función para actualizar el perfil del usuario
 export async function updateUserProfile(userId: string, updates: any) {
     try {
-      
-        
         const { data: profile, error } = await supabase
             .from('profiles')
             .update(updates)
@@ -107,7 +105,6 @@ export async function updateUserProfile(userId: string, updates: any) {
             return { profile: null, error: error.message }
         }
 
-    
         return { profile, error: null }
     } catch (error) {
         console.error('💥 Unexpected error updating profile:', error)

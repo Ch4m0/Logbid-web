@@ -64,7 +64,7 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
     <>
       {/* Sidebar for desktop */}
       <div className={`
-        fixed left-0 top-0 w-[18rem] h-screen border-r border-blue-200 z-40
+        fixed left-0 top-0 w-[16rem] h-screen border-r border-blue-200 z-40
         hidden lg:block
       `}
       style={{ background: 'linear-gradient(90deg, #4916A2 50%, #4A57D9 100%)' }}>
@@ -81,7 +81,7 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
 
       {/* Sidebar for mobile/tablet */}
       <div className={`
-        fixed left-0 top-0 w-[280px] sm:w-[320px] border-r border-blue-200 z-40
+        fixed left-0 top-0 w-[240px] sm:w-[280px] border-r border-blue-200 z-40
         lg:hidden transform transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         flex flex-col h-screen

@@ -1,63 +1,48 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/src/utils/supabase/client'
-import useAuthStore from '@/src/store/authStore'
 
-// Hook para suscribirse a shipments en tiempo real
-export const useRealtimeShipments = () => {
-  const profile = useAuthStore((state) => state.profile)
+export const useRealtimeShipments = (marketId: string | null) => {
   const queryClient = useQueryClient()
   const [isConnected, setIsConnected] = useState(false)
 
+  const invalidateShipments = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['bidListByMarket'] })
+    queryClient.invalidateQueries({ queryKey: ['shipments'] })
+    queryClient.invalidateQueries({ queryKey: ['bidList'] })
+  }, [queryClient, marketId])
+
   useEffect(() => {
-    if (!profile?.id) return
+    if (!marketId) return
+
     
-    // Crear canal de Supabase Realtime
     const channel = supabase
-      .channel('shipments')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'shipments'
-        },
-                 (payload) => {
-           
-           // Invalidar queries para que se refresquen automáticamente
-           queryClient.invalidateQueries({ queryKey: ['shipments'] })
-           queryClient.invalidateQueries({ queryKey: ['bidListByMarket'] })
-           queryClient.invalidateQueries({ queryKey: ['bidList'] })
-           
-         }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'shipments'
-        },
+      .channel('shipments-simple')
+      .on('postgres_changes', 
+        { event: 'INSERT', schema: 'public', table: 'shipments' },
         (payload) => {
-          
-          // Invalidar queries para actualizar los cambios
-          queryClient.invalidateQueries({ queryKey: ['shipments'] })
-          queryClient.invalidateQueries({ queryKey: ['bidListByMarket'] })
-          queryClient.invalidateQueries({ queryKey: ['shipment', payload.new.uuid] })
-          
+          invalidateShipments()
+        }
+      )
+      .on('postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'shipments' },
+        (payload) => {
+          invalidateShipments()
         }
       )
       .subscribe((status) => {
         setIsConnected(status === 'SUBSCRIBED')
+        
+        if (status !== 'SUBSCRIBED') {
+          console.error('❌ Error canal shipments:', status)
+        }
       })
 
-    // Cleanup al desmontar
     return () => {
-      supabase.removeChannel(channel)
-      setIsConnected(false)
+      channel.unsubscribe()
     }
-  }, [profile?.id, queryClient])
+  }, [marketId, invalidateShipments])
 
   return { isConnected }
 } 

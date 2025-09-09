@@ -25,17 +25,18 @@ export function OfferConfirmationDialog(offerData: any) {
  
   const handleConfirm = () => {
     console.log('offerData', offerData)
+    console.log(  { bid_id: offerData.shipment_uuid, offer_id: offerData.uuid })
     setIsConfirming(true)
     console.log('Abriendo modal')
     closeBid(
-      { bid_id: offerData.bidId, offer_id: offerData.id },
+      { bid_id: offerData.shipment_uuid, offer_id: offerData.uuid },
       {
         onSuccess: (res) => {
           console.log('Subasta cerrada correctamente')
 
           // Enviar emails de notificación
           sendEmails(
-            { bid_id: offerData.bidId, offer_id: offerData.id },
+            { bid_id: offerData.shipment_uuid, offer_id: offerData.uuid },
             {
               onSuccess: (emailRes) => {
                 console.log('✅ Emails enviados exitosamente:', emailRes)
@@ -47,7 +48,7 @@ export function OfferConfirmationDialog(offerData: any) {
             }
           )
 
-          router.push(`confirmation-bid?market=${market}&shipment=${offerData.shipment_uuid}&offer=${offerData.uuid}`)
+          router.push(`/confirmation-bid?market=${market}&shipment=${offerData.shipment_uuid}&offer=${offerData.uuid}`)
           modalService.closeModal()
         },
         onError: () => {
@@ -75,10 +76,10 @@ export function OfferConfirmationDialog(offerData: any) {
     <CardContent className="space-y-4 overflow-y-auto flex-1 pr-2">
       <div className="flex justify-between items-center">
         <Badge variant="outline" className="text-sm font-medium border-2 border-primary px-3 py-1">
-          {offerData.codeBid}
+          {offerData.uuid}
         </Badge>
         <Badge
-          className={offerData.status === "Active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}
+          className={offerData.status === "pending" ? "bg-yellow-100 text-yellow-800" : "bg-gray-100 text-gray-800"}
         >
           {offerData.status}
         </Badge>

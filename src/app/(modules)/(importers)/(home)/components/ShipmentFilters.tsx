@@ -5,7 +5,7 @@ import { Input } from '@/src/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/src/components/ui/select'
 import { Calendar } from '@/src/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/src/components/ui/popover'
-import { CalendarIcon, ArrowUpDown, X, Filter } from 'lucide-react'
+import { CalendarIcon, X, Filter } from 'lucide-react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { useState } from 'react'
@@ -26,7 +26,6 @@ interface ShipmentFiltersProps {
     offers_count: string
   }
   onFilterChange: (key: string, value: string) => void
-  onSort: (key: string) => void
   shouldShowStatusElements: boolean
   onApplyFilters?: () => void
   onClearFilters?: () => void
@@ -36,7 +35,6 @@ export function ShipmentFilters({
   shipmentList = [],
   filters,
   onFilterChange,
-  onSort,
   shouldShowStatusElements,
   onApplyFilters,
   onClearFilters
@@ -101,119 +99,90 @@ export function ShipmentFilters({
           )}
         </div>
 
-        <div className="space-y-6">
-          {/* First Row: Origin and Destination */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* Origin */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">
+        {/* Horizontal Filters Layout */}
+        <div className="overflow-x-auto">
+          <div className="flex gap-4 pb-2 min-w-max">
+            {/* Origin Filter */}
+            <div className="flex-1 min-w-0">
+              <label className="text-xs font-medium text-muted-foreground block mb-1.5">
                 {t('cargoList.origin')}
               </label>
-              <div className="flex items-center gap-1 flex-wrap sm:flex-nowrap">
-                <div className="w-full min-w-0">
-                  <Select
-                    value={filters.origin}
-                    onValueChange={(value) => onFilterChange('origin', value)}
-                  >
-                    <SelectTrigger className="w-full truncate">
-                      <SelectValue placeholder={t('filters.filterOrigin')} />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-[300px] min-w-[300px]">
-                      <SelectItem value="all">{t('common.all')}</SelectItem>
-                      {uniqueOrigins.map((origin) => (
-                        <SelectItem 
-                          key={origin} 
-                          value={origin} 
-                          className="break-words whitespace-normal py-2 min-h-[32px]"
-                        >
-                          {origin}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex gap-1 flex-shrink-0">
-                  {filters.origin && filters.origin !== 'all' && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => clearFilter('origin')}
-                      className="h-10 w-10 hover:text-destructive"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
+              <div className="flex items-center gap-1">
+                <Select
+                  value={filters.origin}
+                  onValueChange={(value) => onFilterChange('origin', value)}
+                >
+                  <SelectTrigger className="w-full h-8 text-xs">
+                    <SelectValue placeholder={t('filters.filterOrigin')} />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px] min-w-[300px]">
+                    <SelectItem value="all">{t('common.all')}</SelectItem>
+                    {uniqueOrigins.map((origin) => (
+                      <SelectItem
+                        key={origin}
+                        value={origin}
+                        className="break-words whitespace-normal py-2 min-h-[32px]"
+                      >
+                        {origin}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {filters.origin && filters.origin !== 'all' && (
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => onSort('origin')}
-                    className="h-10 w-10"
+                    onClick={() => clearFilter('origin')}
+                    className="h-8 w-8 hover:text-destructive flex-shrink-0"
                   >
-                    <ArrowUpDown className="h-4 w-4" />
+                    <X className="h-3 w-3" />
                   </Button>
-                </div>
+                )}
               </div>
             </div>
 
-            {/* Destination */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">
+            {/* Destination Filter */}
+            <div className="flex-1 min-w-0">
+              <label className="text-xs font-medium text-muted-foreground block mb-1.5">
                 {t('cargoList.destination')}
               </label>
-              <div className="flex items-center gap-1 flex-wrap sm:flex-nowrap">
-                <div className="w-full min-w-0">
-                  <Select
-                    value={filters.destination}
-                    onValueChange={(value) => onFilterChange('destination', value)}
-                  >
-                    <SelectTrigger className="w-full truncate">
-                      <SelectValue placeholder={t('filters.filterDestination')} />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-[300px] min-w-[300px]">
-                      <SelectItem value="all">{t('common.all')}</SelectItem>
-                      {uniqueDestinations.map((destination) => (
-                        <SelectItem 
-                          key={destination} 
-                          value={destination} 
-                          className="break-words whitespace-normal py-2 min-h-[32px]"
-                        >
-                          {destination}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex gap-1 flex-shrink-0">
-                  {filters.destination && filters.destination !== 'all' && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => clearFilter('destination')}
-                      className="h-10 w-10 hover:text-destructive"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
+              <div className="flex items-center gap-1">
+                <Select
+                  value={filters.destination}
+                  onValueChange={(value) => onFilterChange('destination', value)}
+                >
+                  <SelectTrigger className="w-full h-8 text-xs">
+                    <SelectValue placeholder={t('filters.filterDestination')} />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px] min-w-[300px]">
+                    <SelectItem value="all">{t('common.all')}</SelectItem>
+                    {uniqueDestinations.map((destination) => (
+                      <SelectItem
+                        key={destination}
+                        value={destination}
+                        className="break-words whitespace-normal py-2 min-h-[32px]"
+                      >
+                        {destination}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {filters.destination && filters.destination !== 'all' && (
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => onSort('destination')}
-                    className="h-10 w-10"
+                    onClick={() => clearFilter('destination')}
+                    className="h-8 w-8 hover:text-destructive flex-shrink-0"
                   >
-                    <ArrowUpDown className="h-4 w-4" />
+                    <X className="h-3 w-3" />
                   </Button>
-                </div>
+                )}
               </div>
             </div>
-          </div>
 
-          <Separator className="my-6" />
-
-          {/* Second Row: Creation Date and Expiration Date */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* Creation Date */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">
+            {/* Creation Date Filter */}
+            <div className="flex-1 min-w-0 max-w-40">
+              <label className="text-xs font-medium text-muted-foreground block mb-1.5">
                 {t('cargoList.creationDate')}
               </label>
               <div className="flex items-center gap-1">
@@ -221,13 +190,13 @@ export function ShipmentFilters({
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-start text-left font-normal"
+                      className="w-full h-8 justify-start text-left font-normal text-xs px-2"
                     >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      <CalendarIcon className="mr-1 h-3 w-3" />
                       {creationDate ? (
-                        format(creationDate, 'PPP', { locale: es })
+                        format(creationDate, 'dd/MM', { locale: es })
                       ) : (
-                        <span className="text-muted-foreground">{t('filters.filterCreationDate')}</span>
+                        <span className="text-muted-foreground text-xs">Fecha</span>
                       )}
                     </Button>
                   </PopoverTrigger>
@@ -248,17 +217,17 @@ export function ShipmentFilters({
                     variant="ghost"
                     size="icon"
                     onClick={() => clearFilter('inserted_at')}
-                    className="h-10 w-10 hover:text-destructive flex-shrink-0"
+                    className="h-8 w-8 hover:text-destructive flex-shrink-0"
                   >
-                    <X className="h-4 w-4" />
+                    <X className="h-3 w-3" />
                   </Button>
                 )}
               </div>
             </div>
 
-            {/* Expiration Date */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">
+            {/* Expiration Date Filter */}
+            <div className="flex-1 min-w-0 max-w-40">
+              <label className="text-xs font-medium text-muted-foreground block mb-1.5">
                 {t('cargoList.expirationDate')}
               </label>
               <div className="flex items-center gap-1">
@@ -266,13 +235,13 @@ export function ShipmentFilters({
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-start text-left font-normal"
+                      className="w-full h-8 justify-start text-left font-normal text-xs px-2"
                     >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      <CalendarIcon className="mr-1 h-3 w-3" />
                       {expirationDate ? (
-                        format(expirationDate, 'PPP', { locale: es })
+                        format(expirationDate, 'dd/MM', { locale: es })
                       ) : (
-                        <span className="text-muted-foreground">{t('filters.filterExpirationDate')}</span>
+                        <span className="text-muted-foreground text-xs">Fecha</span>
                       )}
                     </Button>
                   </PopoverTrigger>
@@ -293,116 +262,31 @@ export function ShipmentFilters({
                     variant="ghost"
                     size="icon"
                     onClick={() => clearFilter('expiration_date')}
-                    className="h-10 w-10 hover:text-destructive flex-shrink-0"
+                    className="h-8 w-8 hover:text-destructive flex-shrink-0"
                   >
-                    <X className="h-4 w-4" />
+                    <X className="h-3 w-3" />
                   </Button>
                 )}
               </div>
             </div>
-          </div>
-
-          <Separator className="my-6" />
-
-          {/* Third Row: Transaction ID and Number of Offers */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* Transaction ID */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">
-                {t('cargoList.transactionId')}
-              </label>
-              <div className="flex items-center gap-1 flex-wrap sm:flex-nowrap">
-                <div className="w-full min-w-0">
-                  <Select
-                    value={filters.uuid}
-                    onValueChange={(value) => onFilterChange('uuid', value)}
-                  >
-                    <SelectTrigger className="w-full truncate">
-                      <SelectValue placeholder={t('filters.filterId')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">{t('common.all')}</SelectItem>
-                      {uniqueUuids.map((uuid) => (
-                        <SelectItem key={uuid} value={uuid}>
-                          {uuid.substring(0, 20)}...
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex gap-1 flex-shrink-0">
-                  {filters.uuid && filters.uuid !== 'all' && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => clearFilter('uuid')}
-                      className="h-10 w-10 hover:text-destructive"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onSort('uuid')}
-                    className="h-10 w-10"
-                  >
-                    <ArrowUpDown className="h-4 w-4" />
-                  </Button>
-                </div>
+            
+            {/* Apply Filters Button */}
+            {onApplyFilters && (
+              <div className="flex-shrink-0 w-28">
+                <label className="text-xs font-medium text-muted-foreground block mb-1.5">
+                  &nbsp;
+                </label>
+                <Button
+                  onClick={onApplyFilters}
+                  className="w-full h-8 text-xs"
+                >
+                  <Filter className="h-3 w-3 mr-1" />
+                  {t('common.filter')}
+                </Button>
               </div>
-            </div>
-
-            {/* Number of Offers */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">
-                {t('cargoList.offersCount')}
-              </label>
-              <div className="flex items-center gap-1">
-                <Input
-                  type="number"
-                  value={filters.offers_count || ''}
-                  onChange={(e) => onFilterChange('offers_count', e.target.value)}
-                  placeholder={t('filters.filterOffersCount')}
-                  className="w-full"
-                />
-                <div className="flex gap-1 flex-shrink-0">
-                  {filters.offers_count && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => clearFilter('offers_count')}
-                      className="h-10 w-10 hover:text-destructive"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onSort('offers_count')}
-                    className="h-10 w-10"
-                  >
-                    <ArrowUpDown className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
-
-        {/* Botón de filtrar */}
-        {onApplyFilters && (
-          <div className="flex justify-center mt-6 pt-4 border-t">
-            <Button
-              onClick={onApplyFilters}
-              className="w-full sm:w-auto px-8"
-            >
-              <Filter className="h-4 w-4 mr-2" />
-              {t('common.filter')}
-            </Button>
-          </div>
-        )}
       </CardContent>
     </Card>
   )

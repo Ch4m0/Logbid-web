@@ -44,6 +44,7 @@ const ConfirmationPage = () => {
   
   const shipment = searchParams?.get('shipment')
   const offer = searchParams?.get('offer')
+  console.log(offer, 'offer')
   
   const { data: offerData } = useGetOfferById({ offer_id: offer || null })
   const { data: shipmentData } = useGetShipment({ shipment_id: shipment || null })

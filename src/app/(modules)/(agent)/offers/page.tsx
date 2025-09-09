@@ -8,12 +8,14 @@ import { modalService } from "@/src/service/modalService"
 import useAuthStore from "@/src/store/authStore"
 import { ArrowLeft, DollarSign } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Suspense, useCallback, useMemo, useState, useEffect } from "react"
+import { Suspense, useCallback, useMemo, useState } from "react"
 import Pagination from "../../common/components/pagination/Pagination"
 import AdvancedFilters from "./components/AdvancedFilters"
 import BidInfo from "./components/BidInfo"
 import OfferCard from "./components/OfferCard"
 import ProposalModal from "./components/ProposalModal"
+import { useRealtimeOffers } from "@/src/hooks/useRealtimeOffers"
+import { useGetOffersByShipment } from "@/src/app/hooks/useGetOffersByShipment"
 
 const OffersPageContent = () => {
   const { t } = useTranslation()
@@ -22,29 +24,26 @@ const OffersPageContent = () => {
   const router = useRouter()
 
   const shipment_id = searchParams.get('shipment_id')
-  const market_id = searchParams.get('market')
 
   const { mutate: createOffer } = useCreateOffer()
   const { data: bidDataForAgent, isPending: loading, refetch: refetchShipment } = useGetShipment({ shipment_id })
+  const { data: listOffers = [] } = useGetOffersByShipment({ shipment_id })
+  console.log('listOffers', listOffers)
+
+  const offersData = Array.isArray(listOffers) ? null : listOffers
+  const bidDataForAgentWithShipmentPrice = { 
+    ...bidDataForAgent, 
+    lowestPrice: offersData?.lowestPrice, 
+    lastPrice: offersData?.lastPrice, 
+    offersCount: offersData?.offersCount || 0
+  }
+
+  // Hook de realtime para actualizar ofertas y estado del shipment
+  const { isConnected } = useRealtimeOffers(shipment_id)
+  console.log('isConnected', isConnected)
 
   // Use the actual shipping type from the shipment data, fallback to URL param
-  const shippingType = bidDataForAgent?.shipping_type
-
-  // Efecto para redirigir cuando el shipment sea aceptado (estado 'Closed')
-  /*useEffect(() => {
-    if (bidDataForAgent?.status === 'Closed') {
-      toast({
-        title: t('agentOffers.shipmentClosed'),
-        description: t('agentOffers.shipmentClosedMessage'),
-        variant: "default",
-      })
-      
-      // Redirigir a la lista de ofertas después de un breve delay para que el usuario vea la notificación
-      setTimeout(() => {
-        router.push(`/bid_list?market=${market_id}&status=WithoutOffers`)
-      }, 2000) 
-    } 
-  }, [bidDataForAgent?.status, router, t]) */
+  const shippingType = bidDataForAgentWithShipmentPrice?.shipping_type
 
   const currentPage = Number(searchParams.get("page")) || 1
   const [sort, setSort] = useState({ key: "id", order: "asc" })
@@ -91,7 +90,6 @@ const OffersPageContent = () => {
 
   // Manejar la creación de ofertas
   const handleCreateOffer = (value: any) => {
-    console.log(value, "value")
     sendOffer(value)
   }
 
@@ -103,16 +101,9 @@ const OffersPageContent = () => {
     }))
   }
 
-  // Cerrar modal de confirmación
-  const closeConfirm = () => {
-    modalService.closeModal()
-  }
-
   // Enviar una nueva oferta
   const sendOffer = async (info: any) => {
-    console.log(JSON.stringify(info), "info")
-    
-    if (!bidDataForAgent) {
+    if (!bidDataForAgentWithShipmentPrice) {
       console.error('No bid data available')
       toast({
         title: t('agentOffers.error'),
@@ -185,7 +176,7 @@ const OffersPageContent = () => {
 
       // Si todas las validaciones pasan, crear la oferta
       createOffer(
-        { ...info, bid_id: bidDataForAgent.id, agent_id: user?.id },
+        { ...info, bid_id: bidDataForAgentWithShipmentPrice.id, agent_id: user?.id },
         {
           onSuccess: () => {
             console.log("Oferta creada exitosamente")
@@ -315,14 +306,10 @@ const OffersPageContent = () => {
     });
   }, [sort]);
 
-  // Optimización con useMemo
-  const filteredOffers = useMemo(() => {
-    return filterOffers(bidDataForAgent?.offers || []);
-  }, [bidDataForAgent?.offers, filters, filterOffers]);
-
-  const sortedOffers = useMemo(() => {
-    return sortOffers(filteredOffers);
-  }, [filteredOffers, sort, sortOffers]);
+  // Aplicar filtros y ordenamiento
+  const offers = offersData?.offers || []
+  const filteredOffers = filterOffers(offers)
+  const sortedOffers = sortOffers(filteredOffers)
 
   const paginatedList = useMemo(() => {
     return sortedOffers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -341,11 +328,13 @@ const OffersPageContent = () => {
       <Card className="w-full">
         <CardHeader>
           <div className="flex items-center justify-between flex-wrap gap-4">
-            <h2 className="text-xl font-bold">{t('agentOffers.auctionInfo')}: {bidDataForAgent?.uuid || 'Loading...'}</h2>
-            {bidDataForAgent?.status !== 'Closed' && (
+            <div className="flex items-center gap-3">
+              <h2 className="text-xl font-bold">{t('agentOffers.auctionInfo')}: {bidDataForAgentWithShipmentPrice?.uuid || 'Loading...'}</h2>
+            </div>
+            {bidDataForAgentWithShipmentPrice?.status !== 'Closed' && (
               <ProposalModal 
                 shippingType={shippingType}
-                bidDataShippingType={bidDataForAgent?.shipping_type || shippingType}
+                bidDataShippingType={bidDataForAgentWithShipmentPrice?.shipping_type || shippingType}
                 bidDataForAgent={bidDataForAgent}
                 onSubmit={handleCreateOffer}
               />
@@ -353,13 +342,13 @@ const OffersPageContent = () => {
           </div>
           
           <div className="grid gap-2 pb-6 mt-4">
-            {bidDataForAgent && (<BidInfo bidDataForAgent={bidDataForAgent} />)}
+            {bidDataForAgentWithShipmentPrice && (<BidInfo bidDataForAgent={bidDataForAgentWithShipmentPrice} />)}
           </div>
 
           {/* Banner de advertencia para shipments cerrados o expirados */}
-          {bidDataForAgent && (
+          {bidDataForAgentWithShipmentPrice && (
             <>
-              {(bidDataForAgent.status === 'Closed' || bidDataForAgent.status === 'Cancelled') && (
+              {(bidDataForAgentWithShipmentPrice.status === 'Closed' || bidDataForAgentWithShipmentPrice.status === 'Cancelled') && (
                 <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                   <div className="flex items-center gap-3">
                     <div className="h-8 w-8 bg-red-100 rounded-full flex items-center justify-center">
@@ -377,7 +366,7 @@ const OffersPageContent = () => {
                 </div>
               )}
 
-              {bidDataForAgent.expiration_date && new Date(bidDataForAgent.expiration_date) < new Date() && (
+              {bidDataForAgentWithShipmentPrice.expiration_date && new Date(bidDataForAgentWithShipmentPrice.expiration_date) < new Date() && (
                 <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
                   <div className="flex items-center gap-3">
                     <div className="h-8 w-8 bg-orange-100 rounded-full flex items-center justify-center">
@@ -406,7 +395,7 @@ const OffersPageContent = () => {
             handleFilterChange={handleFilterChange} 
             handleSort={handleSort} 
             resetFilters={resetFilters}
-            bidDataForAgent={bidDataForAgent}
+            bidDataForAgent={bidDataForAgentWithShipmentPrice}
           />
 
           {/* Estado de carga */}

@@ -1,0 +1,401 @@
+'use client'
+import { Button } from '@/src/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/src/components/ui/card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/src/components/ui/dropdown-menu'
+import { Input } from '@/src/components/ui/input'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/src/components/ui/table'
+import { useTranslation } from '@/src/hooks/useTranslation'
+import { convertToColombiaTime, formatDateUTCAsLocal, formatShippingDate } from '@/src/lib/utils'
+import useAuthStore from '@/src/store/authStore'
+import {
+  ArrowRight,
+  Loader2,
+  MoreVertical,
+  Plane,
+  Search,
+  Ship,
+  Truck,
+  X
+} from 'lucide-react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { ShipmentFilters } from './ShipmentFilters'
+
+// Hook personalizado para debounce
+const useDebounce = (value: string, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value)
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value)
+    }, delay)
+
+    return () => {
+      clearTimeout(handler)
+    }
+  }, [value, delay])
+
+  return debouncedValue
+}
+
+interface ShipmentTableProps {
+  title: string
+  subtitle: string
+  shipments: any[]
+  onShowFilters?: () => void
+  onCreateNew?: () => void
+  onExtendDeadline?: (
+    expiration_date: string,
+    origin: string,
+    destination: string,
+    id: string,
+    shipping_date?: string | null
+  ) => void
+  onCancelShipment?: (bid: any) => Promise<void>
+  onGoDetails?: (id: string) => void
+  checkingCancelId?: string | null
+  showCreateButton?: boolean
+  filterType?: 'withoutOffers' | 'withOffers' | 'closed'
+  createShipmentComponent?: React.ReactNode
+  isLoading?: boolean
+  // Props para filtros
+  filters?: {
+    uuid: string
+    origin: string
+    destination: string
+    inserted_at: string
+    expiration_date: string
+    value: string
+    offers_count: string
+  }
+  onFilterChange?: (key: string, value: string) => void
+  onApplyFilters?: () => void
+  onClearFilters?: () => void
+}
+
+// Function to get transport icon
+const getTransportIcon = (shippingType: string) => {
+  switch (shippingType) {
+    case '1':
+      return <Ship className="h-4 w-4 text-blue-600" />
+    case '2':
+      return <Plane className="h-4 w-4 text-blue-600" />
+    case 'Terrestre':
+      return <Truck className="h-4 w-4 text-blue-600" />
+    default:
+      return <Ship className="h-4 w-4 text-blue-600" />
+  }
+}
+
+export function ShipmentTable({
+  title,
+  subtitle,
+  shipments,
+  onShowFilters,
+  onCreateNew,
+  onExtendDeadline,
+  onCancelShipment,
+  onGoDetails,
+  checkingCancelId,
+  showCreateButton = true,
+  filterType = 'withoutOffers',
+  createShipmentComponent,
+  isLoading = false,
+  filters,
+  onFilterChange,
+  onApplyFilters,
+  onClearFilters
+}: ShipmentTableProps) {
+  const { t } = useTranslation()
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
+  const user = useAuthStore((state) => state.user)
+  
+  // Estado del buscador con persistencia en URL
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '')
+  
+  // Estado para mostrar/ocultar filtros
+  const [showFilters, setShowFilters] = useState(false)
+  
+  // Debounce del término de búsqueda (300ms de delay)
+  const debouncedSearchTerm = useDebounce(searchTerm, 300)
+  
+  // Actualizar URL cuando cambie el término de búsqueda (solo si tiene 3+ caracteres o está vacío)
+  useEffect(() => {
+    const currentSearchTerm = searchParams.get('search') || ''
+    
+    // Solo actualizar si el término de búsqueda realmente cambió
+    if (debouncedSearchTerm !== currentSearchTerm) {
+      const params = new URLSearchParams(searchParams)
+      if (debouncedSearchTerm && debouncedSearchTerm.length >= 3) {
+        params.set('search', debouncedSearchTerm)
+        // Resetear paginación cuando se hace una nueva búsqueda
+        params.set('page', '1')
+      } else {
+        params.delete('search')
+        // También resetear paginación cuando se limpia la búsqueda
+        params.set('page', '1')
+      }
+      router.replace(`${pathname}?${params.toString()}`)
+    }
+  }, [debouncedSearchTerm, router, pathname, searchParams])
+  
+
+  return (
+    <Card className="border-0 shadow-sm bg-gray-50">
+      <CardHeader className="pb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-2xl font-bold">{title}</CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
+          </div>
+          <div className="flex items-center space-x-2">
+            {filters && onFilterChange && (
+              <Button variant="outline" size="sm" onClick={() => setShowFilters(!showFilters)}>
+                <Search className="h-4 w-4 mr-2" />
+                {showFilters ? t('common.hideFilters') : t('common.showFilters')}
+              </Button>
+            )}
+            {createShipmentComponent}
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="mb-6 space-y-4">
+          <Input
+            placeholder={t('common.searchPlaceholder')}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="max-w-md"
+          />
+          
+          {/* Filtros integrados */}
+          {showFilters && filters && onFilterChange && (
+            <ShipmentFilters
+              shipmentList={shipments}
+              filters={filters}
+              onFilterChange={onFilterChange}
+              shouldShowStatusElements={true}
+              onApplyFilters={onApplyFilters}
+              onClearFilters={onClearFilters}
+            />
+          )}
+        </div>
+        <div className="overflow-x-auto bg-white">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-white">
+                <TableHead className="w-[80px] min-w-[80px]">{t('common.type')}</TableHead>
+                <TableHead className="w-[120px] min-w-[120px]">ID</TableHead>
+                <TableHead className="w-[180px] min-w-[180px]">{t('cargoList.origin')}</TableHead>
+                <TableHead className="w-[30px] min-w-[30px]"></TableHead>
+                <TableHead className="w-[180px] min-w-[180px]">{t('cargoList.destination')}</TableHead>
+                <TableHead className="w-[120px] min-w-[120px]">{t('cargoList.creation')}</TableHead>
+                <TableHead className="w-[120px] min-w-[120px]">{t('cargoList.finalization')}</TableHead>
+                <TableHead className="w-[110px] min-w-[110px]">{t('cargoList.shipping')}</TableHead>
+                <TableHead className="w-[80px] min-w-[80px] sticky right-0 bg-white border-l-2 border-gray-200 z-10">{t('common.actions')}</TableHead>
+              </TableRow>
+            </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={9} className="text-center py-8">
+                  <div className="flex items-center justify-center space-x-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="text-muted-foreground">{t('common.loading')}</span>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : (
+              shipments.map((shipment: any) => (
+              <TableRow 
+                key={shipment.id} 
+                className="hover:bg-gray-50 cursor-pointer"
+                onClick={() => onGoDetails?.(shipment.uuid)}
+              >
+                {/* Tipo de Transporte */}
+                <TableCell>
+                  <div className="flex items-center space-x-2">
+                    {getTransportIcon(shipment.shipping_type || '1')}
+                    <span className="font-medium text-sm">{shipment.transportation}</span>
+                  </div>
+                </TableCell>
+
+                {/* ID y Ofertas */}
+                <TableCell>
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground font-mono">{shipment.uuid?.substring(0, 12)}...</p>
+                    {filterType !== 'withoutOffers' && (shipment.offers_count || 0) > 0 && (
+                      <div className="flex items-center space-x-1">
+                        <span className="text-blue-600 text-xs">👥</span>
+                        <span className="text-blue-600 font-medium text-xs">{shipment.offers_count} {t('cargoList.offers')}</span>
+                      </div>
+                    )}
+                  </div>
+                </TableCell>
+
+                {/* Origen */}
+                <TableCell>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-lg">{shipment.origin_flag || '🏳️'}</span>
+                    <div>
+                      <p className="font-medium text-sm">{shipment.origin}</p>
+                    </div>
+                  </div>
+                </TableCell>
+
+                {/* Flecha */}
+                <TableCell className="text-center">
+                  <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                </TableCell>
+
+                {/* Destino */}
+                <TableCell>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-lg">{shipment.destination_flag || '🏳️'}</span>
+                    <div>
+                      <p className="font-medium text-sm">{shipment.destination}</p>
+                    </div>
+                  </div>
+                </TableCell>
+
+                {/* Fecha de Inicio */}
+                <TableCell>
+                  <p className="text-sm font-mono">{convertToColombiaTime(shipment.inserted_at)}</p>
+                </TableCell>
+
+                {/* Cierre de Subasta */}
+                <TableCell>
+                  <p className="text-sm font-mono">{formatDateUTCAsLocal(shipment.expiration_date)}</p>
+                </TableCell>
+
+                {/* Fecha de Embarque */}
+                <TableCell>
+                  <p className="text-sm font-mono">
+                    {shipment.shipping_date ? formatShippingDate(shipment.shipping_date) : 'N/A'}
+                  </p>
+                </TableCell>
+
+                <TableCell className="sticky right-0 bg-white border-l-2 border-gray-200 z-10">
+                  {filterType !== 'closed' && shipment.status !== 'Cancelled' ? (
+                    <div className="flex items-center space-x-2">
+                      {/* Si el usuario es agente y el shipment está activo, mostrar solo botón Cotizar */}
+                      {user?.profile?.role === 'agent' && shipment.status === 'Active' ? (
+                        <Button 
+                          variant="default" 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            const marketId = searchParams.get('market') || user?.all_markets?.[0]?.id?.toString()
+                            const shippingType = searchParams.get('shipping_type') || '1'
+                            router.push(`/offers?shipment_id=${shipment.uuid}&market=${marketId}&shipping_type=${shippingType}`)
+                          }}
+                        >
+                          {t('common.quote')}
+                        </Button>
+                      ) : (
+                        /* Dropdown menu original para importadores o otros casos */
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem 
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                if (onGoDetails) {
+                                  onGoDetails(shipment.uuid)
+                                }
+                              }}
+                            >
+                              {t('common.showDetails')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                if (onExtendDeadline) {
+                                  onExtendDeadline(
+                                    shipment.expiration_date,
+                                    shipment.origin,
+                                    shipment.destination,
+                                    shipment.id.toString(),
+                                    shipment.shipping_date
+                                  )
+                                }
+                              }}
+                            >
+                              {t('common.extend')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              className="text-destructive"
+                              disabled={checkingCancelId === shipment.id.toString()}
+                              onClick={async (e) => {
+                                e.stopPropagation()
+                                if (onCancelShipment) {
+                                  await onCancelShipment(shipment)
+                                }
+                              }}
+                            >
+                              {checkingCancelId === shipment.id.toString() ? (
+                                <span className="flex items-center gap-2">
+                                  <Loader2 className="h-3 w-3 animate-spin" />
+                                  {t('cancelShipment.checkingOffers')}
+                                </span>
+                              ) : (
+                                t('common.cancel')
+                              )}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 text-red-700">
+                      <X className="h-4 w-4" />
+                      <span className="text-xs font-medium">
+                        {t('cargoList.cancelled')}
+                      </span>
+                    </div>
+                  )}
+                </TableCell>
+              </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+        </div>
+        
+        {!isLoading && shipments.length === 0 && (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">
+              {debouncedSearchTerm.trim() 
+                ? t('common.noSearchResults') 
+                : t('cargoList.noCargoTripsMessage')
+              }
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}

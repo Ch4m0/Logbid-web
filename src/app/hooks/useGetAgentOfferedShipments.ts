@@ -3,8 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 
 interface Args {
   marketId: string | null
-  status: string
-  user_id: string | null  // Cambiado de number a string para UUIDs
+  agentId: string | null  // ID del agente para filtrar sus ofertas
   shippingType: string
   searchTerm?: string
   page?: number
@@ -19,10 +18,9 @@ interface Args {
   offersCountFilter?: string
 }
 
-export const useGetBidListByMarket = ({
+export const useGetAgentOfferedShipments = ({
   marketId,
-  status,
-  user_id,
+  agentId,
   shippingType,
   searchTerm,
   page = 1,
@@ -35,15 +33,14 @@ export const useGetBidListByMarket = ({
   uuidFilter,
   offersCountFilter,
 }: Args) => {
-  const result = useQuery({
-    queryKey: ['bidListByMarket', marketId, status, user_id, shippingType, searchTerm, page, limit, originFilter, destinationFilter, creationDateFilter, expirationDateFilter, uuidFilter, offersCountFilter, enabled],
+  return useQuery({
+    queryKey: ['agentOfferedShipments', marketId, agentId, shippingType, searchTerm, page, limit, originFilter, destinationFilter, creationDateFilter, expirationDateFilter, uuidFilter, offersCountFilter],
     queryFn: async () => {
       
-      // Llamar función de Supabase que devuelve el objeto completo con paginación
-      const { data, error } = await supabase.rpc('get_bid_list_by_market_paginated', {
+      // Llamar función de Supabase específica para ofertas del agente
+      const { data, error } = await supabase.rpc('get_agent_offered_shipments_paginated', {
         p_market_id: marketId,
-        p_status: status,
-        p_user_id: user_id,
+        p_agent_id: agentId,
         p_shipping_type: shippingType,
         p_search_term: searchTerm || null,
         p_page: page,
@@ -58,10 +55,9 @@ export const useGetBidListByMarket = ({
       })
       
       if (error) {
-        console.error('❌ Error en función get_bid_list_by_market_paginated:', error)
+        console.error('❌ Error en función get_agent_offered_shipments_paginated:', error)
         throw error
       }
-      
       
       // La función de Supabase devuelve directamente el objeto con la estructura:
       // {
@@ -76,12 +72,7 @@ export const useGetBidListByMarket = ({
       // }
       return data
     },
-    enabled: enabled && !!marketId,
+    enabled: enabled && !!marketId && !!agentId,
     staleTime: 1000 * 60 * 10, // 10 minutos
-    refetchOnWindowFocus: false,
-    retry: 1,
-    gcTime: 1000 * 60 * 30, // 30 minutos
   })
-
-  return result
 }

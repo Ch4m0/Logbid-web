@@ -33,7 +33,7 @@ export function CargaTransportListHistory() {
   const shippingType = searchParams.get('shipping_type') as any
 
   const { data: shipmentList } = useGetShipments({
-    user_id: profile?.id ? Number(profile.id) : null,
+    user_id: profile?.id || null,
     market_id: marketId,
     status: 'Closed',
     shipping_type: shippingType,

@@ -174,7 +174,8 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
           
           const shippingDate = new Date(value)
           const closingDate = new Date(fechaExpiracion)
-          return shippingDate >= closingDate
+          const minShippingDate = new Date(closingDate.getTime() + 24 * 60 * 60 * 1000) // Al menos 1 día después
+          return shippingDate >= minShippingDate
         }
       ),
     tipoMercancia: Yup.string()
@@ -523,6 +524,22 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
 
 
 
+  // Función para calcular la fecha mínima de embarque
+  const getMinShippingDate = () => {
+    if (!formik.values.fechaExpiracion) return new Date()
+    
+    // Parsear fecha manualmente para evitar problemas de zona horaria
+    const parts = formik.values.fechaExpiracion.split('-')
+    const year = parseInt(parts[0], 10)
+    const month = parseInt(parts[1], 10) - 1
+    const day = parseInt(parts[2], 10)
+    const closingDate = new Date(year, month, day)
+    
+    // Agregar 1 día
+    closingDate.setDate(closingDate.getDate() + 1)
+    return closingDate
+  }
+
   // Efecto para limpiar fecha de embarque si es anterior a la nueva fecha de cierre
   useEffect(() => {
     const { fechaExpiracion, fechaEmbarque } = formik.values
@@ -530,7 +547,8 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
       const closingDate = new Date(fechaExpiracion)
       const shippingDate = new Date(fechaEmbarque)
       
-      if (shippingDate < closingDate) {
+      const minShippingDate = new Date(closingDate.getTime() + 24 * 60 * 60 * 1000) // Al menos 1 día después
+      if (shippingDate < minShippingDate) {
         formik.setFieldValue('fechaEmbarque', '')
       }
     }
@@ -633,7 +651,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
 
         <SheetContent
           side="right"
-          className="w-full sm:max-w-lg md:max-w-2xl lg:max-w-3xl overflow-y-scroll"
+          className="w-full sm:max-w-md md:max-w-lg lg:max-w-xl overflow-y-scroll"
         >
           <SheetHeader className="px-3 md:px-6">
             <SheetTitle className="text-lg md:text-xl">{t('createCargo.title')}</SheetTitle>
@@ -1095,7 +1113,6 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                       </div>
                     )}
                   </div>
-
                   {(formik.values.tipoTransporte === '1' || formik.values.tipoTransporte === '2') && (
                     <div className="grid gap-1">
                       <Label htmlFor="fechaEmbarque" className="text-xs md:text-sm font-semibold text-gray-700">{t('createCargo.shippingDate')}</Label>
@@ -1103,7 +1120,7 @@ export default function CreateShipment({ onRefetch }: CreateShipmentProps = {}) 
                         value={formik.values.fechaEmbarque}
                         onChange={(date) => formik.setFieldValue('fechaEmbarque', date)}
                         placeholder={t('extendCargo.selectDate')}
-                        minDate={formik.values.fechaExpiracion ? new Date(formik.values.fechaExpiracion) : new Date()} // Usar fecha de cierre como mínimo
+                        minDate={getMinShippingDate()} // Día siguiente a la fecha de cierre
                         maxDate={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)} // Máximo 1 año en el futuro
                       />
                       {formik.errors.fechaEmbarque && formik.touched.fechaEmbarque && (

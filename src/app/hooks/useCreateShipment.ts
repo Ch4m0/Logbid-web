@@ -241,12 +241,14 @@ export const useCreateShipment = () => {
       return result.shipment
     },
     onSuccess: (data) => {
-      console.log('✅ SHIPMENT: Creado exitosamente, invalidando queries...')
-      // Invalidar queries relacionadas para refrescar la lista
+      console.log('✅ SHIPMENT: Creado exitosamente, forzando actualización global...')
+      // Invalidar TODAS las queries bidListByMarket para TODOS los agentes
+      queryClient.invalidateQueries({ 
+        predicate: (query) => query.queryKey[0] === 'bidListByMarket'
+      })
       queryClient.invalidateQueries({ queryKey: ['shipments'] })
       queryClient.invalidateQueries({ queryKey: ['bidList'] })
-      queryClient.invalidateQueries({ queryKey: ['bidListByMarket'] })
-      console.log('🔄 SHIPMENT: Queries invalidadas')
+      console.log('🔄 SHIPMENT: Actualización global forzada - todos los agentes verán el nuevo shipment')
       return data
     },
     onError: (error: Error) => {

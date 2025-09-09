@@ -4,9 +4,20 @@ import { BidStatus, ShippingType } from '@/src/models/common'
 
 interface Args {
   market_id: string | null
-  user_id: number | null
+  user_id: string | null  // Cambiar a string porque profile_id es UUID
   status: BidStatus
   shipping_type: ShippingType
+  filterType?: 'withoutOffers' | 'withOffers' | 'closed'
+  searchTerm?: string
+  page?: number
+  limit?: number
+  // Filtros adicionales opcionales
+  originFilter?: string
+  destinationFilter?: string
+  creationDateFilter?: string
+  expirationDateFilter?: string
+  uuidFilter?: string
+  offersCountFilter?: string
 }
 
 export const useGetShipments = ({
@@ -14,97 +25,60 @@ export const useGetShipments = ({
   market_id,
   status,
   shipping_type,
+  filterType,
+  searchTerm,
+  page = 1,
+  limit = 10,
+  originFilter,
+  destinationFilter,
+  creationDateFilter,
+  expirationDateFilter,
+  uuidFilter,
+  offersCountFilter,
 }: Args) => {
 
   return useQuery({
-    queryKey: ['shipments', user_id, market_id, status, shipping_type],
+    queryKey: ['shipments', user_id, market_id, status, shipping_type, filterType, searchTerm, page, limit, originFilter, destinationFilter, creationDateFilter, expirationDateFilter, uuidFilter, offersCountFilter],
     queryFn: async () => {
       
-      let query = supabase
-        .from('shipments')
-        .select(`
-          *,
-          offers(
-            id,
-            agent_code,
-            agent_id,
-            status,
-            shipping_type,
-            price,
-            details,
-            inserted_at
-          )
-        `)
-
-      // Filtrar por market_id si se proporciona
-      if (market_id) {
-        query = query.eq('market_id', market_id)
-      }
-
-      // Filtrar por profile_id (user_id) si se proporciona
-      if (user_id) {
-        query = query.eq('profile_id', user_id)
-      }
-
-      // Filtrar por status
-      if (status) {
-        if (status === 'Closed') {
-          // Para el historial, incluir tanto 'Closed' como 'Cancelled'
-          query = query.in('status', ['Closed', 'Cancelled'])
-        } else {
-          query = query.eq('status', status)
-        }
-      }
-
-      // Filtrar por shipping_type - mapear valores descriptivos a numéricos
-      if (shipping_type) {
-        query = query.eq('shipping_type', shipping_type)
-      }
-
-      // Ordenar por fecha de inserción descendente
-      query = query.order('inserted_at', { ascending: false })
-
-      const { data, error } = await query
-
+      // Llamar función de Supabase que devuelve el objeto completo con paginación
+      const { data, error } = await supabase.rpc('get_shipments_paginated', {
+        p_user_id: user_id,
+        p_market_id: market_id,
+        p_status: status,
+        p_shipping_type: shipping_type,
+        p_filter_type: filterType || 'all',
+        p_search_term: searchTerm || null,
+        p_page: page,
+        p_limit: limit,
+        // Filtros adicionales opcionales
+        p_origin_filter: originFilter || null,
+        p_destination_filter: destinationFilter || null,
+        p_creation_date_filter: creationDateFilter || null,
+        p_expiration_date_filter: expirationDateFilter || null,
+        p_uuid_filter: uuidFilter || null,
+        p_offers_count_filter: offersCountFilter || null
+      })
+      
       if (error) {
+        console.error('❌ Error en función get_shipments_paginated:', error)
         throw error
       }
-
-      console.log(data, "data")
-
-      // Transformar los datos para mantener compatibilidad con el modelo existente
-      return data?.map((shipment) => ({
-        id: shipment.id,
-        status: shipment.status,
-        uuid: shipment.uuid,
-        agent_code: shipment.agent_code,
-        origin_id: shipment.origin_id,
-        origin: `${shipment.origin_country} - ${shipment.origin_name}`,
-        origin_country: shipment.origin_country,
-        destination_id: shipment.destination_id,
-        destination: `${shipment.destination_country} - ${shipment.destination_name}`,
-        destination_country: shipment.destination_country,
-        transportation: shipment.transportation,
-        comex_type: shipment.comex_type,
-        expiration_date: shipment.expiration_date,
-        shipping_type: shipment.shipping_type,
-        shipping_date: shipment.shipping_date,
-        value: shipment.value,
-        currency: shipment.currency,
-        additional_info: shipment.additional_info,
-        user_id: shipment.profile_id,
-        market_id: shipment.market_id,
-        bid_details_id: shipment.shipment_details_id,
-        inserted_at: shipment.inserted_at,
-        last_price: shipment.offers?.length > 0 
-          ? Math.min(...shipment.offers.map((offer: any) => parseFloat(offer.price)))
-          : null,
-        offers_count: shipment.offers?.length || 0,
-        // Campos de cancelación
-        cancellation_reason: shipment.cancellation_reason,
-        cancelled_at: shipment.cancelled_at
-      })) || []
+      
+      // La función de Supabase devuelve directamente el objeto con la estructura:
+      // {
+      //   "data": [/* array de shipments */],
+      //   "pagination": {
+      //     "currentPage": 1,
+      //     "totalPages": 15,
+      //     "totalItems": 150,
+      //     "hasNext": true,
+      //     "hasPrev": false
+      //   }
+      // }
+      return data
     },
-   // 10 minutos
+    enabled: !!market_id, // Solo ejecutar si hay market_id
+    staleTime: 1000 * 60 * 10, // 10 minutos
   })
-} 
+}

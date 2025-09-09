@@ -8,20 +8,27 @@ import { Button } from '@/src/components/ui/button'
 import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react'
 import { useTranslation } from '@/src/hooks/useTranslation'
 
-export default function Pagination({ totalPages }: { totalPages: number }) {
+interface PaginationProps {
+  totalPages: number
+  currentPage: number
+  itemsPerPage: number
+  filterType?: 'withoutOffers' | 'withOffers' | 'closed'
+}
+
+export default function Pagination({ totalPages, currentPage, itemsPerPage, filterType }: PaginationProps) {
   const { t } = useTranslation()
   const pathName = usePathname()
   const searchParams = useSearchParams()
-  const currentPage = Number(searchParams.get('page')) || 1
+  
   const allPages = generatePagination(currentPage, totalPages)
 
   const createPageURL = (page: string | number) => {
     const params = new URLSearchParams(searchParams)
-    if (page !== undefined) {
-      params.set('page', page.toString())
-    } else {
-      params.set('page', '1')
-    }
+    
+    // Usar parámetros estándar page y limit
+    params.set('page', page.toString())
+    params.set('limit', itemsPerPage.toString())
+    
     return `${pathName}?${params.toString()}`
   }
 

@@ -29,7 +29,6 @@ import { cn } from '@/src/lib/utils'
 import { useRouter } from 'next/navigation'
 import { ProtectedRoute } from '@/src/components/ProtectedRoute'
 import useAuthStore from '@/src/store/authStore'
-import { RealtimeDebugger } from '@/src/components/RealtimeDebugger'
 
 export default function NotificationsPage() {
   const { 
@@ -163,7 +162,6 @@ export default function NotificationsPage() {
 
   return (
     <ProtectedRoute allowedRoles={['customer', 'agent']}>
-      {/*<RealtimeDebugger />*/}
       <div className="container mx-auto p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

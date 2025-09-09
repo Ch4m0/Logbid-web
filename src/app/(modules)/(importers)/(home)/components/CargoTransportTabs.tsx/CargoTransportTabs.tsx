@@ -1,5 +1,6 @@
 'use client'
-import { useEffect, useState } from 'react'
+import React from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Tabs,
   TabsContent,
@@ -21,38 +22,41 @@ export default function CargoTransportTabs({
   children3,
 }: CargoTransportTabsProps) {
   const { t } = useTranslation()
-  const [activeTab, setActiveTab] = useState('sin-propuestas')
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  
   const filterTypeChildren1 = children1.props.filterType
   const filterTypeChildren2 = children2.props.filterType
   const filterTypeChildren3 = children3.props.filterType
 
-  useEffect(() => {
-    try {
-      const searchParams = new URLSearchParams(window.location.search)
-
-      const filterParam = searchParams.get('filter')
-
-      if (filterParam === filterTypeChildren1) {
-        setActiveTab('sin-propuestas')
-
-      } else if (filterParam === filterTypeChildren2) {
-        setActiveTab('con-propuestas')
-
-      } else if (filterParam === filterTypeChildren3) {
-        setActiveTab('historico')
-
-      }
-    } catch (error) {
-      console.error('Error reading URL parameters:', error)
-    }
-  }, [filterTypeChildren1, filterTypeChildren2, filterTypeChildren3])
-
-  const changeUrl = (value: string) => {
-    const url = new URL(window.location.href)
-
-    url.searchParams.set('filter', value)
+  // Obtener el tab activo basado en el parámetro de la URL
+  const getActiveTabFromUrl = () => {
+    const filterParam = searchParams.get('filter')
     
-    window.history.pushState({}, '', url.toString())
+    if (filterParam === filterTypeChildren1) return 'sin-propuestas'
+    if (filterParam === filterTypeChildren2) return 'con-propuestas'  
+    if (filterParam === filterTypeChildren3) return 'historico'
+    
+    return 'sin-propuestas' // default
+  }
+
+  const currentActiveTab = getActiveTabFromUrl()
+
+  const handleTabChange = (tabValue: string) => {
+    let filterType = ''
+    
+    if (tabValue === 'sin-propuestas') filterType = filterTypeChildren1
+    else if (tabValue === 'con-propuestas') filterType = filterTypeChildren2
+    else if (tabValue === 'historico') filterType = filterTypeChildren3
+    
+    if (filterType) {
+      const params = new URLSearchParams(searchParams.toString())
+      params.set('filter', filterType)
+      params.set('page', '1') // Resetear paginación
+      params.delete('search') // Limpiar búsqueda al cambiar de tab
+      
+      router.push(`?${params.toString()}`)
+    }
   }
 
   return (
@@ -62,45 +66,27 @@ export default function CargoTransportTabs({
         <MenuHeader />
       </div>
       
-      <Tabs defaultValue={activeTab} value={activeTab} className="w-full">
+      <Tabs value={currentActiveTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-        <TabsTrigger
-          value="sin-propuestas"
-          onClick={() => {
-            setActiveTab('sin-propuestas')
-            if (filterTypeChildren1) {
-              changeUrl(filterTypeChildren1)
-            }
-          }}
-        >
-                        {t('cargoList.withoutOffers')}
-        </TabsTrigger>
-        <TabsTrigger
-          value="con-propuestas"
-          onClick={() => {
-            setActiveTab('con-propuestas')
-            if (filterTypeChildren2) {
-              changeUrl(filterTypeChildren2)
-            }
-          }}
-        >
-                        {t('cargoList.withOffers')}
-        </TabsTrigger>
-        <TabsTrigger
-          value="historico"
-          onClick={() => {
-            setActiveTab('historico')
-            if (filterTypeChildren3) {
-              changeUrl(filterTypeChildren3)
-            }
-          }}
-        >
-          {t('cargoList.history')}
-        </TabsTrigger>
-      </TabsList>
-      <TabsContent value="sin-propuestas">{children1}</TabsContent>
-      <TabsContent value="con-propuestas">{children2}</TabsContent>
-      <TabsContent value="historico">{children3}</TabsContent>
+          <TabsTrigger value="sin-propuestas">
+            {t('cargoList.withoutOffers')}
+          </TabsTrigger>
+          <TabsTrigger value="con-propuestas">
+            {t('cargoList.withOffers')}
+          </TabsTrigger>
+          <TabsTrigger value="historico">
+            {t('cargoList.history')}
+          </TabsTrigger>
+        </TabsList>
+      <TabsContent value="sin-propuestas" className="mt-6 p-6 bg-gray-50 rounded-lg border">
+        {children1}
+      </TabsContent>
+      <TabsContent value="con-propuestas" className="mt-6 p-6 bg-gray-50 rounded-lg border">
+        {children2}
+      </TabsContent>
+      <TabsContent value="historico" className="mt-6 p-6 bg-gray-50 rounded-lg border">
+        {children3}
+      </TabsContent>
       </Tabs>
     </div>
   )

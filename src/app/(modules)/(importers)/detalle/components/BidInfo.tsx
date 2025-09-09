@@ -46,97 +46,96 @@ const BidInfo = ({ bidDataForAgent }: any) => {
 
   return (
     <div className="bg-white rounded-lg shadow-md w-full mx-auto p-4 sm:p-6 overflow-hidden">
-      {/* Información de Ruta y Fechas Importantes */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
-        <div className="bg-gray-50 p-3 sm:p-4 rounded-md overflow-hidden">
-          <h3 className="font-bold text-base sm:text-lg mb-3 text-blue-700">{t('bidInfo.routeInformation')}</h3>
-          <div className="space-y-2 sm:space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[100px]">{t('bidInfo.origin')}:</span>
+      <div className="space-y-6">
+        {/* Información de Ruta */}
+        <div>
+          <h3 className="font-bold text-lg mb-4 text-blue-700 border-b border-blue-200 pb-2">{t('bidInfo.routeInformation')}</h3>
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.origin')}:</span>
               <span className="text-sm sm:text-base break-words overflow-wrap-anywhere w-full sm:flex-1 min-w-0">
                 {displayValue(bidDataForAgent.origin_country && bidDataForAgent.origin_name 
                   ? `${bidDataForAgent.origin_country} - ${bidDataForAgent.origin_name}` 
                   : null)}
               </span>
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[100px]">{t('bidInfo.destination')}:</span>
+            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.destination')}:</span>
               <span className="text-sm sm:text-base break-words overflow-wrap-anywhere w-full sm:flex-1 min-w-0">
                 {displayValue(bidDataForAgent.destination_country && bidDataForAgent.destination_name 
                   ? `${bidDataForAgent.destination_country} - ${bidDataForAgent.destination_name}` 
                   : null)}
               </span>
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[100px]">{t('bidInfo.shipmentType')}:</span>
+            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.shipmentType')}:</span>
               <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">{displayValue(getTransportTypeName(bidDataForAgent.shipping_type, t))}</span>
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[100px]">{t('bidInfo.transport')}:</span>
+            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.transport')}:</span>
               <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">{displayValue(bidDataForAgent.transportation)}</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-50 p-3 sm:p-4 rounded-md overflow-hidden">
-          <h3 className="font-bold text-base sm:text-lg mb-3 text-blue-700">{t('bidInfo.importantDates')}</h3>
-          <div className="space-y-2 sm:space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.startDate')}:</span>
+        {/* Fechas Importantes */}
+        <div>
+          <h3 className="font-bold text-lg mb-4 text-blue-700 border-b border-blue-200 pb-2">{t('bidInfo.importantDates')}</h3>
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.startDate')}:</span>
               <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">
                 {bidDataForAgent.inserted_at ? convertToColombiaTime(bidDataForAgent.inserted_at) : t('common.notSpecified')}
               </span>
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.endDate')}:</span>
+            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.endDate')}:</span>
               <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">
                 {bidDataForAgent.expiration_date ? formatDateUTCAsLocal(bidDataForAgent.expiration_date) : t('common.notSpecified')}
               </span>
             </div>
             {bidDataForAgent.shipping_date && (
-              <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-                <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.shippingDate')}:</span>
+              <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+                <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.shippingDate')}:</span>
                 <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">
                   {formatShippingDate(bidDataForAgent.shipping_date)}
                 </span>
               </div>
             )}
-            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.status')}:</span>
+            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.status')}:</span>
               <span className="inline-block px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs sm:text-sm max-w-full truncate">
                 {displayValue(bidDataForAgent.status)}
               </span>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Detalles de Mercancía y Información de Precio */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
-        <div className="bg-gray-50 p-3 sm:p-4 rounded-md overflow-hidden">
-          <h3 className="font-bold text-base sm:text-lg mb-3 text-blue-700">{t('bidInfo.merchandiseDetails')}</h3>
-          <div className="space-y-2 sm:space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.merchandiseType')}:</span>
+        {/* Detalles de Mercancía */}
+        <div>
+          <h3 className="font-bold text-lg mb-4 text-blue-700 border-b border-blue-200 pb-2">{t('bidInfo.merchandiseDetails')}</h3>
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.merchandiseType')}:</span>
               <span className="text-sm sm:text-base break-words overflow-wrap-anywhere w-full sm:flex-1 min-w-0">
                 {getMerchandiseValue('merchandise_type')}
               </span>
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.units')}:</span>
+            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.units')}:</span>
               <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">{getMerchandiseValue('units')}</span>
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.totalWeight')}:</span>
+            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.totalWeight')}:</span>
               <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">{getMerchandiseValue('total_weight')} {getMerchandiseValue('measure_type')}</span>
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.volume')}:</span>
+            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.volume')}:</span>
               <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">{getMerchandiseValue('volume')} m³</span>
             </div>
             {bidDataForAgent.tariff_item && (
-              <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-                <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.tariffItem')}:</span>
+              <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+                <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.tariffItem')}:</span>
                 <span className="text-sm sm:text-base break-words overflow-wrap-anywhere w-full sm:flex-1 min-w-0">
                   {bidDataForAgent.tariff_item}
                 </span>
@@ -145,32 +144,33 @@ const BidInfo = ({ bidDataForAgent }: any) => {
           </div>
         </div>
 
-        <div className="bg-gray-50 p-3 sm:p-4 rounded-md overflow-hidden">
-          <h3 className="font-bold text-base sm:text-lg mb-3 text-blue-700">{t('bidInfo.priceInformation')}</h3>
-          <div className="space-y-2 sm:space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.lowestPrice')}:</span>
+        {/* Información de Precio */}
+        <div>
+          <h3 className="font-bold text-lg mb-4 text-blue-700 border-b border-blue-200 pb-2">{t('bidInfo.priceInformation')}</h3>
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.lowestPrice')}:</span>
               <span className="text-sm sm:text-base font-semibold text-green-600 break-words w-full sm:flex-1 min-w-0">
                 {bidDataForAgent.currency && bidDataForAgent.lowestPrice 
                   ? `${bidDataForAgent.currency} ${bidDataForAgent.lowestPrice}` 
                   : t('common.notSpecified')}
               </span>
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.value')}:</span>
+            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.value')}:</span>
               <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">
                 {bidDataForAgent.currency && bidDataForAgent.value 
                   ? `${bidDataForAgent.currency} ${bidDataForAgent.value}` 
                   : t('common.notSpecified')}
               </span>
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.comexType')}:</span>
+            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.comexType')}:</span>
               <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">{displayValue(getTypeShipmentName(bidDataForAgent.comex_type, t))}</span>
             </div>
             {bidDataForAgent.offers && bidDataForAgent.offers.length > 0 && (
-              <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-                <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.offersCount')}:</span>
+              <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+                <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.offersCount')}:</span>
                 <span className="text-blue-600 font-semibold text-sm sm:text-base w-full sm:flex-1 min-w-0">
                   {bidDataForAgent.offers.length}
                 </span>
@@ -178,88 +178,61 @@ const BidInfo = ({ bidDataForAgent }: any) => {
             )}
           </div>
         </div>
-      </div>
 
-      {/* Información adicional si está disponible */}
-      {(bidDataForAgent.container_name || bidDataForAgent.incoterm_name || bidDataForAgent.dimensions) && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
-          <div className="bg-blue-50 p-3 sm:p-4 rounded-md overflow-hidden">
-            <h3 className="font-bold text-base sm:text-lg mb-3 text-blue-700">{t('bidInfo.additionalDetails')}</h3>
-            <div className="space-y-2 sm:space-y-3">
+        {/* Detalles Adicionales */}
+        {(bidDataForAgent.container_name || bidDataForAgent.incoterm_name || bidDataForAgent.dimensions) && (
+          <div>
+            <h3 className="font-bold text-lg mb-4 text-blue-700 border-b border-blue-200 pb-2">{t('bidInfo.additionalDetails')}</h3>
+            <div className="space-y-3">
               {bidDataForAgent.container_name && (
-                <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-                  <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.container')}:</span>
+                <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+                  <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.container')}:</span>
                   <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">{bidDataForAgent.container_name}</span>
                 </div>
               )}
               {bidDataForAgent.incoterm_name && (
-                <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-                  <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.incoterm')}:</span>
+                <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+                  <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.incoterm')}:</span>
                   <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">{bidDataForAgent.incoterm_name}</span>
                 </div>
               )}
               {bidDataForAgent.dimensions && (
-                <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-                  <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.dimensions')}:</span>
-                  <span className="text-xs sm:text-sm break-all font-mono bg-gray-100 p-1 rounded w-full sm:flex-1 min-w-0 overflow-hidden">
+                <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+                  <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.dimensions')}:</span>
+                  <span className="text-xs sm:text-sm break-all font-mono bg-gray-100 p-2 rounded w-full sm:flex-1 min-w-0 overflow-hidden">
                     {JSON.stringify(bidDataForAgent.dimensions)}
                   </span>
                 </div>
               )}
             </div>
           </div>
+        )}
 
-          {/* Identificación - siempre mostrar */}
-          <div className="bg-blue-50 p-3 sm:p-4 rounded-md overflow-hidden">
-            <h3 className="font-bold text-base sm:text-lg mb-3 text-blue-700">{t('bidInfo.identification')}</h3>
-            <div className="space-y-2 sm:space-y-3">
-              {bidDataForAgent.status === 'Closed' && bidDataForAgent.agent_code && (
-                <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-                  <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.agentCode')}:</span>
-                  <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">{bidDataForAgent.agent_code}</span>
-                </div>
-              )}
-              <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-                <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.shipmentId')}:</span>
-                <span className="font-mono text-xs sm:text-sm bg-gray-100 p-1 rounded break-all w-full sm:flex-1 min-w-0 overflow-hidden">
-                  {displayValue(bidDataForAgent.uuid)}
-                </span>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2">
-                <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[120px]">{t('bidInfo.dangerousCargo')}:</span>
-                <span className="text-sm sm:text-base w-full sm:flex-1 min-w-0">
-                  {bidDataForAgent.dangerous_march ? t('bidInfo.yes') : t('bidInfo.no')}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Mostrar identificación como sección individual si no hay detalles adicionales */}
-      {!(bidDataForAgent.container_name || bidDataForAgent.incoterm_name || bidDataForAgent.dimensions) && (
-        <div className="bg-blue-50 p-3 sm:p-4 rounded-md mb-4 sm:mb-6 overflow-hidden">
-          <h3 className="font-bold text-base sm:text-lg mb-3 text-blue-700">{t('bidInfo.identification')}</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
+        {/* Identificación */}
+        <div>
+          <h3 className="font-bold text-lg mb-4 text-blue-700 border-b border-blue-200 pb-2">{t('bidInfo.identification')}</h3>
+          <div className="space-y-3">
             {bidDataForAgent.status === 'Closed' && bidDataForAgent.agent_code && (
-              <div className="flex flex-col gap-1 min-w-0">
-                <span className="font-bold text-sm sm:text-base">{t('bidInfo.agentCode')}:</span>
-                <span className="text-sm sm:text-base break-words">{bidDataForAgent.agent_code}</span>
+              <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+                <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.agentCode')}:</span>
+                <span className="text-sm sm:text-base break-words w-full sm:flex-1 min-w-0">{bidDataForAgent.agent_code}</span>
               </div>
             )}
-            <div className="flex flex-col gap-1 min-w-0">
-              <span className="font-bold text-sm sm:text-base">{t('bidInfo.shipmentId')}:</span>
-              <span className="font-mono text-xs sm:text-sm bg-gray-100 p-1 rounded break-all overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.shipmentId')}:</span>
+              <span className="font-mono text-xs sm:text-sm bg-gray-100 p-2 rounded break-all w-full sm:flex-1 min-w-0 overflow-hidden">
                 {displayValue(bidDataForAgent.uuid)}
               </span>
             </div>
-            <div className="flex flex-col gap-1 min-w-0">
-              <span className="font-bold text-sm sm:text-base">{t('bidInfo.dangerousCargo')}:</span>
-              <span className="text-sm sm:text-base">{bidDataForAgent.dangerous_march ? t('bidInfo.yes') : t('bidInfo.no')}</span>
+            <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
+              <span className="font-bold text-sm sm:text-base shrink-0 w-full sm:w-auto sm:min-w-[140px]">{t('bidInfo.dangerousCargo')}:</span>
+              <span className="text-sm sm:text-base w-full sm:flex-1 min-w-0">
+                {bidDataForAgent.dangerous_march ? t('bidInfo.yes') : t('bidInfo.no')}
+              </span>
             </div>
           </div>
         </div>
-      )}
+      </div>
 
       {/* Lista de empaque si está disponible */}
       {bidDataForAgent.documents_url && (

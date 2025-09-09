@@ -11,6 +11,7 @@ import { Menu } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { Suspense, useState } from 'react'
+import { useRealtimeNotifications } from '@/src/hooks/useNotifications'
 
 interface HeaderProps {
   onToggleSidebar?: () => void
@@ -60,6 +61,8 @@ const HeaderContent = ({ onToggleSidebar }: HeaderProps) => {
   const searchParams = useSearchParams()
   const { t } = useTranslation()
   const [popoverOpen, setPopoverOpen] = useState(false)
+  const { isConnected } = useRealtimeNotifications()
+
   
   // Usar datos del perfil si están disponibles, sino usar datos de auth
   const fullName = profile?.full_name || (user as any)?.user_metadata?.full_name || ''
