@@ -11,7 +11,8 @@ export const useRealtimeShipments = (marketId: string | null) => {
     queryClient.invalidateQueries({ queryKey: ['bidListByMarket'] })
     queryClient.invalidateQueries({ queryKey: ['shipments'] })
     queryClient.invalidateQueries({ queryKey: ['bidList'] })
-  }, [queryClient, marketId])
+    queryClient.invalidateQueries({ queryKey: ['agentOfferedShipments'] })
+  }, [queryClient])
 
   useEffect(() => {
     if (!marketId) return
@@ -21,13 +22,13 @@ export const useRealtimeShipments = (marketId: string | null) => {
       .channel('shipments-simple')
       .on('postgres_changes', 
         { event: 'INSERT', schema: 'public', table: 'shipments' },
-        (payload) => {
+        () => {
           invalidateShipments()
         }
       )
       .on('postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'shipments' },
-        (payload) => {
+        () => {
           invalidateShipments()
         }
       )

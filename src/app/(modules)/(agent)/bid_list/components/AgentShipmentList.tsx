@@ -77,9 +77,8 @@ export function AgentShipmentList({ status }: AgentShipmentListProps) {
 
   // Decidir qué hook usar basado en el status
   const shouldUseOfferedShipmentsHook = status === 'MyOffers'
-  console.log('🚀 RENDER - Status:', status, 'shouldUseOfferedShipmentsHook:', shouldUseOfferedShipmentsHook)
 
-  const { data: offeredShipmentResponse, refetch: refetchOffered, isLoading: isLoadingOffered, error: errorOffered } = useGetAgentOfferedShipments({
+  const { data: offeredShipmentResponse, refetch: refetchOffered, isLoading: isLoadingOffered } = useGetAgentOfferedShipments({
     marketId,
     agentId: user?.id?.toString() || null,
     shippingType: shippingType as ShippingType,
@@ -97,7 +96,7 @@ export function AgentShipmentList({ status }: AgentShipmentListProps) {
   })
 
   // Hook estándar para otros status
-  const { data: standardShipmentResponse, refetch: refetchStandard, isLoading: isLoadingStandard, error: errorStandard } = useGetBidListByMarket({
+  const { data: standardShipmentResponse, refetch: refetchStandard, isLoading: isLoadingStandard } = useGetBidListByMarket({
     marketId,
     status,
     user_id: user?.id?.toString() || null,
@@ -120,7 +119,6 @@ export function AgentShipmentList({ status }: AgentShipmentListProps) {
   const shipmentResponse = shouldUseOfferedShipmentsHook ? offeredShipmentResponse : standardShipmentResponse
   const refetch = shouldUseOfferedShipmentsHook ? refetchOffered : refetchStandard
   const isLoading = shouldUseOfferedShipmentsHook ? isLoadingOffered : isLoadingStandard
-  const error = shouldUseOfferedShipmentsHook ? errorOffered : errorStandard
 
   // Extraer datos y paginación del response
   const shipmentList = shipmentResponse?.data || []
@@ -148,7 +146,6 @@ export function AgentShipmentList({ status }: AgentShipmentListProps) {
   const handleApplyFilters = () => {
     // Aplicar los filtros pendientes
     setAppliedFilters(pendingFilters)
-    console.log('Filtros aplicados:', pendingFilters)
   }
 
   const handleClearFilters = () => {
@@ -199,7 +196,7 @@ export function AgentShipmentList({ status }: AgentShipmentListProps) {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-ful">
       <ShipmentTable
         title={t(`transport.${normalizeShippingType(shippingType)}`)}
         subtitle={`${getSubtitle()}`}

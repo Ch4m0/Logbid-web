@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from "@/src/components/ui/separator"
 import { useTranslation } from "@/src/hooks/useTranslation"
 import IconPrinter from "@/src/icons/PrintIcon"
+import { formatComexType } from "@/src/lib/utils"
 import { copyProposalDetails } from "@/src/utils/clipboardUtils"
 import { supabase } from "@/src/utils/supabase/client"
 import { AlertTriangle,
@@ -230,16 +231,6 @@ const ConfirmationPage = () => {
     })
   }
 
-  // Format commerce type
-  const formatComexType = (type: string) => {
-    switch(type) {
-      case "1": return t('confirmationBid.import')
-      case "2": return t('confirmationBid.export')
-      default: return t('common.notSpecified')
-    }
-  }
-
-
   return (
     <div className="flex justify-center items-center min-h-[80vh] p-4">
       <Card className="w-full max-w-3xl shadow-lg print:shadow-none">
@@ -352,7 +343,7 @@ const ConfirmationPage = () => {
                 </div>
                 <div className="flex justify-between p-2 bg-white/50 rounded">
                   <span className="text-muted-foreground">{t('bidInfo.comexType')}:</span>
-                  <span className="font-medium">{formatComexType(combinedData.comex_type)}</span>
+                <span className="font-medium">{formatComexType(combinedData.comex_type, t)}</span>
                 </div>
                 <div className="flex justify-between p-2 bg-white/50 rounded">
                   <span className="text-muted-foreground">{t('confirmationBid.transportation')}:</span>

@@ -1,4 +1,5 @@
 import { toast } from "@/src/components/ui/use-toast"
+import { formatComexType } from "../lib/utils"
 
 interface CopyToClipboardOptions {
   text: string
@@ -120,13 +121,6 @@ const formatDate = (dateString: string) => {
   })
 }
 
-const formatComexType = (type: string, t: (key: string) => string) => {
-  switch(type) {
-    case "1": return t('confirmationBid.import')
-    case "2": return t('confirmationBid.export')
-    default: return t('common.notSpecified')
-  }
-}
 
 const formatTransportation = (transportation: string, t: (key: string) => string) => {
   switch(transportation) {

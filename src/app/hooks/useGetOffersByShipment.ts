@@ -3,54 +3,82 @@ import { supabase } from '@/src/utils/supabase/client'
 
 interface Args {
   shipment_id: string | null
+  page?: number
+  limit?: number
+  searchTerm?: string
+  enabled?: boolean
+  // Filtros adicionales
+  agentCodeFilter?: string
+  offerIdFilter?: string
+  priceMinFilter?: string
+  priceMaxFilter?: string
+  statusFilter?: string
 }
 
-export const useGetOffersByShipment = ({ shipment_id }: Args) => {
-  return useQuery({
-    queryKey: ['offers', 'shipment', shipment_id],
+export const useGetOffersByShipment = ({ 
+  shipment_id, 
+  page = 1, 
+  limit = 10, 
+  searchTerm,
+  enabled = true,
+  agentCodeFilter,
+  offerIdFilter,
+  priceMinFilter,
+  priceMaxFilter,
+  statusFilter
+}: Args) => {
+  
+  const result = useQuery({
+    queryKey: ['offers', 'shipment', shipment_id, page, limit, searchTerm, agentCodeFilter, offerIdFilter, priceMinFilter, priceMaxFilter, statusFilter, enabled],
     queryFn: async () => {
       if (!shipment_id) {
         throw new Error('Shipment ID is required')
       }
 
-      // Primero obtener el ID numérico del shipment por UUID
-      const { data: shipmentData, error: shipmentError } = await supabase
-        .from('shipments')
-        .select('id')
-        .eq('uuid', shipment_id)
-        .single()
+      // Llamar función de Supabase que devuelve el objeto completo con paginación
+      const { data, error } = await supabase.rpc('get_offers_by_shipment_paginated', {
+        p_shipment_id: shipment_id,
+        p_page: page,
+        p_limit: limit,
+        p_search_term: searchTerm || null,
+        p_agent_code_filter: agentCodeFilter || null,
+        p_offer_id_filter: offerIdFilter || null,
+        p_price_min_filter: priceMinFilter || null,
+        p_price_max_filter: priceMaxFilter || null,
+        p_status_filter: statusFilter || null
+      })
 
-      if (shipmentError) {
-        throw shipmentError
+      if (error) {
+        console.error('❌ Error en función get_offers_by_shipment_paginated:', error)
+        throw error
       }
 
-      // Consultar offers del shipment
-      const { data: offersData, error: offersError } = await supabase
-        .from('offers')
-        .select('*')
-        .eq('shipment_id', shipmentData.id)
-        .order('inserted_at', { ascending: false })
+      console.log('✅ OFFERS HOOK - Returning data with', data || 0, 'offers')
 
-      if (offersError) {
-        throw offersError
-      }
-
-      // Calcular métricas de las ofertas
-      const offers = offersData || []
-      const lowestPrice = offers.length > 0 
-        ? Math.min(...offers.map((offer: any) => parseFloat(offer.price)))
-        : 0
-      const lastPrice = offers.length > 0 
-        ? parseFloat(offers[offers.length - 1].price)
-        : 0
-
-      return {
-        offers,
-        lowestPrice: lowestPrice.toString(),
-        lastPrice: lastPrice.toString(),
-        offersCount: offers.length
-      }
+      // La función de Supabase devuelve directamente el objeto con la estructura:
+      // {
+      //   "data": [/* array de offers con info de agente */],
+      //   "pagination": {
+      //     "currentPage": 1,
+      //     "totalPages": 5,
+      //     "totalItems": 25,
+      //     "hasNext": true,
+      //     "hasPrev": false
+      //   },
+      //   "metrics": {
+      //     "lowestPrice": "1500.00",
+      //     "lastPrice": "2000.00", 
+      //     "offersCount": 25
+      //   }
+      // }
+      return data
     },
-    enabled: !!shipment_id,
+    enabled: enabled && !!shipment_id,
+    staleTime: 1000 * 60 * 10, // 10 minutos
+    refetchOnWindowFocus: false,
+    retry: 1,
+    gcTime: 1000 * 60 * 30, // 30 minutos
   })
+
+  return result
 }

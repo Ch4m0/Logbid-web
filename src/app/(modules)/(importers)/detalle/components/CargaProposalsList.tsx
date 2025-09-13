@@ -1,109 +1,97 @@
 'use client'
 import { useGetShipment } from '@/src/app/hooks/useGetShipment'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/src/components/ui/card'
 import { modalService } from '@/src/service/modalService'
-import { DollarSign } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Suspense, useEffect, useState } from 'react'
-import AdvancedFilters from '../../../(agent)/offers/components/AdvancedFilters'
-
+import { Suspense, useState } from 'react'
 import Pagination from '../../../common/components/pagination/Pagination'
-import ListItem from './ListItem'
 
 import { OfferConfirmationDialog } from '../../(home)/components/OfferConfirmacionDialog'
-import { FiltersOffer } from '@/src/models/FiltersOffer'
-import useAuthStore from '@/src/store/authStore'
 import { useTranslation } from '@/src/hooks/useTranslation'
 import { useGetOffersByShipment } from '@/src/app/hooks/useGetOffersByShipment'
 import { useRealtimeOffers } from '@/src/hooks/useRealtimeOffers'
-
-interface Offer {
-  id: number
-  uuid: string
-  agent_id: number
-  price: string
-  inserted_at: string
-}
-
-interface Shipment {
-  id: number
-  uuid: string
-  origin_country: string
-  origin_name: string
-  destination_country: string
-  destination_name: string
-  transportation: string
-  comex_type: string
-  shipping_type: string
-  inserted_at: string
-  expiration_date: string
-  shipping_date?: string | null
-  offers: Offer[]
-  currency: string
-  value: string
-  lowestPrice: string
-  last_price: string
-  total_weight: number
-  measure_type: string
-  volume: number
-  units: number
-  merchandise_type: string
-  dangerous_march: boolean
-  tariff_item: string
-  agent_code: string
-  documents_url?: string | null
-  additional_info?: string
-}
+import { TableColumn, AgentTable } from '@/src/app/(modules)/(importers)/detalle/components/AgentTable'
+import { Button } from '@/src/components/ui/button'
+import { Eye, Check } from 'lucide-react'
+import { OfferFilters } from './OfferFilters'
 
 export function CargaProposalsList() {
   const router = useRouter()
   const { t } = useTranslation()
-  const [sort, setSort] = useState({ key: 'id', order: 'asc' })
   const params = useSearchParams()
 
   const currentPage = Number(params.get('page')) || 1
-  const shipmentId = params.get('bidId') || '' // Mantenemos el nombre del param para compatibilidad
+  const shipmentId = params.get('shipment_id') || '' // Mantenemos el nombre del param para compatibilidad
   const marketId = params.get('market') || ''
 
-  const { data: offersData, isPending: loading } = useGetOffersByShipment({ shipment_id: shipmentId })
-  const { offers = [], lowestPrice = '0', lastPrice = '0', offersCount = 0 } = offersData || {}
+  // Estados para filtros
+  const [showFilters, setShowFilters] = useState(false)
+  const [appliedFilters, setAppliedFilters] = useState({
+    agent_code: '',
+    offer_id: '',
+    price_min: '',
+    price_max: '',
+    status: ''
+  })
+  
+  const [pendingFilters, setPendingFilters] = useState({
+    agent_code: '',
+    offer_id: '',
+    price_min: '',
+    price_max: '',
+    status: ''
+  })
+
+
+  // Usar el hook con paginación y filtros
+  const { data: offersResponse, isPending: loading } = useGetOffersByShipment({ 
+    shipment_id: shipmentId,
+    page: currentPage,
+    limit: 10,
+    enabled: !!shipmentId,
+    agentCodeFilter: appliedFilters.agent_code || undefined,
+    offerIdFilter: appliedFilters.offer_id || undefined,
+    priceMinFilter: appliedFilters.price_min || undefined,
+    priceMaxFilter: appliedFilters.price_max || undefined,
+    statusFilter: appliedFilters.status || undefined
+  })
+  
+  const offers = offersResponse?.data || []
+  const pagination = offersResponse?.pagination
   const { data: shipment, isPending: loadingShipment } = useGetShipment({ shipment_id: shipmentId })
-  const [itemsPerPage] = useState(20)
 
   // Hook de tiempo real para ofertas (con fallback a auto-refresh)
   const { isConnected } = useRealtimeOffers(shipmentId)
 
-
-
-  const [filters, setFilters] = useState<FiltersOffer>({
-    inserted_at: '',
-    agent_id: '',
-    price: '',
-    "details.freight_fees.container": '',
-    "details.freight_fees.value": '',
-    "details.destination_fees.handling": '',
-    "details.freight_fees.dimensions.length": '',
-    "details.additional_fees.fuel": '',
-  })
-
-  const resetFilters = () => {
-    setFilters({
-      inserted_at: "",
-      agent_id: "",
-      price: "",
-      "details.freight_fees.container": "",
-      "details.freight_fees.value": "",
-      "details.destination_fees.handling": "",
-      "details.freight_fees.dimensions.length": "",
-      "details.additional_fees.fuel": "",
-    });
+  // Funciones para manejar filtros
+  const handleFilterChange = (key: string, value: string) => {
+    setPendingFilters(prev => ({ ...prev, [key]: value }))
   }
 
+  const handleApplyFilters = () => {
+    setAppliedFilters(pendingFilters)
+    
+    // Resetear a la primera página cuando se aplican filtros
+    const currentUrl = new URL(window.location.href)
+    currentUrl.searchParams.set('page', '1')
+    router.push(currentUrl.pathname + currentUrl.search)
+  }
+
+  const handleClearFilters = () => {
+    const emptyFilters = {
+      agent_code: '',
+      offer_id: '',
+      price_min: '',
+      price_max: '',
+      status: ''
+    }
+    setPendingFilters(emptyFilters)
+    setAppliedFilters(emptyFilters)
+    
+    // Resetear a la primera página cuando se limpian filtros
+    const currentUrl = new URL(window.location.href)
+    currentUrl.searchParams.set('page', '1')
+    router.push(currentUrl.pathname + currentUrl.search)
+  }
 
   const handleViewOfferDetail = (offerId: string) => {
     router.push(`/detalle/offer/${offerId}?market=${marketId}`)
@@ -117,17 +105,6 @@ export function CargaProposalsList() {
 
   if (loading || loadingShipment) {
     return <h1>{t('common.loading')}</h1>
-  }
-
-  const handleSort = (key: string) => {
-    if (sort.key === key) {
-      setSort((prev) => ({
-        ...prev,
-        order: prev.order === 'asc' ? 'desc' : 'asc',
-      }))
-    } else {
-      setSort({ key, order: 'asc' })
-    }
   }
 
   const openModal = (
@@ -161,162 +138,122 @@ export function CargaProposalsList() {
     })
   }
 
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters((prev) => ({ ...prev, [key]: value }))
-  }
+  // Los datos ya vienen paginados del hook, no necesitamos filtrar ni paginar aquí
+  const paginatedList = offers
 
-  // Función auxiliar para obtener valor de propiedades anidadas
-  const getNestedProperty = (obj: any, path: string): any => {
-    return path.split('.').reduce((current, key) => {
-      return current && current[key] !== undefined ? current[key] : null;
-    }, obj);
-  }
-
-  // Filtrado y ordenamiento aplicado a la lista de ofertas
-  const filteredOffers = offers?.filter((offer: any) => {
-      // Si no hay filtros aplicados, mostrar todas las ofertas
-      const hasActiveFilters = Object.values(filters).some(value => value && value.trim() !== '');
-      if (!hasActiveFilters) return true;
-      
-      // Solo aplicar filtros si hay valores de filtro activos
-      return Object.keys(filters).every((key) => {
-        const filterValue = filters[key as keyof typeof filters];
-        if (!filterValue || filterValue.trim() === '') return true; // Si este filtro específico está vacío, no filtrar por él
-        
-        let offerValue: any;
-        
-        // Manejar propiedades anidadas
-        if (key.includes('.')) {
-          offerValue = getNestedProperty(offer, key);
-        } else {
-          offerValue = offer[key];
-        }
-        
-        // Si el valor no existe para este filtro específico, no mostrar esta oferta
-        if (offerValue === null || offerValue === undefined) {
-          return false;
-        }
-        
-        return offerValue
-          .toString()
-          .toLowerCase()
-          .includes(filterValue.toLowerCase());
-      });
-    })
-    .sort((a: any, b: any) => {
-      let aValue, bValue;
-      
-      // Manejar propiedades anidadas para el sorting también
-      if (sort.key.includes('.')) {
-        aValue = getNestedProperty(a, sort.key);
-        bValue = getNestedProperty(b, sort.key);
-      } else {
-        aValue = a[sort.key as keyof typeof a];
-        bValue = b[sort.key as keyof typeof b];
-      }
-
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
-        return sort.order === 'asc'
-          ? aValue.localeCompare(bValue)
-          : bValue.localeCompare(aValue)
-      }
-
-      return sort.order === 'asc'
-        ? Number(aValue) - Number(bValue)
-        : Number(bValue) - Number(aValue)
-    })
-
-  const paginatedList = filteredOffers?.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  )
+  // Configuración de columnas para la tabla de ofertas
+  const columns: TableColumn[] = [
+    {
+      key: 'agent_code',
+      label: t('offerCard.agentCode'),
+      width: 'w-[120px]',
+      minWidth: '120px'
+    },
+    {
+      key: 'uuid',
+      label: t('offerCard.offerId'),
+      width: 'w-[120px]',
+      minWidth: '120px'
+    },
+    {
+      key: 'price',
+      label: t('offerCard.offer'),
+      width: 'w-[100px]',
+      minWidth: '100px'
+    },
+    {
+      key: 'inserted_at',
+      label: t('offerCard.creationDate'),
+      width: 'w-[160px]',
+      minWidth: '120px'
+    },
+    {
+      key: 'status',
+      label: t('common.status'),
+      width: 'w-[100px]',
+      minWidth: '100px'
+    },
+    {
+      key: 'actions',
+      label: t('common.actions'),
+      width: 'w-[120px]',
+      minWidth: '120px',
+      render: (offer: any) => (
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={(e: React.MouseEvent) => {
+              e.stopPropagation()
+              handleViewOfferDetail(offer.uuid)
+            }}
+            className="flex items-center gap-1"
+          >
+            <Eye className="h-4 w-4" />
+            {t('common.showDetails')}
+          </Button>
+          {offer.status === "pending" && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={(e: React.MouseEvent) => {
+                e.stopPropagation()
+                openModal(offer)
+              }}
+              className="flex items-center gap-1"
+            >
+              <Check className="h-4 w-4" />
+              {t('common.accept')}
+            </Button>
+          )}
+        </div>
+      )
+    }
+  ]
 
 
 
   return (
     <>
       {shipment && (
-        <Card className="w-full">
-          <CardHeader>
-            <button
-              onClick={() => router.back()}
-              className="bg-blue-500 text-white font-semibold py-2 px-4 rounded mb-4 flex items-center max-w-[8rem]"
-            >
-              <svg
-                className="w-4 h-4 mr-2"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 19l-7-7 7-7"
-                ></path>
-              </svg>
-              {t('common.back')}
-            </button>
-
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-blue-500 font-bold text-xl">
-                {t('proposals.title')}
-              </CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-       
-          <AdvancedFilters 
-            filters={filters} 
-            handleFilterChange={handleFilterChange} 
-            handleSort={handleSort} 
-            resetFilters={resetFilters}
-            bidDataForAgent={shipment || {}}
-          />
-
-          {/* Estado de carga */}
-          {loading && (
-            <div className="text-center py-8">
-              <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto"></div>
-              <p className="mt-2 text-sm text-muted-foreground">{t('proposals.loadingOffers')}</p>
-            </div>
-          )}
-
-
-
-          <div className="space-y-4">
-            {paginatedList?.map((offer: any, idx: number) => (
-              <ListItem
-                key={idx}
-                offer={offer}
-                currency={shipment?.currency}
-                onAcceptOffer={openModal}
-                handleViewOfferDetail={handleViewOfferDetail}
-              />
-            ))}
-            
-          </div>
-
-
-          {(!paginatedList || paginatedList.length === 0) && (
-              <div className="text-center py-8">
-                <DollarSign className="h-12 w-12 mx-auto text-muted-foreground" />
-                <h3 className="mt-2 text-lg font-medium">{t('proposals.noProposals')}</h3>
-                <p className="text-sm text-muted-foreground">{t('proposals.noProposalsMessage')}</p>
-              </div>
-            )}
-            <div className="w-full flex justify-end mt-8">
+        <div className="w-full">
+          {/* Tabla de ofertas usando AgentTable */}
+          <AgentTable
+            title={t('cargoList.offers')}
+            subtitle=""
+            data={paginatedList}
+            columns={columns}
+            isLoading={loading}
+            emptyMessage={t('proposals.noProposals')}
+            noSearchResultsMessage={t('common.noSearchResults')}
+            enableSearch={false}
+            showFilters={showFilters}
+            onToggleFilters={() => setShowFilters(!showFilters)}
+            hoverable={true}
+            stickyActions={true}
+            filtersComponent={null}
+            pagination={
               <Suspense fallback={<div>Loading...</div>}>
                 <Pagination
-                  totalPages={Math.ceil(
-                    (filteredOffers?.length || 0) / itemsPerPage
-                  )}
+                  currentPage={currentPage}
+                  totalPages={pagination?.totalPages || 1}
+                  itemsPerPage={10}
                 />
               </Suspense>
-            </div>
-          </CardContent>
-        </Card>
+            }
+          />
+
+          {/* Modal de filtros */}
+          <OfferFilters
+            isOpen={showFilters}
+            shipmentId={shipmentId}
+            filters={pendingFilters}
+            onFilterChange={handleFilterChange}
+            onApplyFilters={handleApplyFilters}
+            onClearFilters={handleClearFilters}
+            onClose={() => setShowFilters(false)}
+          />
+        </div>
       )}
     </>
   )

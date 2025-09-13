@@ -217,7 +217,7 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
 
   const goDetails = (id: string) => {
     setMarketData(marketId)
-    router.push(`/detalle/?bidId=${id}&market=${marketId}`)
+    router.push(`/detalle/?shipment_id=${id}&market=${marketId}`)
   }
 
   // Manejo de estados de carga y error

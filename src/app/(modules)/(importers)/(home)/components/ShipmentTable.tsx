@@ -22,7 +22,7 @@ import {
   TableRow,
 } from '@/src/components/ui/table'
 import { useTranslation } from '@/src/hooks/useTranslation'
-import { convertToColombiaTime, formatDateUTCAsLocal, formatShippingDate } from '@/src/lib/utils'
+import { convertToColombiaTime, formatDateUTCAsLocal, formatShippingDate, formatStatus } from '@/src/lib/utils'
 import useAuthStore from '@/src/store/authStore'
 import {
   ArrowRight,
@@ -37,6 +37,7 @@ import {
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { ShipmentFilters } from './ShipmentFilters'
+import { StatusShipmentHistorical } from './StatusShipmentHistorical'
 
 // Hook personalizado para debounce
 const useDebounce = (value: string, delay: number) => {
@@ -104,6 +105,12 @@ const getTransportIcon = (shippingType: string) => {
   }
 }
 
+const listStatus = ['Closed', 'Cancelled', 'Expired']
+
+const isStatusClosed = (status: string) => {
+  return listStatus.includes(status)
+}
+
 export function ShipmentTable({
   title,
   subtitle,
@@ -138,6 +145,14 @@ export function ShipmentTable({
   // Debounce del término de búsqueda (300ms de delay)
   const debouncedSearchTerm = useDebounce(searchTerm, 300)
   
+  // Función para determinar si hay filtros activos
+  const hasActiveFilters = () => {
+    if (debouncedSearchTerm.trim()) return true
+    if (!filters) return false
+    
+    return Object.values(filters).some(value => value && value.trim() !== '' && value !== 'all')
+  }
+  
   // Actualizar URL cuando cambie el término de búsqueda (solo si tiene 3+ caracteres o está vacío)
   useEffect(() => {
     const currentSearchTerm = searchParams.get('search') || ''
@@ -160,7 +175,7 @@ export function ShipmentTable({
   
 
   return (
-    <Card className="border-0 shadow-sm bg-gray-50">
+    <Card className="border-0 shadow-sm bg-gray-50  flex flex-col">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div>
@@ -178,7 +193,20 @@ export function ShipmentTable({
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-0">
+
+      {!isLoading && shipments.length === 0 && (
+          <div className="text-center py-8 flex-1 flex items-center justify-center">
+            <p className="text-muted-foreground">
+              {hasActiveFilters() 
+                ? t('common.noSearchResults') 
+                : t('cargoList.noCargoTripsMessage')
+              }
+            </p>
+          </div>
+        )} 
+
+      {(!isLoading && shipments.length > 0) && (
+        <CardContent className="pt-0 flex-1">
         <div className="mb-6 space-y-4">
           <Input
             placeholder={t('common.searchPlaceholder')}
@@ -295,7 +323,7 @@ export function ShipmentTable({
                 </TableCell>
 
                 <TableCell className="sticky right-0 bg-white border-l-2 border-gray-200 z-10">
-                  {filterType !== 'closed' && shipment.status !== 'Cancelled' ? (
+                  {!isStatusClosed(shipment.status) ? (
                     <div className="flex items-center space-x-2">
                       {/* Si el usuario es agente y el shipment está activo, mostrar solo botón Cotizar */}
                       {user?.profile?.role === 'agent' && shipment.status === 'Active' ? (
@@ -370,12 +398,7 @@ export function ShipmentTable({
                       )}
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2 text-red-700">
-                      <X className="h-4 w-4" />
-                      <span className="text-xs font-medium">
-                        {t('cargoList.cancelled')}
-                      </span>
-                    </div>
+                    <StatusShipmentHistorical status={shipment.status} />
                   )}
                 </TableCell>
               </TableRow>
@@ -385,17 +408,9 @@ export function ShipmentTable({
         </Table>
         </div>
         
-        {!isLoading && shipments.length === 0 && (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">
-              {debouncedSearchTerm.trim() 
-                ? t('common.noSearchResults') 
-                : t('cargoList.noCargoTripsMessage')
-              }
-            </p>
-          </div>
-        )}
+
       </CardContent>
+      )}
     </Card>
   )
 }

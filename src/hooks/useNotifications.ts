@@ -398,7 +398,6 @@ export const useRealtimeNotifications = () => {
   // Función para mostrar toast simplificada
   const showNotificationToast = useCallback((notification: Notification) => {
     const getToastConfig = (type: string) => {
-      console.log('type', type)
       switch (type) {
         case 'new_offer':
           return {
@@ -479,12 +478,9 @@ export const useRealtimeNotifications = () => {
 
   useEffect(() => {
     if (!profile?.auth_id) {
-      console.log('❌ REALTIME: No hay profile.auth_id, no se puede configurar canal')
       return
     }
 
-    console.log('🚀 REALTIME: Configurando canal para notificaciones del usuario:', profile.auth_id)
-    
     const channel = supabase
       .channel(`notifications-${profile.auth_id}`)
       .on(
@@ -496,9 +492,7 @@ export const useRealtimeNotifications = () => {
           filter: `user_id=eq.${profile.auth_id}`
         },
         async (payload) => {
-          console.log('🔔 PAYLOAD RECIBIDO:', payload)
           const newNotification = payload.new as Notification
-          console.log('🔔 NUEVA NOTIFICACIÓN:', newNotification)
           
           // Mostrar toast inmediatamente
           try {
@@ -525,7 +519,6 @@ export const useRealtimeNotifications = () => {
         }
       )
       .subscribe((status) => {
-        console.log('📡 Canal notificaciones:', status)
         setIsConnected(status === 'SUBSCRIBED')
         
         if (status !== 'SUBSCRIBED') {
@@ -534,7 +527,6 @@ export const useRealtimeNotifications = () => {
       })
 
     return () => {
-      console.log('🧹 Limpiando canal notificaciones')
       channel.unsubscribe()
     }
   }, [profile?.auth_id, queryClient, showNotificationToast])

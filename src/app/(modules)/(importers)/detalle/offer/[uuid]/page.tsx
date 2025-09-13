@@ -11,6 +11,7 @@ import { useGetOfferById } from "@/src/app/hooks/useGetOfferById"
 import { useGetShipment } from "@/src/app/hooks/useGetShipment"
 import { useTranslation } from "@/src/hooks/useTranslation"
 import { modalService } from "@/src/service/modalService"
+import { formatPrice } from "@/src/lib/utils"
 import { OfferConfirmationDialog } from "../../../(home)/components/OfferConfirmacionDialog"
 import { OfferRejectionDialog } from "../components/OfferRejectionDialog"
 import BidInfo from "../../components/BidInfo"
@@ -149,10 +150,13 @@ export default function OfferDetailPage() {
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="space-y-4">
-        <Button variant="outline" size="sm" onClick={() => router.back()}>
-          <ArrowLeft className="w-4 h-4 mr-1" />
-          { t('common.back') }
-        </Button>
+      <button
+        onClick={() => router.back()}
+        className="bg-primary text-white font-semibold py-2 px-4 rounded mb-4 flex items-center"
+      >
+        <ArrowLeft className="w-4 h-4 mr-2" />
+        {t('common.back')}
+      </button>
         <div className="flex flex-col gap-4">
           {/* Título, badge y botón */}
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -205,7 +209,7 @@ export default function OfferDetailPage() {
             <div className="flex items-center justify-between p-4 bg-primary/5 rounded-lg">
               <div>
                 <p className="text-sm text-muted-foreground">{ t('common.totalPrice') }</p>
-                <p className="text-3xl font-bold text-primary">{currency} {offer.price}</p>
+                <p className="text-3xl font-bold text-primary font-mono">{formatPrice(offer.price, currency)}</p>
               </div>
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">{t('common.offerDate')}</p>
@@ -223,7 +227,7 @@ export default function OfferDetailPage() {
                 {freight_fees.value && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{t('common.baseFreight')}</span>
-                    <span>{currency} {freight_fees.value}</span>
+                    <span className="font-mono">{formatPrice(freight_fees.value, currency)}</span>
                   </div>
                 )}
 
@@ -234,7 +238,7 @@ export default function OfferDetailPage() {
                     {Object.entries(origin_fees).map(([key, value]) => (
                       <div key={key} className="flex justify-between pl-4">
                         <span className="text-muted-foreground capitalize">{key.replace('_', ' ')}</span>
-                        <span>{currency} {value}</span>
+                        <span className="font-mono">{formatPrice(Number(value) || 0, currency)}</span>
                       </div>
                     ))}
                   </>
@@ -247,7 +251,7 @@ export default function OfferDetailPage() {
                     {Object.entries(destination_fees).map(([key, value]) => (
                       <div key={key} className="flex justify-between pl-4">
                         <span className="text-muted-foreground capitalize">{key.replace('_', ' ')}</span>
-                        <span>{currency} {value}</span>
+                        <span className="font-mono">{formatPrice(Number(value) || 0, currency)}</span>
                       </div>
                     ))}
                   </>
@@ -260,7 +264,7 @@ export default function OfferDetailPage() {
                     {Object.entries(additional_fees).map(([key, value]) => (
                       <div key={key} className="flex justify-between pl-4">
                         <span className="text-muted-foreground capitalize">{key.replace('_', ' ')}</span>
-                        <span>{currency} {value}</span>
+                        <span className="font-mono">{formatPrice(Number(value) || 0, currency)}</span>
                       </div>
                     ))}
                   </>
@@ -273,7 +277,7 @@ export default function OfferDetailPage() {
                     {Object.entries(other_fees).map(([key, value]) => (
                       <div key={key} className="flex justify-between pl-4">
                         <span className="text-muted-foreground capitalize">{key.replace('_', ' ')}</span>
-                        <span>{currency} {value}</span>
+                        <span className="font-mono">{formatPrice(Number(value) || 0, currency)}</span>
                       </div>
                     ))}
                   </>
@@ -282,7 +286,7 @@ export default function OfferDetailPage() {
                 <Separator />
                 <div className="flex justify-between font-bold text-lg">
                   <span>{t('common.total')}</span>
-                  <span className="text-primary">{currency} {offer.price}</span>
+                  <span className="text-primary font-mono">{formatPrice(offer.price, currency)}</span>
                 </div>
               </div>
             </div>
@@ -358,6 +362,7 @@ export default function OfferDetailPage() {
               <div>
                 <p className="text-sm text-muted-foreground">{t('common.originGeneric')}</p>
                 <p className="font-medium">
+                <span className="mr-2">{ shipmentData?.origin_flag }</span>
                   {offer.origin_country && offer.origin_name 
                     ? `${offer.origin_country} - ${offer.origin_name}`
                     : t('common.notSpecified')
@@ -367,6 +372,7 @@ export default function OfferDetailPage() {
               <div>
                 <p className="text-sm text-muted-foreground">{t('common.destinationGeneric')}</p>
                 <p className="font-medium">
+                <span className="mr-2">{ shipmentData?.destination_flag }</span>
                   {offer.destination_country && offer.destination_name 
                     ? `${offer.destination_country} - ${offer.destination_name}`
                     : t('common.notSpecified')
@@ -426,14 +432,14 @@ export default function OfferDetailPage() {
               {basic_service.cancellation_fee && (
                 <div>
                   <p className="text-sm text-muted-foreground">{t('common.cancellationFee')}</p>
-                  <p className="font-medium">{currency} {basic_service.cancellation_fee}</p>
+                  <p className="font-medium font-mono">{formatPrice(basic_service.cancellation_fee, currency)}</p>
                 </div>
               )}
               
               {additional_fees.insurance && (
                 <div>
                   <p className="text-sm text-muted-foreground">{t('common.insurance')}</p>
-                  <p className="font-medium text-sm">{t('common.includedUpTo')} {currency} {additional_fees.insurance}</p>
+                  <p className="font-medium text-sm">{t('common.includedUpTo')} <span className="font-mono">{formatPrice(additional_fees.insurance, currency)}</span></p>
                 </div>
               )}
               

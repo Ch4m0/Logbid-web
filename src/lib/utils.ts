@@ -144,3 +144,34 @@ export function formatShippingDate(utcDateStr: string) {
     return 'Error en fecha'
   }
 }
+
+export function formatStatus(status: string, t: any) {
+  const statusLabels = {
+    Expired: t('common.expired'),
+    Cancelled: t('cargoList.cancelled'),
+    Closed: t('common.closed'),
+    Active: t('common.active'),
+    Offering: t('common.offering'),
+  }
+
+  return statusLabels[status as keyof typeof statusLabels] || status
+}
+
+export function formatPrice(price: number, currency: string) {
+  console.log('price', price)
+  console.log('currency', currency)
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currency,
+    minimumFractionDigits: 2,
+  }).format(price);
+}
+
+
+export const formatComexType = (type: string, t: (key: string) => string) => {
+  switch(type) {
+    case "1": return t('confirmationBid.import')
+    case "2": return t('confirmationBid.export')
+    default: return t('common.notSpecified')
+  }
+}
