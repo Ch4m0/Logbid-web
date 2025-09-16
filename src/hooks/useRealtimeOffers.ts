@@ -10,6 +10,7 @@ export const useRealtimeOffers = (shipmentId: string | null) => {
   const invalidateOffers = useCallback(() => {
     console.log('🔄 Actualizando ofertas para shipment:', shipmentId)
     queryClient.invalidateQueries({ queryKey: ['offers', 'shipment', shipmentId] })
+    queryClient.invalidateQueries({ queryKey: ['shipment', shipmentId] })
   }, [queryClient, shipmentId])
 
   useEffect(() => {
@@ -18,11 +19,46 @@ export const useRealtimeOffers = (shipmentId: string | null) => {
     console.log('🚀 REALTIME: Configurando canal simple para ofertas')
     
     const channel = supabase
-      .channel('offers-simple')
+      .channel(`offers-shipment-${shipmentId}`)
       .on('postgres_changes', 
-        { event: 'INSERT', schema: 'public', table: 'offers' },
-        (payload) => {
-          console.log('🎉 NUEVA OFERTA:', payload.new)
+        { 
+          event: 'INSERT', 
+          schema: 'public', 
+          table: 'offers',
+          filter: `shipment_uuid=eq.${shipmentId}`
+        },
+        (payload: any) => {
+          console.log('🎉 NUEVA OFERTA en shipment:', payload.new)
+          invalidateOffers()
+        }
+      )
+      .on('postgres_changes', 
+        { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'offers',
+          filter: `shipment_uuid=eq.${shipmentId}`
+        },
+        (payload: any) => {
+          const updatedOffer = payload.new
+          const oldOffer = payload.old
+          
+          console.log('🔄 OFERTA ACTUALIZADA en shipment:', {
+            offerId: updatedOffer.id,
+            oldStatus: oldOffer?.status,
+            newStatus: updatedOffer.status,
+            agentCode: updatedOffer.agent_code
+          })
+
+          // Si una oferta cambió a 'accepted' o 'rejected', es muy importante actualizar
+          if (updatedOffer.status === 'accepted' || updatedOffer.status === 'rejected') {
+            console.log(`🎯 Oferta ${updatedOffer.status === 'accepted' ? 'ACEPTADA' : 'RECHAZADA'}:`, {
+              agentCode: updatedOffer.agent_code,
+              price: updatedOffer.price,
+              currency: updatedOffer.currency || 'USD'
+            })
+          }
+          
           invalidateOffers()
         }
       )

@@ -160,139 +160,37 @@ export const useNotifications = () => {
 
   // Función para interpolar mensajes de notificación
   const interpolateNotificationMessage = useCallback((notification: Notification) => {
-    const { type, data, message } = notification;
+    const { message, data } = notification;
     
-    // Si el mensaje original ya no contiene texto hardcodeado español típico, usarlo tal como está
-    // Esto es para compatibilidad con notificaciones futuras que ya vengan con claves de traducción
-    const spanishIndicators = [
-      'Recibiste una nueva', 
-      'Tu oferta de', 
-      'Nuevo aéreo', 
-      'Nuevo marítimo', 
-      'Tu envío', 
-      'La fecha límite de',
-      '¡Felicidades!',
-      'expira en',
-      'cambió de',
-      'no fue seleccionada'
-    ];
-    const hasSpanishText = spanishIndicators.some(indicator => message.includes(indicator));
-    
-    // Si no tiene texto en español hardcodeado, probablemente ya está bien formateado
-    if (!hasSpanishText && !message.includes('{{')) {
-      return message;
-    }
-    
-    // Función helper para reemplazar variables en el template
-    const interpolateTemplate = (template: string, variables: any): string => {
-      return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-        return variables[key] || match;
+    // Si el mensaje contiene placeholders {{}} (mensajes legacy), interpolarlos
+    if (message.includes('{{')) {
+      // Función helper para reemplazar variables en el template
+      const interpolateTemplate = (template: string, variables: any): string => {
+        return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+          return variables[key] || match;
+        });
+      };
+
+      return interpolateTemplate(message, {
+        price: data?.price || '0',
+        currency: data?.currency || 'USD',
+        origin: data?.origin || '',
+        destination: data?.destination || '',
+        hours: data?.hours_until_expiration || '0',
+        winningPrice: data?.winningPrice || '0',
+        oldStatus: data?.oldStatus || '',
+        newStatus: data?.newStatus || '',
+        statusEmoji: '🔄',
+        value: data?.value ? Number(data.value).toLocaleString() : '0',
+        shippingType: data?.shipping_type?.toLowerCase() || '',
+        marketName: data?.market_name || '',
+        cancellationReason: data?.cancellation_reason || ''
       });
-    };
-
-    try {
-      switch (type) {
-        case 'new_offer':
-          return interpolateTemplate(t('notifications.messages.newOfferReceived'), {
-            price: data?.price || '0',
-            currency: data?.currency || 'USD',
-            origin: data?.origin || '',
-            destination: data?.destination || ''
-          });
-
-        case 'offer_accepted':
-          return interpolateTemplate(t('notifications.messages.offerAccepted'), {
-            price: data?.price || '0',
-            currency: data?.currency || 'USD',
-            origin: data?.origin || '',
-            destination: data?.destination || ''
-          });
-
-        case 'offer_rejected':
-          return interpolateTemplate(t('notifications.messages.offerRejected'), {
-            price: data?.price || '0',
-            currency: data?.currency || 'USD',
-            origin: data?.origin || '',
-            destination: data?.destination || '',
-            winningPrice: data?.winningPrice || '0'
-          });
-
-        case 'shipment_expiring':
-          return interpolateTemplate(t('notifications.messages.shipmentExpiring'), {
-            origin: data?.origin || '',
-            destination: data?.destination || '',
-            hours: data?.hours_until_expiration || '0'
-          });
-
-        case 'shipment_status_changed':
-          const getStatusEmoji = (status: string) => {
-            switch (status) {
-              case 'Active': return '🟢'
-              case 'Closed': return '✅'
-              case 'Offering': return '📋'
-              default: return '🔄'
-            }
-          };
-          return interpolateTemplate(t('notifications.messages.statusUpdated'), {
-            origin: data?.origin || '',
-            destination: data?.destination || '',
-            oldStatus: data?.oldStatus || '',
-            newStatus: data?.newStatus || '',
-            statusEmoji: getStatusEmoji(data?.newStatus || '')
-          });
-
-        case 'deadline_extended':
-          // Si no hay datos de origin/destination, intentar extraer del mensaje original
-          let origin = data?.origin || '';
-          let destination = data?.destination || '';
-          
-          if (!origin || !destination) {
-            // Intentar extraer del mensaje original: "La fecha límite de tu envío ORIGIN → DESTINATION se extendió exitosamente"
-            const routeMatch = message.match(/envío (.+?) → (.+?) se extendió/);
-            if (routeMatch) {
-              origin = routeMatch[1] || '';
-              destination = routeMatch[2] || '';
-            }
-          }
-          
-          return interpolateTemplate(t('notifications.messages.deadlineExtended'), {
-            origin,
-            destination
-          });
-
-        case 'deadline_extended_for_agents':
-          return interpolateTemplate(t('notifications.messages.deadlineExtendedForAgents'), {
-            origin: data?.origin || '',
-            destination: data?.destination || '',
-            value: data?.value ? Number(data.value).toLocaleString() : '0',
-            currency: data?.currency || 'USD'
-          });
-
-        case 'new_shipment':
-          return interpolateTemplate(t('notifications.messages.newShipmentAvailable'), {
-            shippingType: data?.shipping_type?.toLowerCase() || '',
-            marketName: data?.market_name || '',
-            origin: data?.origin || '',
-            destination: data?.destination || '',
-            value: data?.value ? Number(data.value).toLocaleString() : '0',
-            currency: data?.currency || 'USD'
-          });
-
-        case 'shipment_cancelled':
-          return interpolateTemplate(t('notifications.messages.shipmentCancelled'), {
-            origin: data?.origin || '',
-            destination: data?.destination || '',
-            cancellationReason: data?.cancellation_reason || ''
-          });
-
-        default:
-          return notification.message;
-      }
-    } catch (error) {
-      console.error('Error interpolating notification message:', error);
-      return notification.message; // Fallback al mensaje original
     }
-  }, [t]);
+    
+    // Si no tiene placeholders, usar el mensaje tal como viene (ya interpolado desde el backend)
+    return message;
+  }, []);
 
   // Función para mostrar toast basado en el tipo de notificación
   const showNotificationToast = useCallback((notification: Notification) => {
@@ -397,6 +295,7 @@ export const useRealtimeNotifications = () => {
 
   // Función para mostrar toast simplificada
   const showNotificationToast = useCallback((notification: Notification) => {
+    console.log('🔄 REALTIME: Nueva notificación', notification.message)
     const getToastConfig = (type: string) => {
       switch (type) {
         case 'new_offer':

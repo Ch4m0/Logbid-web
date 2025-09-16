@@ -22,7 +22,7 @@ import {
   TableRow,
 } from '@/src/components/ui/table'
 import { useTranslation } from '@/src/hooks/useTranslation'
-import { convertToColombiaTime, formatDateUTCAsLocal, formatShippingDate, formatStatus } from '@/src/lib/utils'
+import { convertToColombiaTime, formatDateUTCAsLocal, formatPrice, formatShippingDate, formatStatus } from '@/src/lib/utils'
 import useAuthStore from '@/src/store/authStore'
 import {
   ArrowRight,
@@ -175,7 +175,7 @@ export function ShipmentTable({
   
 
   return (
-    <Card className="border-0 shadow-sm bg-gray-50  flex flex-col">
+    <Card className="border-0 shadow-sm  flex flex-col">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div>
@@ -206,7 +206,7 @@ export function ShipmentTable({
         )} 
 
       {(!isLoading && shipments.length > 0) && (
-        <CardContent className="pt-0 flex-1">
+        <CardContent className="p-3 flex-1">
         <div className="mb-6 space-y-4">
           <Input
             placeholder={t('common.searchPlaceholder')}
@@ -231,15 +231,20 @@ export function ShipmentTable({
           <Table>
             <TableHeader>
               <TableRow className="bg-white">
-                <TableHead className="w-[80px] min-w-[80px]">{t('common.type')}</TableHead>
-                <TableHead className="w-[120px] min-w-[120px]">ID</TableHead>
-                <TableHead className="w-[180px] min-w-[180px]">{t('cargoList.origin')}</TableHead>
-                <TableHead className="w-[30px] min-w-[30px]"></TableHead>
-                <TableHead className="w-[180px] min-w-[180px]">{t('cargoList.destination')}</TableHead>
-                <TableHead className="w-[120px] min-w-[120px]">{t('cargoList.creation')}</TableHead>
-                <TableHead className="w-[120px] min-w-[120px]">{t('cargoList.finalization')}</TableHead>
-                <TableHead className="w-[110px] min-w-[110px]">{t('cargoList.shipping')}</TableHead>
-                <TableHead className="w-[80px] min-w-[80px] sticky right-0 bg-white border-l-2 border-gray-200 z-10">{t('common.actions')}</TableHead>
+                <TableHead className="w-[80px] min-w-[80px] px-2">{t('common.type')}</TableHead>
+                <TableHead className="w-[120px] min-w-[120px] px-2">ID</TableHead>
+                <TableHead className="w-[180px] min-w-[180px] px-2">{t('cargoList.origin')}</TableHead>
+                <TableHead className="w-[10px] min-w-[10px] px-2"></TableHead>
+                <TableHead className="w-[180px] min-w-[180px] px-2">{t('cargoList.destination')}</TableHead>
+                { filterType !== 'withoutOffers' && (
+                  <TableHead className="w-[180px] min-w-[110px] px-2">{t('cargoList.lowestPrice')}</TableHead>
+                )}
+                {filterType === 'withoutOffers' && (
+                  <TableHead className="w-[120px] min-w-[120px] px-2">{t('cargoList.creation')}</TableHead>
+                )}
+                <TableHead className="w-[120px] min-w-[120px] px-2">{t('cargoList.finalization')}</TableHead>
+                <TableHead className="w-[110px] min-w-[110px] px-2">{t('cargoList.shipping')}</TableHead>
+                <TableHead className="w-[40px] min-w-[20px] sticky right-0 bg-white border-l-2 border-gray-200 z-10">{t('common.actions')}</TableHead>
               </TableRow>
             </TableHeader>
           <TableBody>
@@ -260,29 +265,29 @@ export function ShipmentTable({
                 onClick={() => onGoDetails?.(shipment.uuid)}
               >
                 {/* Tipo de Transporte */}
-                <TableCell>
-                  <div className="flex items-center space-x-2">
+                <TableCell className="px-2">
+                  <div className="flex items-center">
                     {getTransportIcon(shipment.shipping_type || '1')}
                     <span className="font-medium text-sm">{shipment.transportation}</span>
                   </div>
                 </TableCell>
 
                 {/* ID y Ofertas */}
-                <TableCell>
+                <TableCell className="px-2">
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground font-mono">{shipment.uuid?.substring(0, 12)}...</p>
                     {filterType !== 'withoutOffers' && (shipment.offers_count || 0) > 0 && (
                       <div className="flex items-center space-x-1">
                         <span className="text-blue-600 text-xs">👥</span>
-                        <span className="text-blue-600 font-medium text-xs">{shipment.offers_count} {t('cargoList.offers')}</span>
+                        <span className="text-blue-600 font-medium text-xs">{shipment.offers_count} {t('common.offers')}</span>
                       </div>
                     )}
                   </div>
                 </TableCell>
 
                 {/* Origen */}
-                <TableCell>
-                  <div className="flex items-center space-x-2">
+                <TableCell className="px-2">
+                  <div className="flex items-center space-x-1">
                     <span className="text-lg">{shipment.origin_flag || '🏳️'}</span>
                     <div>
                       <p className="font-medium text-sm">{shipment.origin}</p>
@@ -291,13 +296,13 @@ export function ShipmentTable({
                 </TableCell>
 
                 {/* Flecha */}
-                <TableCell className="text-center">
+                <TableCell className="text-center px-2">
                   <ArrowRight className="h-4 w-4 text-muted-foreground" />
                 </TableCell>
 
                 {/* Destino */}
-                <TableCell>
-                  <div className="flex items-center space-x-2">
+                <TableCell className="px-2">
+                  <div className="flex items-center space-x-1">
                     <span className="text-lg">{shipment.destination_flag || '🏳️'}</span>
                     <div>
                       <p className="font-medium text-sm">{shipment.destination}</p>
@@ -305,26 +310,37 @@ export function ShipmentTable({
                   </div>
                 </TableCell>
 
+                {/* Precio más bajo */}
+                {
+                  filterType !== 'withoutOffers' && (
+                  <TableCell className="px-2">
+                    <p className="text-sm font-mono space-x-1">{formatPrice(shipment.min_offer_price, shipment.currency)}</p>
+                  </TableCell>
+                )}
+
                 {/* Fecha de Inicio */}
-                <TableCell>
-                  <p className="text-sm font-mono">{convertToColombiaTime(shipment.inserted_at)}</p>
-                </TableCell>
+                {
+                  filterType === 'withoutOffers' && (
+                  <TableCell className="px-2">
+                    <p className="text-sm font-mono space-x-1">{convertToColombiaTime(shipment.inserted_at)}</p>
+                  </TableCell>
+                )}
 
                 {/* Cierre de Subasta */}
-                <TableCell>
-                  <p className="text-sm font-mono">{formatDateUTCAsLocal(shipment.expiration_date)}</p>
+                <TableCell className="px-2">
+                  <p className="text-sm font-mono space-x-1">{formatDateUTCAsLocal(shipment.expiration_date)}</p>
                 </TableCell>
 
                 {/* Fecha de Embarque */}
-                <TableCell>
-                  <p className="text-sm font-mono">
+                <TableCell className="px-2">
+                  <p className="text-sm font-mono space-x-1">
                     {shipment.shipping_date ? formatShippingDate(shipment.shipping_date) : 'N/A'}
                   </p>
                 </TableCell>
 
-                <TableCell className="sticky right-0 bg-white border-l-2 border-gray-200 z-10">
+                <TableCell className="sticky right-0 bg-white border-l-2 border-gray-200 z-10 px-2">
                   {!isStatusClosed(shipment.status) ? (
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-1">
                       {/* Si el usuario es agente y el shipment está activo, mostrar solo botón Cotizar */}
                       {user?.profile?.role === 'agent' && shipment.status === 'Active' ? (
                         <Button 

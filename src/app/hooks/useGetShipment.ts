@@ -21,7 +21,7 @@ export const useGetShipment = ({ shipment_id }: Args) => {
         console.error('❌ Error en función get_shipment_detailed:', error)
         throw error
       }
-
+      console.log('data', data)
       return data
     },
     enabled: !!shipment_id,

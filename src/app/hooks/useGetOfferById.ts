@@ -41,11 +41,11 @@ export const useGetOfferById = ({ offer_id }: Args) => {
 
       // Consultar información del shipment si existe
       let shipmentData = null
-      if (offerData.shipment_id) {
+      if (offerData.shipment_uuid) {
         const { data: shipment, error: shipmentError } = await supabase
           .from('shipments')
           .select('id, uuid, origin_country, origin_name, destination_country, destination_name, transportation, shipping_type')
-          .eq('id', offerData.shipment_id)
+          .eq('uuid', offerData.shipment_uuid)
           .single()
         
         if (!shipmentError && shipment) {
@@ -84,8 +84,8 @@ export const useGetOfferById = ({ offer_id }: Args) => {
         originBid: null, // No se incluye información del shipment
         finishBid: null,
         codeBid: null,
-        bidId: offerData.shipment_id || null,
-        bid_id: offerData.shipment_id || null,
+        bidId: offerData.shipment_uuid || null,
+        bid_id: offerData.shipment_uuid || null,
       }
 
       return transformedData

@@ -18,7 +18,7 @@ import { convertToColombiaTime, formatPrice } from "@/src/lib/utils"
 import { modalService } from "@/src/service/modalService"
 import useAuthStore from "@/src/store/authStore"
 import { getTransportTypeName } from "@/src/utils/translateTypeName"
-import { ArrowLeft, CheckCircle, DollarSign, Loader2, Package, Ruler, Search, User } from "lucide-react"
+import { ArrowLeft, CheckCircle, Clock, DollarSign, Loader2, Package, Ruler, Search, User, XCircle } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react"
 import Pagination from "../../common/components/pagination/Pagination"
@@ -109,11 +109,6 @@ const OffersPageContent = () => {
   });
 
 
-  // Manejar cambios en los filtros
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters((prev: any) => ({ ...prev, [key]: value }))
-  }
-
   // Funciones para manejar OfferFilters
   const handleOfferFilterChange = (key: string, value: string) => {
     setPendingFilters(prev => ({ ...prev, [key]: value }))
@@ -149,6 +144,7 @@ const OffersPageContent = () => {
 
   // Manejar la creación de ofertas
   const handleCreateOffer = (value: any) => {
+    console.log('value', value)
     sendOffer(value)
   }
 
@@ -326,39 +322,6 @@ const OffersPageContent = () => {
     router.push(`/detalle/offer/${offer.uuid}`)
   }
 
-  // Función para ordenar ofertas
-  const sortOffers = useCallback((offers: any[]) => {
-    if (!offers || !Array.isArray(offers)) return [];
-    
-    return [...offers].sort((a, b) => {
-      let aValue = sort.key.includes('.')
-        ? getNestedValue(a, sort.key)
-        : a[sort.key];
-      
-      let bValue = sort.key.includes('.')
-        ? getNestedValue(b, sort.key)
-        : b[sort.key];
-      
-      if (aValue == null) aValue = '';
-      if (bValue == null) bValue = '';
-      
-      if (typeof aValue === "string" && typeof bValue === "string") {
-        return sort.order === "asc" ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
-      }
-      
-      aValue = isNaN(Number(aValue)) ? 0 : Number(aValue);
-      bValue = isNaN(Number(bValue)) ? 0 : Number(bValue);
-      
-      return sort.order === "asc" ? aValue - bValue : bValue - aValue;
-    });
-  }, [sort]);
-
-  // Con el nuevo RPC, las ofertas ya vienen paginadas del servidor
-  // Solo aplicamos filtros y ordenamiento locales si es necesario
-  const filteredOffers = filterOffers(offersData)
-
-
-
   return (
     <>
       <button
@@ -368,11 +331,63 @@ const OffersPageContent = () => {
         <ArrowLeft className="w-4 h-4 mr-2" />
         {t('common.back')}
       </button>
-      <Card className="w-full">
-        <CardHeader>
-          <div className="flex items-center justify-between flex-wrap gap-4">
+       
+        {
+          bidDataForAgentWithShipmentPrice.shipment_accepted  && bidDataForAgentWithShipmentPrice.status === 'Closed' &&
+          // mostrar un mensaje de que el shipment fue aceptado por el importador
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
+                <CheckCircle className="h-6 w-6 text-green-500" />
+              </div>
+              <div>
+                {t('agentOffers.offerAccepted')}
+              </div>
+            </div>
           </div>
-          
+        }
+
+      {/* Banner de advertencia para shipments cerrados o expirados */}
+      {bidDataForAgentWithShipmentPrice && (
+        <>
+          {((bidDataForAgentWithShipmentPrice.status === 'Closed' || bidDataForAgentWithShipmentPrice.status === 'Cancelled')
+            && !bidDataForAgentWithShipmentPrice.shipment_accepted) && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="h-8 w-8 bg-red-100 rounded-full flex items-center justify-center">
+                    <XCircle className="h-6 w-6 text-red-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-red-800">
+                      {t('agentOffers.shipmentClosed')}
+                    </h3>
+                    <p className="text-sm text-red-600 mt-1">
+                      {t('agentOffers.shipmentClosedMessage')}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          {bidDataForAgentWithShipmentPrice.status === 'Expired' && (
+            <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 bg-orange-100 rounded-full flex items-center justify-center">
+                  <Clock className="h-6 w-6 text-orange-500" />
+                </div>
+                <div>
+                  <h3 className="font-medium text-orange-800">
+                    {t('agentOffers.shipmentExpired')}
+                  </h3>
+                  <p className="text-sm text-orange-600 mt-1">
+                    {t('agentOffers.shipmentExpiredMessage')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
           <div className="grid gap-2 pb-6 mt-4">
             {bidDataForAgentWithShipmentPrice && (
               <BidInfo 
@@ -383,49 +398,8 @@ const OffersPageContent = () => {
             )}
           </div>
 
-          {/* Banner de advertencia para shipments cerrados o expirados */}
-          {bidDataForAgentWithShipmentPrice && (
-            <>
-              {(bidDataForAgentWithShipmentPrice.status === 'Closed' || bidDataForAgentWithShipmentPrice.status === 'Cancelled') && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 bg-red-100 rounded-full flex items-center justify-center">
-                      <span className="text-red-600 text-sm">⚠️</span>
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-red-800">
-                        {t('agentOffers.shipmentClosed')}
-                      </h3>
-                      <p className="text-sm text-red-600 mt-1">
-                        {t('agentOffers.shipmentClosedMessage')}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
 
-              {bidDataForAgentWithShipmentPrice.status === 'Expired' && (
-                <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 bg-orange-100 rounded-full flex items-center justify-center">
-                      <span className="text-orange-600 text-sm">⏰</span>
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-orange-800">
-                        {t('agentOffers.shipmentExpired')}
-                      </h3>
-                      <p className="text-sm text-orange-600 mt-1">
-                        {t('agentOffers.shipmentExpiredMessage')}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
 
-        </CardHeader>
-        <CardContent>
           {/* Botón para mostrar filtros */}
           <div className="mb-4 flex justify-between items-center">
           <CardTitle className="text-black-500 font-bold text-xl">{t('common.offers')}</CardTitle>
@@ -491,7 +465,7 @@ const OffersPageContent = () => {
                     {/* Precio */}
                     <TableCell>
                       <div className="flex items-center space-x-1">
-                        <span className="font-bold font-mono">{formatPrice(offer.price, offer.details.currency)}</span>
+                        <span className="font-bold font-mono">{ formatPrice(offer.price, offer.details.currency || 'USD')}</span>
                       </div>
                     </TableCell>
 
@@ -557,8 +531,6 @@ const OffersPageContent = () => {
               </Suspense>
             </div>
           )}
-        </CardContent>
-      </Card>
     </>
   )
 }

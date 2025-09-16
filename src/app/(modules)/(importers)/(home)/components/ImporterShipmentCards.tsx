@@ -18,8 +18,8 @@ import Pagination from '../../../common/components/pagination/Pagination'
 import CancelShipmentModal from './CancelShipmentModal'
 import CreateShipment from './CreateShipment/CreateShipment'
 import { ExtendShipmentDeadline } from './ExtendShipmentDeadline'
-import { ShipmentFilters } from './ShipmentFilters'
 import { ShipmentTable } from './ShipmentTable'
+import { useRealtimeShipments } from '@/src/hooks/useRealtimeShipments'
 
 interface ImporterShipmentCardsProps {
   filterType: 'withoutOffers' | 'withOffers' | 'closed'
@@ -63,6 +63,9 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
     profile?.all_markets?.[0]?.id?.toString() ??
     null
 
+
+  const { isConnected } = useRealtimeShipments(marketId)
+
   const shippingType = searchParams.get('shipping_type') || '1'
   const searchTerm = searchParams.get('search') || ''
   
@@ -72,6 +75,17 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
 
   // Filtros realmente aplicados para el filtrado (movido aquí para evitar error de referencia)
   const [appliedFilters, setAppliedFilters] = useState({
+    uuid: '',
+    origin: '',
+    destination: '',
+    inserted_at: '',
+    expiration_date: '',
+    value: '',
+    offers_count: '',
+  })
+
+  // Filtros que el usuario está configurando (no aplicados aún)
+  const [pendingFilters, setPendingFilters] = useState({
     uuid: '',
     origin: '',
     destination: '',
@@ -126,20 +140,25 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
   const [hasOffersForCancel, setHasOffersForCancel] = useState<boolean>(false)
   const [checkingCancelId, setCheckingCancelId] = useState<string | null>(null)
 
-  // Filtros que el usuario está configurando (no aplicados aún)
-  const [pendingFilters, setPendingFilters] = useState({
-    uuid: '',
-    origin: '',
-    destination: '',
-    inserted_at: '',
-    expiration_date: '',
-    value: '',
-    offers_count: '',
-  })
+  // useEffect para resetear filtros cuando cambie el filterType (cambio de tab)
+  useEffect(() => {
+    const emptyFilters = {
+      uuid: '',
+      origin: '',
+      destination: '',
+      inserted_at: '',
+      expiration_date: '',
+      value: '',
+      offers_count: '',
+    }
+    setAppliedFilters(emptyFilters)
+    setPendingFilters(emptyFilters)
+    console.log('🔄 Filtros reseteados por cambio de tab:', filterType)
+  }, [filterType]) // Se ejecuta cuando cambia el filterType
 
 
   const handleFilterChange = (key: string, value: string) => {
-    setPendingFilters((prev) => ({ ...prev, [key]: value }))
+    setPendingFilters((prev: any) => ({ ...prev, [key]: value }))
   }
 
   const handleApplyFilters = () => {
@@ -287,8 +306,6 @@ export function ImporterShipmentCards({ filterType }: ImporterShipmentCardsProps
 
   return (
     <div>
-      
-
       <ShipmentTable
         title={t(`transport.${normalizeShippingType(shippingType)}`)}
         subtitle={getSubtitle()}

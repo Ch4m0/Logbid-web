@@ -90,7 +90,7 @@ export function NotificationPanel({ onClose }: NotificationPanelProps) {
           router.push(`/offers?shipment_id=${shipmentData.shipment_uuid}&market=${market_id}&shipping_type=${shipping_type}`)
         } else {
           // Fallback por defecto
-          router.push(`/detalle?bidId=${shipmentData.shipment_uuid}&market=${shipmentData.market_id}`)
+          router.push(`/detalle?shipment_id=${shipmentData.shipment_uuid}&market=${shipmentData.market_id}`)
         }
       }
     }

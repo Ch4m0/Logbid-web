@@ -85,7 +85,7 @@ export function ShipmentInfo({ shipmentId }: ShipmentInfoProps) {
   }
 
   return (
-    <Card className="mb-6 border-0 shadow-sm bg-gray-50">
+    <Card className="mb-6 border-0 shadow-sm">
       <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                   {getTransportIcon()}

@@ -66,7 +66,7 @@ export async function createNewOfferNotification(
   return createNotification({
     user_id: importerUserId.toString(), // Asegurar que sea string
     type: 'new_offer',
-    title: '🎉 ¡Nueva oferta recibida!',
+    title: '💰 ¡Nueva oferta recibida!',
     message: `Recibiste una nueva oferta de $${offerData.price} ${offerData.currency} para tu envío ${shipmentData.origin} → ${shipmentData.destination}`,
     data: {
       shipment_uuid: shipmentData.uuid,

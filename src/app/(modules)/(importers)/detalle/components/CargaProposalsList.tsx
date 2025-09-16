@@ -219,7 +219,7 @@ export function CargaProposalsList() {
         <div className="w-full">
           {/* Tabla de ofertas usando AgentTable */}
           <AgentTable
-            title={t('cargoList.offers')}
+            title={t('common.offers')}
             subtitle=""
             data={paginatedList}
             columns={columns}

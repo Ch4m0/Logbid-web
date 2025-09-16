@@ -8,10 +8,10 @@ interface CloseBidArgs {
 }
 
 const closeBidWithSupabase = async ({ bid_id, offer_id }: CloseBidArgs) => {
-  // Primero obtener la información de la oferta aceptada para extraer el agent_code y shipment_id
+  // Primero obtener la información de la oferta aceptada para extraer el agent_code y shipment_uuid
   const { data: acceptedOffer, error: fetchError } = await supabase
     .from('offers')
-    .select('agent_code, shipment_id, id')
+    .select('agent_code, shipment_uuid, id')
     .eq('uuid', offer_id)
     .single()
 
@@ -57,7 +57,7 @@ const closeBidWithSupabase = async ({ bid_id, offer_id }: CloseBidArgs) => {
   const { error: rejectError } = await supabase
     .from('offers')
     .update({ status: 'rejected' })
-    .eq('shipment_id', acceptedOffer.shipment_id)
+    .eq('shipment_uuid', acceptedOffer.shipment_uuid)
     .neq('uuid', offer_id)
 
   if (rejectError) {

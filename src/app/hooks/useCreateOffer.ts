@@ -22,10 +22,11 @@ export const useCreateOffer = () => {
   
   return useMutation({
     mutationFn: async (data: CreateOfferData) => {
+      console.log('data', data)
       // Verificar el estado del shipment antes de crear la oferta
       const { data: shipmentData, error: shipmentError } = await supabase
         .from('shipments')
-        .select('status, expiration_date, market_id')
+        .select('status, expiration_date, market_id, uuid')
         .eq('id', data.bid_id)
         .single()
 
@@ -69,25 +70,17 @@ export const useCreateOffer = () => {
       }
       
       // Extraer las propiedades principales y el resto va a details
-      const { bid_id, agent_id, price, shipping_type, agent_code: ac, details, ...formDetails } = data
+      const { bid_id, agent_id, price, shipping_type, agent_code: ac, ...formDetails } = data
       
-      // Construir el objeto details con todos los detalles del formulario
-      const detailsObject = {
-        ...(details || {}), // Si ya hay details, los mantenemos
-        ...formDetails      // Agregamos todos los datos del formulario
-      }
-
       // 🚀 Crear oferta y notificar al customer usando la función de base de datos
       const offerData = {
-        shipment_id: bid_id,
+        shipment_uuid: shipmentData.uuid,
         agent_id: agent_id,
         price: parseFloat(price.toString()),
         currency: 'USD', // Por ahora hardcodeado a USD
         shipping_type: shipping_type,
         agent_code: agentCode,
-        additional_info: JSON.stringify({
-          details: detailsObject
-        }),
+        details: JSON.stringify(formDetails),
         market_id: shipmentData.market_id
       }
 

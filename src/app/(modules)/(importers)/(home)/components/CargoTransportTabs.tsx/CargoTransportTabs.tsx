@@ -72,7 +72,7 @@ export default function CargoTransportTabs({
             {t('cargoList.withoutOffers')}
           </TabsTrigger>
           <TabsTrigger value="con-propuestas">
-            {t('cargoList.withOffers')}
+            {t('common.offers')}
           </TabsTrigger>
           <TabsTrigger value="historico">
             {t('cargoList.history')}

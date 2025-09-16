@@ -19,24 +19,44 @@ export const useRealtimeShipments = (marketId: string | null) => {
 
     
     const channel = supabase
-      .channel('shipments-simple')
+      .channel('shipments-and-offers')
       .on('postgres_changes', 
         { event: 'INSERT', schema: 'public', table: 'shipments' },
-        () => {
+        (payload: any) => {
           invalidateShipments()
         }
       )
       .on('postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'shipments' },
-        () => {
+        (payload: any) => {
           invalidateShipments()
         }
       )
-      .subscribe((status) => {
+      .on('postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'offers' },
+        (payload: any) => {
+          invalidateShipments()
+        }
+      )
+      .on('postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'offers' },
+        (payload: any) => {
+          invalidateShipments()
+        }
+      )
+      .on('postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'offers' },
+        (payload: any) => {
+          invalidateShipments()
+        }
+      )
+      .subscribe((status: any) => {
         setIsConnected(status === 'SUBSCRIBED')
         
         if (status !== 'SUBSCRIBED') {
-          console.error('❌ Error canal shipments:', status)
+          console.error('❌ Error canal shipments-and-offers:', status)
+        } else {
+          console.log('✅ Canal realtime conectado: shipments-and-offers')
         }
       })
 

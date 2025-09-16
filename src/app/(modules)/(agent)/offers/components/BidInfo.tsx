@@ -66,13 +66,18 @@ const BidInfo = ({ bidDataForAgent, onCreateOffer, shippingType }: BidInfoProps)
                 {t('common.shipment')}: {displayValue(bidDataForAgent.uuid)}
               </CardTitle>
             </div>
-            <Button 
-              className="bg-primary hover:bg-primary/90"
-              onClick={handleCreateQuote}
-            >
-              <span className="mr-2">+</span>
-              {t('bidInfo.createQuote')}
-            </Button>
+            {
+              bidDataForAgent.status === 'Active' && (
+                <Button 
+                  className="bg-primary hover:bg-primary/90"
+                  onClick={handleCreateQuote}
+                >
+                  <span className="mr-2">+</span>
+                  {t('bidInfo.createQuote')}
+                </Button>
+              )
+            }
+            
           </div>
         </CardHeader>
         <CardContent>
