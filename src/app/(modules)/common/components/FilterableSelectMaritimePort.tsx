@@ -85,7 +85,7 @@ export default function FilterableSelectMaritimePort({
 
   return (
     <div className="grid gap-2">
-      <label htmlFor="tipo-envio" className="text-sm font-medium">
+      <label htmlFor="tipo-envio" className="text-sm font-medium text-muted-foreground">
         {label}
       </label>
 

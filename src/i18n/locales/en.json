@@ -620,7 +620,7 @@
     "offer": "Offer"
   },
   "createCargo": {
-    "title": "Create Cargo Transport",
+    "title": "Create Shipment",
     "transportType": "Transport Type",
     "origin": "Origin",
     "destination": "Destination",

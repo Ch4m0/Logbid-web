@@ -13,11 +13,11 @@ const LoadingFallback = () => (
   </div>
 )
 
-const Page = () => {
+const DetalleContent = () => {
   const router = useRouter()
   const { t } = useTranslation()
   const searchParams = useSearchParams()
-  
+
   // Obtener shipment_id de la URL
   const shipmentId = searchParams.get('shipment_id')
 
@@ -30,19 +30,27 @@ const Page = () => {
         <ArrowLeft className="w-4 h-4 mr-2" />
         {t('common.back')}
       </button>
-      
+
       {/* Información del Shipment */}
       {shipmentId && (
         <Suspense fallback={<LoadingFallback />}>
           <ShipmentInfo shipmentId={shipmentId} />
         </Suspense>
       )}
-      
+
       {/* Lista de Ofertas */}
       <Suspense fallback={<LoadingFallback />}>
         <CargaProposalsList />
       </Suspense>
     </div>
+  )
+}
+
+const Page = () => {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <DetalleContent />
+    </Suspense>
   )
 }
 
