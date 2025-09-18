@@ -1,29 +1,26 @@
 'use client'
-import React from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/card'
+import { ResponseTimeFilters, useGetResponseTimeMetrics } from '@/src/app/hooks/useGetResponseTimeMetrics'
 import { Badge } from '@/src/components/ui/badge'
-import { useGetResponseTimeMetrics, ResponseTimeFilters } from '@/src/app/hooks/useGetResponseTimeMetrics'
-import { 
-  Clock, 
-  TrendingUp,
-  AlertTriangle,
-  CheckCircle,
-  Activity,
-  Calendar
-} from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/card'
 import { useTranslation } from '@/src/hooks/useTranslation'
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  BarChart,
+  Activity,
+  AlertTriangle,
+  Calendar,
+  CheckCircle,
+  Clock,
+  TrendingUp
+} from 'lucide-react'
+import {
   Bar,
-  ComposedChart
+  CartesianGrid,
+  ComposedChart,
+  Legend,
+  Line,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis
 } from 'recharts'
 
 interface ResponseTimeMetricsProps {

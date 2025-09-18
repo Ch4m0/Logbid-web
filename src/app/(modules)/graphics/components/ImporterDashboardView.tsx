@@ -1,25 +1,24 @@
 'use client'
-import React, { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/card'
+import { CostFilters } from '@/src/app/hooks/useGetCostMetrics'
+import { ResponseTimeFilters } from '@/src/app/hooks/useGetResponseTimeMetrics'
+import { ShipmentStatusFilters } from '@/src/app/hooks/useGetShipmentStatusMetrics'
+import { SuccessRateFilters } from '@/src/app/hooks/useGetSuccessRateMetrics'
 import { Button } from '@/src/components/ui/button'
-import { 
+import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/card'
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '@/src/components/ui/select'
-import { CostMetricsCard } from './CostMetricsCard'
-import { ShipmentStatusMetrics } from './ShipmentStatusMetrics'
-import { ResponseTimeMetrics } from './ResponseTimeMetrics'
-import { TopRoutesMetrics } from './TopRoutesMetrics'
-import { SuccessRateMetrics } from './SuccessRateMetrics'
-import { CostFilters } from '@/src/app/hooks/useGetCostMetrics'
-import { ShipmentStatusFilters } from '@/src/app/hooks/useGetShipmentStatusMetrics'
-import { ResponseTimeFilters } from '@/src/app/hooks/useGetResponseTimeMetrics'
-import { SuccessRateFilters } from '@/src/app/hooks/useGetSuccessRateMetrics'
 import { useTranslation } from '@/src/hooks/useTranslation'
-import { Calendar, Filter, BarChart3, Package, TrendingUp } from 'lucide-react'
+import { BarChart3, Calendar, Filter, Package } from 'lucide-react'
+import { useState } from 'react'
+import { CostMetricsCard } from './CostMetricsCard'
+import { ResponseTimeMetrics } from './ResponseTimeMetrics'
+import { ShipmentStatusMetrics } from './ShipmentStatusMetrics'
+import { TopRoutesMetrics } from './TopRoutesMetrics'
 
 interface ImporterDashboardViewProps {
   profile: any
@@ -228,12 +227,6 @@ export function ImporterDashboardView({ profile }: ImporterDashboardViewProps) {
             limitRoutes: 5
           }}
         />
-      </div>
-
-      {/* Métricas de Tasa de Éxito y Actividad */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold">🎯 {t('dashboard.customer.successRate.title')}</h2>
-        <SuccessRateMetrics filters={successRateFilters} />
       </div>
 
       {/* Placeholder para futuras métricas */}
